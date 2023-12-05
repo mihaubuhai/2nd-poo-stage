@@ -1,4 +1,4 @@
-package player.commands;
+package player;
 
 import input.commands.CommandIn;
 import main.users.NormalUser;

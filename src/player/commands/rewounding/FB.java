@@ -1,4 +1,4 @@
-package player.commands;
+package player.commands.rewounding;
 
 import input.commands.CommandIn;
 

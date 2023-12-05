@@ -1,4 +1,4 @@
-package player.commands;
+package player;
 
 import fileio.input.SongInput;
 import main.users.NormalUser;

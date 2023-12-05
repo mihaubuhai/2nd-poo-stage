@@ -77,17 +77,15 @@ public final class Main {
 
         // TODO add your implementation
 
-        if (filePathInput.contains("test01")) { //                || filePathInput.contains("test02") || filePathInput.contains("test03") || filePathInput.contains("test04")) {
-            File filein = new File("input/" + filePathInput);
-            ArrayList<CommandIn> commands = objectMapper.readValue(filein, new TypeReference<>() {
-            });
+        File filein = new File("input/" + filePathInput);
+        ArrayList<CommandIn> commands = objectMapper.readValue(filein, new TypeReference<>() {
+        });
 
-            AnalyzeCommands analyzer = AnalyzeCommands.getInstance();
+        AnalyzeCommands analyzer = AnalyzeCommands.getInstance();
 
-            ArrayList<Output> result = analyzer.anaylzeFunc(library, commands);
+        ArrayList<Output> result = analyzer.anaylzeFunc(library, commands);
 
-            ObjectWriter objectWriter = objectMapper.writerWithDefaultPrettyPrinter();
-            objectWriter.writeValue(new File(filePathOutput), result);
-        }
+        ObjectWriter objectWriter = objectMapper.writerWithDefaultPrettyPrinter();
+        objectWriter.writeValue(new File(filePathOutput), result);
     }
 }

@@ -5,7 +5,7 @@ import fileio.input.PodcastInput;
 import fileio.input.SongInput;
 import fileio.input.UserInput;
 import input.commands.CommandIn;
-import player.commands.Player;
+import player.Player;
 import playlist.commands.collections.Playlist;
 import playlist.commands.collections.SongsCollection;
 import search.bar.Select;
@@ -27,31 +27,6 @@ public final class NormalUser extends UserInfo {
         playlists = new ArrayList<>();          /* Instantiem lista de playlist-uri */
         likedSongs = new ArrayList<>();
         fwdPlaylits = new ArrayList<>();
-    }
-
-    /** Setter */
-    public void setPlayer(final Player newPlayer) {
-        player = newPlayer;
-    }
-
-    /** Getter */
-    public Player getPlayer() {
-        return player;
-    }
-
-    /** Getter */
-    public ArrayList<Playlist> getPlaylists() {
-        return playlists;
-    }
-
-    /** Getter */
-    public ArrayList<String> getLikedSongs() {
-        return likedSongs;
-    }
-
-    /** Getter */
-    public ArrayList<String> getFwdPlaylits() {
-        return fwdPlaylits;
     }
 
     /** Metoda elimina player-ul pentru user-ul care a apelat-o */
@@ -414,6 +389,36 @@ public final class NormalUser extends UserInfo {
         player.getStats().setName(currentEpisode.getName());
 
         return 0;
+    }
+
+    /** Getter */
+    public SongsCollection getSongsCollection() {
+        return player.getLoadInfo().getSelectInfo().getSongsCollection();
+    }
+
+    /** Setter */
+    public void setPlayer(final Player newPlayer) {
+        player = newPlayer;
+    }
+
+    /** Getter */
+    public Player getPlayer() {
+        return player;
+    }
+
+    /** Getter */
+    public ArrayList<Playlist> getPlaylists() {
+        return playlists;
+    }
+
+    /** Getter */
+    public ArrayList<String> getLikedSongs() {
+        return likedSongs;
+    }
+
+    /** Getter */
+    public ArrayList<String> getFwdPlaylits() {
+        return fwdPlaylits;
     }
 
 }

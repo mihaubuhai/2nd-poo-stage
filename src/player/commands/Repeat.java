@@ -3,6 +3,8 @@ package player.commands;
 import input.commands.CommandIn;
 import main.users.NormalUser;
 import output.result.ResultOut;
+import player.Player;
+import player.Stats;
 
 /**
  *      Metoda de mai jos are singurul scop de a executa comanda "repeat"
@@ -51,6 +53,7 @@ public class Repeat {
             Player currentPlayer = user.getPlayer();
             int currentRunner = currentPlayer.getLoadInfo().getSelectInfo().getResultType();
             /*    ^^------ Tine cont de ce se ruleaza in player la un moment dat */
+
             Stats currentPlayerStats = currentPlayer.getStats();
             String repeatMode;
             if (currentRunner == playlistId) {

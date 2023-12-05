@@ -1,10 +1,10 @@
-package player.commands;
+package player.commands.rewounding;
 
 import fileio.input.LibraryInput;
 import fileio.input.SongInput;
 import input.commands.CommandIn;
 import main.users.NormalUser;
-import playlist.commands.collections.Playlist;
+import playlist.commands.collections.SongsCollection;
 
 import java.util.ArrayList;
 
@@ -20,8 +20,8 @@ public class NP extends FBNP {
         currentUser = user;
     }
     /** Getter */
-    public Playlist getPlaylist() {
-        return currentPlayer.getLoadInfo().getSelectInfo().getPlaylist();
+    public SongsCollection getSongsCollection() {
+        return currentUser.getSongsCollection();
     }
 
     /** Metoda verifica daca se pot executa comenzile "Next" sau "Repeat" */
@@ -49,9 +49,8 @@ public class NP extends FBNP {
     /**
      *      Metoda care returneaza indicele melodiei din player care ruleaza
      * */
-    public int findInPlaylist() {
-        Playlist playlist = getPlaylist();
-        ArrayList<SongInput> songs = playlist.getSongs();
+    public int findInPlaylistOrAlbum() {
+        ArrayList<SongInput> songs = currentUser.getSongsCollection().getSongs();
         String currSong = currentPlayer.getStats().getName();
 
         for (int idx = 0; idx < songs.size(); idx++) {
@@ -60,5 +59,14 @@ public class NP extends FBNP {
             }
         }
         return -1;
+    }
+
+    /** Metoda folosita pentru "next" si "prev" finalizate cu succes */
+    protected void executeSucces(final String audioFileName, final CommandIn command,
+                                     final String succes, final int duration) {
+        setResult(command, succes + audioFileName + ".");
+        currentPlayer.getStats().setPaused(false);
+        currentPlayer.getStats().setName(audioFileName);
+        currentPlayer.getStats().setRemainedTime(duration);
     }
 }

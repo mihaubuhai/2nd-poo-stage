@@ -3,6 +3,7 @@ package player.commands;
 import input.commands.CommandIn;
 import main.users.NormalUser;
 import output.result.ResultOut;
+import player.Player;
 
 /**
  *      Aceasta clasa singletton are singurul rol de a "implementa" comanda "playPause"

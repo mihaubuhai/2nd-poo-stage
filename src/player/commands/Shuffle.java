@@ -3,7 +3,8 @@ package player.commands;
 import input.commands.CommandIn;
 import main.users.NormalUser;
 import output.result.ResultOut;
-import playlist.commands.collections.Playlist;
+import player.Player;
+import playlist.commands.collections.SongsCollection;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -55,8 +56,8 @@ public final class Shuffle {
             /* Se verifica daca player ruleaza altceva decat un playlist */
             result.setMessage("The loaded source is not a playlist.");
         } else {
-            /* Player-ul ruleaza un playlist; verificam daca exista shuffle activ */
-            Playlist playlist = currentPlayer.getLoadInfo().getSelectInfo().getPlaylist();
+            /* Player-ul ruleaza un playlist / album; verificam daca exista shuffle activ */
+            SongsCollection songCollection = currentPlayer.getLoadInfo().getSelectInfo().getSongsCollection();
 
             if (currentPlayer.getStats().getShuffle()) {
                 /* Se dezactiveaza shuffle */
@@ -66,12 +67,12 @@ public final class Shuffle {
                     return result;
                 }
                 currentPlayer.getStats().setShuffle(false);
-                playlist.setShuffledIndices(null);
+                songCollection.setShuffledIndices(null);
                 result.setMessage("Shuffle function deactivated successfully.");
             } else {
                 /* Se activeaza functia "shuffle" si cream vectorul de indici amestecati */
-                int playlistSize = playlist.getSongs().size();
-                playlist.setShuffledIndices(createShuffleArray(playlistSize, command.getSeed()));
+                int playlistSize = songCollection.getSongs().size();
+                songCollection.setShuffledIndices(createShuffleArray(playlistSize, command.getSeed()));
                 currentPlayer.getStats().setShuffle(true);
                 result.setMessage("Shuffle function activated successfully.");
             }

@@ -1,4 +1,4 @@
-package player.commands;
+package player.commands.rewounding;
 
 import fileio.input.EpisodeInput;
 import fileio.input.LibraryInput;
@@ -6,7 +6,7 @@ import fileio.input.SongInput;
 import input.commands.CommandIn;
 import main.users.NormalUser;
 import output.result.ResultOut;
-import playlist.commands.collections.Playlist;
+import playlist.commands.collections.SongsCollection;
 
 /**
  *      Clasa de mai jos implementeaza comanda "next"
@@ -21,13 +21,14 @@ public class Next extends NP {
     public ResultOut nextFunc(final CommandIn command, final LibraryInput library) {
         /* Verifica daca se poate executa comanda "next" */
         final String fail = "Please load a source before skipping to the next track.";
+        final String success = "Skipped to next track successfully. The current track is ";
+
         if (!checkValidity(command)) {
             setResult(command, fail);
         } else {
             /* Se afla ce se ruleaza in player */
             String repeatMode = currentPlayer.getStats().getRepeat().toLowerCase();
             int playerType = currentPlayer.getLoadInfo().getSelectInfo().getResultType();
-            final String success = "Skipped to next track successfully. The current track is ";
 
             if (playerType == 1) {
                 /* Se ruleaza o melodie din biblioteca */
@@ -41,9 +42,7 @@ public class Next extends NP {
                         si repeat-ul schimbat aferent
                      */
                     SongInput currSong = findSong(library);
-                    currentPlayer.getStats().setPaused(false);
-                    currentPlayer.getStats().setRemainedTime(currSong.getDuration());
-                    setResult(command, success + currSong.getName() + ".");
+                    executeSucces(currSong.getName(), command, success, currSong.getDuration());
                     if (repeatMode.contains("once")) {
                         /* Se face doar o singura repetare, dar aceasta s-a efectuat deja*/
                         currentPlayer.getStats().setRepeat("No Repeat");
@@ -63,11 +62,7 @@ public class Next extends NP {
                     } else {
                         /* Nu este final de podcast, se incarca urmatorul episod */
                         EpisodeInput nextEpisode = getPodcast().getEpisodes().get(episodeIdx + 1);
-                        String nextEpisodeName = nextEpisode.getName();
-                        currentPlayer.getStats().setPaused(false);
-                        currentPlayer.getStats().setName(nextEpisodeName);
-                        currentPlayer.getStats().setRemainedTime(nextEpisode.getDuration());
-                        setResult(command, success + nextEpisodeName + ".");
+                        executeSucces(nextEpisode.getName(), command, success, nextEpisode.getDuration());
                     }
                 } else {
                     /* Episodul se repeta */
@@ -80,9 +75,10 @@ public class Next extends NP {
                     }
                 }
             } else {
-                /* Se ruleaza un playlist */
-                Playlist playlist = getPlaylist();
-                int nextIdx = playlist.findNextIdxSong(currentUser);
+                /* Se ruleaza un playlist / album */
+                SongsCollection currSongCollection = currentUser.getSongsCollection();
+                int nextIdx = currSongCollection.findNextIdxSong(currentUser);
+
                 if (repeatMode.contains("no")) {
                     /* Nu se face repeat; verificam daca s-a ajuns la final de playlist */
                     if (nextIdx < 0) {
@@ -91,19 +87,19 @@ public class Next extends NP {
                         setResult(command, fail);
                     } else {
                         /* Nu suntem la final de playlist, se trece la urmatoarea melodie */
-                        SongInput nextSong = getPlaylist().getSongs().get(nextIdx);
-                        executeNext(nextSong, command, success);
+                        SongInput nextSong =currSongCollection.getSongs().get(nextIdx);
+                        executeSucces(nextSong.getName(), command, success, nextSong.getDuration());
                     }
                 } else if (repeatMode.contains("all")) {
                     /* Se va trece la urmatorea melodie din playlist */
-                    SongInput nextSong = getPlaylist().getSongs().get(nextIdx);
-                    executeNext(nextSong, command, success);
+                    SongInput nextSong =currSongCollection.getSongs().get(nextIdx);
+                    executeSucces(nextSong.getName(), command, success, nextSong.getDuration());
                 } else {
                     /* Se da next la o melodie din playlist cu repeatMode: "repeat current song" */
-                    int idx = findInPlaylist();
-                    SongInput currSong = getPlaylist().getSongs().get(idx);
+                    int idx = findInPlaylistOrAlbum();
+                    SongInput currSong = currSongCollection.getSongs().get(idx);
                     //  Se va trece, --^ evident, la inceputul melodiei care ruleaza
-                    executeNext(currSong, command, success);
+                    executeSucces(currSong.getName(), command, success, currSong.getDuration());
                 }
             }
             // v-- Se schimba timpul ultimei comenzi!!!!
@@ -111,14 +107,5 @@ public class Next extends NP {
         }
 
         return  getResult();
-    }
-
-    private void executeNext(final SongInput song, final CommandIn command,
-                                               final String succes) {
-        String songName = song.getName();
-        setResult(command, succes + songName + ".");
-        currentPlayer.getStats().setPaused(false);
-        currentPlayer.getStats().setName(songName);
-        currentPlayer.getStats().setRemainedTime(song.getDuration());
     }
 }

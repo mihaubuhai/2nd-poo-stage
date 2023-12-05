@@ -1,7 +1,7 @@
 package output.result;
 
 import input.commands.CommandIn;
-import player.commands.Stats;
+import player.Stats;
 
 /**
  *      Clasa curenta este folosita pentru output-ul comenzii "status"

@@ -1,8 +1,9 @@
-package player.commands;
+package player.commands.rewounding;
 
 import fileio.input.EpisodeInput;
 import input.commands.CommandIn;
 import output.result.ResultOut;
+import player.Player;
 
 /**
  *      Aceasta clasa "implementeaza" comanda Forward

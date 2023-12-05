@@ -1,4 +1,4 @@
-package player.commands;
+package player.commands.rewounding;
 
 import fileio.input.EpisodeInput;
 import fileio.input.LibraryInput;
@@ -22,19 +22,18 @@ public class Prev extends NP {
     public ResultOut prevFunc(final CommandIn command, final LibraryInput library) {
         /* Se verifica daca se poate efectua comanda "prev" */
         final String fail = "Please load a source before returning to the previous track.";
+        final String succes = "Returned to previous track successfully. The current track is ";
+
         if (!checkValidity(command)) {
             setResult(command, fail);
         } else {
             /* Se poate efectua "prev" si intai se afla ce se ruleaza in player */
             int playerType = currentPlayer.getLoadInfo().getSelectInfo().getResultType();
-            final String succes = "Returned to previous track successfully. The current track is ";
 
             if (playerType == 1) {
                 /* Se ruleaza o melodie din biblioteca */
                 SongInput currSong = findSong(library);         // <-- Se cauta melodia
-                currentPlayer.getStats().setPaused(false);
-                currentPlayer.getStats().setRemainedTime(currSong.getDuration());
-                setResult(command, succes + currSong.getName() + ".");
+                executeSucces(currSong.getName(), command, succes, currSong.getDuration());
             } else if (playerType == 2) {
                 /* Se ruleaza un episod de podcast */
                 EpisodeInput currEpisode = findEpisode();       // <-- Se cauta episodul
@@ -55,9 +54,9 @@ public class Prev extends NP {
                     setResult(command, succes + prevEpisode.getName() + ".");
                 }
             } else {
-                /* Se ruleaza un playlist */
-                int currSongIdx = findInPlaylist();
-                SongInput currSong = getPlaylist().getSongs().get(currSongIdx);
+                /* Se ruleaza un playlist / album */
+                int currSongIdx = findInPlaylistOrAlbum();
+                SongInput currSong = getSongsCollection().getSongs().get(currSongIdx);
                 currentUser.updateRemainedTime(command);
 
                 /*
@@ -67,7 +66,7 @@ public class Prev extends NP {
                 if (!currentPlayer.getStats().getShuffle()) {
                     checkTime(currSong, currSongIdx, command, false, succes);
                 } else {
-                    int shuffleCurrIdx = getPlaylist().getShuffledIndices().indexOf(currSongIdx);
+                    int shuffleCurrIdx = getSongsCollection().getShuffledIndices().indexOf(currSongIdx);
                     checkTime(currSong, shuffleCurrIdx, command, true, succes);
                 }
             }
@@ -83,33 +82,30 @@ public class Prev extends NP {
         if (shuffle) {
             return findPrevIdxShuffle(idx);
         }
-        return currentUser.findPrevSong(idx, getPlaylist());
+        return currentUser.findPrevSong(idx, getSongsCollection());
     }
 
     /**
-     *          Metoda abordeaza problema alegerii melodiei din playlist antecedente celei ..
-     *      .. care ruleaza raportat la starea "shuffle"
+     *          Metoda abordeaza problema alegerii melodiei din playlist / album ..
+     *          antecedente celei care ruleaza raportat la starea "shuffle"
      */
     private void checkTime(final SongInput currSong, final int currIdx,
                                             final CommandIn command, final boolean shuffle,
                                             final String succes) {
         int remainedTime = currentPlayer.getStats().getRemainedTime();
         int initDuration = currSong.getDuration();
+        SongInput runnableSong;    // <-- Pentru a retine melodia ce trebuie incarcata in player
+
         if (initDuration - remainedTime >= 1 || currIdx == 0) {
             /* Se revine la melodia curenta (daca este prima, se ruleaza tot ea) */
-            currentPlayer.getStats().setPaused(false);
-            currentPlayer.getStats().setRemainedTime(initDuration);
-            setResult(command, succes + currSong.getName() + ".");
+            runnableSong = currSong;
         } else {
             /* Se ruleaza melodia precedenta */
             int prevIdx = getPrevidx(currIdx, shuffle);
-            SongInput prevSong = getPlaylist().getSongs().get(prevIdx);
-            initDuration = prevSong.getDuration();
-            currentPlayer.getStats().setPaused(false);
-            currentPlayer.getStats().setRemainedTime(initDuration);
-            currentPlayer.getStats().setName(prevSong.getName());
-            setResult(command, succes + prevSong.getName() + ".");
+            runnableSong = getSongsCollection().getSongs().get(prevIdx);
         }
+
+        executeSucces(runnableSong.getName(), command, succes, runnableSong.getDuration());
     }
 
     /**
@@ -117,7 +113,7 @@ public class Prev extends NP {
      * */
     private int findPrevIdxShuffle(final int idx) {
         /* idx - indice al lui "shuffle" */
-        ArrayList<Integer> shuffles = getPlaylist().getShuffledIndices();
+        ArrayList<Integer> shuffles = getSongsCollection().getShuffledIndices();
         String repeatMode = currentPlayer.getStats().getRepeat().toLowerCase();
 
         /* Verificam tipul de repeat al player-ului */

@@ -1,9 +1,10 @@
-package player.commands;
+package player.commands.rewounding;
 
 import fileio.input.EpisodeInput;
 import fileio.input.PodcastInput;
 import input.commands.CommandIn;
 import output.result.ResultOut;
+import player.Player;
 
 /**
  *      Clasa "ForwardBackwardNextPrev" este punctul comun al acestor comenzi
