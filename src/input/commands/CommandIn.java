@@ -13,6 +13,8 @@ public class CommandIn {
     private int seed;
     private int playlistId;
     private String playlistName;
+    private int age;
+    private String city;
 
     /** Setter  */
     public void setCommand(final String command) {
@@ -93,6 +95,24 @@ public class CommandIn {
     /** Getter */
     public String getPlaylistName() {
         return playlistName;
+    }
+
+    /** Setter */
+    public void setAge(final int age) {
+        this.age = age;
+    }
+    /** Getter */
+    public int getAge() {
+        return age;
+    }
+
+    /** Setter */
+    public void setCity(final String city) {
+        this.city = city;
+    }
+    /** Getter */
+    public String getCity() {
+        return city;
     }
 
 }

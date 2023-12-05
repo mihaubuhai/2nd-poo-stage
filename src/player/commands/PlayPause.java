@@ -25,13 +25,15 @@ public final class PlayPause {
     /** Metoda implementeaza comanda "playPause" */
     public ResultOut playPauseFunc(final Player player, final CommandIn command,
                                    final NormalUser currentUser) {
-
         ResultOut result = new ResultOut(command);
-        /*
-            In cazul in care se pune pe pauza player-ul, timpul s-a scurs
-            pana la comanda de pauza, deci trebuie modificat
-        */
-        currentUser.updateRemainedTime(command);
+
+        /* Se verifica aceasta comanda se invoca pentru player care nu ruleaza nimic */
+        if (player == null || player.getLoadInfo() == null) {
+            result.setMessage("Please load a source before attempting"
+                    + " to pause or resume playback.");
+            return result;
+        }
+
         player.getStats().setPaused(player.getStats().getPaused() ^ true);
 
         if (player.getStats().getPaused()) {

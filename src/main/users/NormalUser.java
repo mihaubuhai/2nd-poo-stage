@@ -5,6 +5,7 @@ import fileio.input.PodcastInput;
 import fileio.input.SongInput;
 import fileio.input.UserInput;
 import input.commands.CommandIn;
+import output.result.ResultOut;
 import player.Player;
 import playlist.commands.collections.Playlist;
 import playlist.commands.collections.SongsCollection;
@@ -21,12 +22,15 @@ public final class NormalUser extends UserInfo {
     private final ArrayList<Playlist> playlists;    /* Tine cont de playlist-urile user-ului */
     private final ArrayList<String> likedSongs;  /* Melodiile apreciate de user */
     private final ArrayList<String> fwdPlaylits; /* Playlist-urile urmarite de user */
+    private boolean state;        /* <-- Starea unui utilizator: Online (true), Offline (false) */
 
     public NormalUser(final UserInput userInfo) {
         setUserInfo(userInfo);
         playlists = new ArrayList<>();          /* Instantiem lista de playlist-uri */
         likedSongs = new ArrayList<>();
         fwdPlaylits = new ArrayList<>();
+        userType = UserType.NORMALUSER;     /* Retinem ca aceasta clasa reprezinta un user normal */
+        state = true;   /* <-- Utilizatorul este "Online" atunci cand este adaugat pe platforma */
     }
 
     /** Metoda elimina player-ul pentru user-ul care a apelat-o */
@@ -74,8 +78,8 @@ public final class NormalUser extends UserInfo {
                         }
                     }
                 } else {
-                    /* Se ruleaza un playlist */
-                    if (!repeatPlaylist()) {
+                    /* Se ruleaza un playlist / album */
+                    if (!repeatSongCollection()) {
                         SongsCollection currSongsColl = player.getLoadInfo().getSelectInfo().getSongsCollection();
                         /*
                          *   "idxSong" continea indicele urmatoarei melodii relativ la cea care ..
@@ -157,11 +161,11 @@ public final class NormalUser extends UserInfo {
     }
 
     /**
-     *      Metoda de mai jos implementeaza starea "repeat" pentru un playlist.
+     *      Metoda de mai jos implementeaza starea "repeat" pentru o colectie de melodii.
      *      Adica, in caz de repeat, aceasta verifica ce tip este si efectueaza aferent..
      *      .. operatiile.
      * */
-    public boolean repeatPlaylist() {
+    public boolean repeatSongCollection() {
         /* Metoda poate fi apelata de "playlist" care nu are vreun "repeat mode" */
         String repeatMode = player.getStats().getRepeat().toLowerCase();
         if (repeatMode.contains("no")) {
@@ -419,6 +423,16 @@ public final class NormalUser extends UserInfo {
     /** Getter */
     public ArrayList<String> getFwdPlaylits() {
         return fwdPlaylits;
+    }
+
+    /** Aceasta metoda va "flip-ui" starea utilizatorului  */
+    public void changeState() {
+        state ^= true;
+    }
+
+    /** Getter */
+    public boolean getState() {
+        return state;
     }
 
 }

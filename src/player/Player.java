@@ -58,20 +58,6 @@ public class Player {
         stats.setPaused(true);
     }
 
-    /** Metoda implementeaza comanda "status" */
-    public ResultStatus statusFunc(final CommandIn command, final NormalUser currentUser) {
-        ResultStatus output = new ResultStatus(command);
-
-        /* Pana la comanda de status, timpul s-a scurs, deci trebuie modificat */
-        currentUser.updateRemainedTime(command);
-
-        if (currentUser.getPlayer() == null) {
-            removeStats();
-        }
-        output.setStats(stats);
-        return output;
-    }
-
     /** Metoda doar actualizeaza timpul ramas al player-ului */
     public int findRemainedTime(final int currentTime) {
         return stats.getRemainedTime() - (currentTime - lastLoadTime);

@@ -4,6 +4,9 @@ import fileio.input.SongInput;
 import input.commands.CommandIn;
 import main.users.NormalUser;
 import output.result.ResultOut;
+import playlist.commands.FollowStats;
+
+import java.util.ArrayList;
 
 public class Playlist extends SongsCollection {
     private String userName;        // <-- numele utilizatorului care a creat acest playlist
@@ -73,6 +76,36 @@ public class Playlist extends SongsCollection {
         }
 
         return result;
+    }
+
+    /**
+     *      Metoda care creaza un playlist
+     *      Returneaza rezultatul comenzii
+     *      Playlist-ul este retinut in lista de playlist-uri ale user-ului
+     * */
+    public static ResultOut createPlaylist(final NormalUser currentUser, final CommandIn command,
+                                           final ArrayList<FollowStats> topFwdPlaylits) {
+        ResultOut out = new ResultOut(command);
+        boolean isCreated = false;
+        // ^-- Pentru verificare existenta a playlist-ului cu numele in command
+
+        /* Iteram prin lista de playlist-uri si verificam numele acestora in parte */
+        for (Playlist iter: currentUser.getPlaylists()) {
+            if (iter.getName().equals(command.getPlaylistName())) {
+                out.setMessage("A playlist with the same name already exists.");
+                isCreated = true;
+            }
+        }
+
+        if (!isCreated) {
+            // v-- Cream efectiv playlist-ul
+            Playlist newPlaylist = ((Playlist)SongsColFactory.getCollection(command));
+            currentUser.getPlaylists().add(newPlaylist);
+            topFwdPlaylits.add(new FollowStats(command.getPlaylistName()));
+            out.setMessage("Playlist created successfully.");
+        }
+
+        return out;
     }
 
 }

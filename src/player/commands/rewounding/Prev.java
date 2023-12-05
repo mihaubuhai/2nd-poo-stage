@@ -57,7 +57,6 @@ public class Prev extends NP {
                 /* Se ruleaza un playlist / album */
                 int currSongIdx = findInPlaylistOrAlbum();
                 SongInput currSong = getSongsCollection().getSongs().get(currSongIdx);
-                currentUser.updateRemainedTime(command);
 
                 /*
                     Pot exista probleme din cauza starii "shuffle";

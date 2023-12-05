@@ -3,6 +3,9 @@ package player;
 
 import fileio.input.EpisodeInput;
 import fileio.input.SongInput;
+import input.commands.CommandIn;
+import main.users.NormalUser;
+import output.result.ResultStatus;
 import playlist.commands.collections.Playlist;
 
 /**
@@ -101,6 +104,22 @@ public class Stats {
             setRemainedTime(songInfo.getDuration());
             setName(songInfo.getName());
         }
+    }
+
+    /** Metoda implementeaza comanda "status" */
+    public static ResultStatus statusFunc(final CommandIn command, final NormalUser currentUser) {
+        ResultStatus output = new ResultStatus(command);
+
+        Player player = currentUser.getPlayer();
+        /* Verificam daca s-a chemat comanda status pentru player care nu ruleaza */
+        if (player == null || player.getLoadInfo() == null) {
+            output.setStats(new Stats());
+            output.getStats().setPaused(true);
+            return output;
+        }
+
+        output.setStats(player.getStats());
+        return output;
     }
 
 }

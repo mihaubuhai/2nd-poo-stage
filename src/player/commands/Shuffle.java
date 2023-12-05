@@ -61,7 +61,6 @@ public final class Shuffle {
 
             if (currentPlayer.getStats().getShuffle()) {
                 /* Se dezactiveaza shuffle */
-                user.updateRemainedTime(command);
                 if (user.getPlayer().getLoadInfo() == null) {
                     result.setMessage("Please load a source before using the shuffle function.");
                     return result;

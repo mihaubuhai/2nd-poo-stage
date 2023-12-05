@@ -4,17 +4,12 @@ import fileio.input.UserInput;
 import main.users.NormalUser;
 import main.users.UserFactory;
 import main.users.UserInfo;
+import output.result.*;
 import playlist.commands.collections.SongsColFactory;
 import top5.top5Playlists;
 import top5.top5Songs;
 import fileio.input.LibraryInput;
 import input.commands.CommandIn;
-import output.result.ResultOut;
-import output.result.Output;
-import output.result.ResultShowPlaylists;
-import output.result.ResultPreferedSongs;
-import output.result.ResultOutSearch;
-import output.result.ResultStatus;
 import player.Player;
 import player.commands.rewounding.Prev;
 import player.commands.rewounding.Next;
@@ -31,6 +26,7 @@ import playlist.commands.FollowStats;
 import playlist.commands.collections.Playlist;
 import search.bar.Search;
 import search.bar.Select;
+import output.OutputClassFactory;
 
 import java.util.ArrayList;
 /**
@@ -85,19 +81,42 @@ public final class AnalyzeCommands {
                 top5Songs top = top5Songs.getInstance();
                 result.add(top.getTop5Songs(command, topLikedSongs, library));
                 continue;
+            } else if (command.getCommand().contains("getOnline")) {
+                ResultGetTop5 output = new ResultGetTop5(command);
+                /* Iteram prin lista "users" */
+                users.forEach(utilizator -> {
+                    /* Verificam daca sunt user-i normali, apoi daca sunt online */
+                    if (utilizator.isNormalUser()) {
+                        if (((NormalUser) utilizator).getState()) {
+                            output.getResult().add(utilizator.getUsername());
+                        }
+                    }
+                });
+                result.add(output);
+                continue;
             }
 
+            NormalUser currentUser;
+            //Artist
+            //Host
+
             /* Cautam in lista "users" user curent  */
-            NormalUser currentUser = null;
-            for (UserInfo iter: users) {
-                if (iter.getUsername().equals(command.getUsername())) {
-                    currentUser = (NormalUser)iter;
-                    break;
-                }
-            }
-            /* Se intampla ca user curent sa nu existe, deci trebuie adaugat in lista de users */
-            if (currentUser == null) {
+            UserInfo user = analyzeUser(users, command, result);
+            if (user == null) {
                 continue;
+            }
+            currentUser = (NormalUser) user;
+
+            /*
+                Actualizez pentru orice player (care ruleaza) timpul relativ la ..
+                .. penultima comanda data pentru calcularea remainTime al piesei incarcate
+            */
+            for (UserInfo updateTimer: users) {
+                if (updateTimer.isNormalUser()) {
+                    if (((NormalUser) updateTimer).getPlayer() != null) {
+                        ((NormalUser) updateTimer).updateRemainedTime(command);
+                    }
+                }
             }
 
             /* ------------------------------  Verificare comenzi ------------------------------ */
@@ -178,50 +197,13 @@ public final class AnalyzeCommands {
 
                 result.add(resultLoad);
             } else if (command.getCommand().contains("status")) {
-                /* Caz in care se apeleaza comanda pt player gol (utilizatorul nu ruleaza nimic) */
-                Player player = currentUser.getPlayer();
-                if (player == null || player.getLoadInfo() == null) {
-                    ResultStatus out = new ResultStatus(command);
-                    out.setStats(new Stats());
-                    out.getStats().setPaused(true);
-                    result.add(out);
-                } else {
-                    result.add(currentUser.getPlayer().statusFunc(command, currentUser));
-                }
+                result.add(Stats.statusFunc(command, currentUser));
             } else if (command.getCommand().contains("playPause")) {
-                /* Se verifica aceasta comanda se invoca pentru player care nu ruleaza nimic */
+                PlayPause func = PlayPause.getInstance();
                 Player player = currentUser.getPlayer();
-                if (player == null || player.getLoadInfo() == null) {
-                    ResultOut out = new ResultOut(command);
-                    out.setMessage("Please load a source before attempting"
-                            + " to pause or resume playback.");
-                    result.add(out);
-                } else {
-                    PlayPause func = PlayPause.getInstance();
-                    result.add((func.playPauseFunc(player, command, currentUser)));
-                }
+                result.add((func.playPauseFunc(player, command, currentUser)));
             } else if (command.getCommand().contains("createPlaylist")) {
-                ResultOut out = new ResultOut(command);
-                boolean isCreated = false;
-                // ^-- Pentru verificare existenta a playlist-ului cu numele in command
-
-                /* Iteram prin lista de playlist-uri si verificam numele acestora in parte */
-                for (Playlist iter: currentUser.getPlaylists()) {
-                    if (iter.getName().equals(command.getPlaylistName())) {
-                        out.setMessage("A playlist with the same name already exists.");
-                        isCreated = true;
-                    }
-                }
-
-                if (!isCreated) {
-                    // v-- Cream efectiv playlist-ul
-                    Playlist newPlaylist = ((Playlist)SongsColFactory.getCollection(command));
-                    currentUser.getPlaylists().add(newPlaylist);
-                    topFwdPlaylits.add(new FollowStats(command.getPlaylistName()));
-                    out.setMessage("Playlist created successfully.");
-                }
-
-                result.add(out);
+                result.add(Playlist.createPlaylist(currentUser, command, topFwdPlaylits));
             } else if (command.getCommand().contains("addRemoveInPlaylist")) {
                 result.add(AddRemove.addRemoveInPlaylist(currentUser, command, library.getSongs()));
             } else if (command.getCommand().equals("like")) {
@@ -263,20 +245,64 @@ public final class AnalyzeCommands {
 
                 FollowStats temp = new FollowStats(null);       // <-- doar pentru a apela metoda
                 result.add(temp.followPlaylist(command, users, selectInfo, topFwdPlaylits));
+            } else if (command.getCommand().contains("switch")) {
+                result.add(currentUser.changeConnectionStatus(command));
             }
 
-            /*
-                Actualizez pentru orice player (care ruleaza) timpul relativ la ..
-                .. penultima comanda data pentru calcularea remainTime al piesei incarcate
-            */
-            for (UserInfo updateTimer: users) {
-                if (updateTimer instanceof NormalUser) {
-                    if (((NormalUser)updateTimer).getPlayer() != null) {
-                        ((NormalUser)updateTimer).updateRemainedTime(command);
-                    }
-                }
-            }
         }
         return result;
     }
+
+    /**
+     *      Aceasta metoda:
+     *          --> va gasi in lista "users" pe user care a invocat comanda
+     *          --> va verifica starea acestuia (online / offline sau apartenent in lista "users")
+     *
+     *      Metoda va intoarce, in cazul in care user este online si exista, referinta catre ..
+     *      .. obiectul in cauza, altfel va returna null ( daca este offline sau ..
+     *      .. nu exista si comanda nu este "addUser" )
+     * */
+    private UserInfo analyzeUser(ArrayList<UserInfo> users, CommandIn command, ArrayList<Output> result) {
+        UserInfo tempRefference = null;
+        /* Cautam user-ul care a dat comanda "command" */
+        for (UserInfo iter: users) {
+            if (iter.getUsername().equals(command.getUsername())) {
+                tempRefference = iter;
+                break;
+            }
+        }
+
+        /* Verificam daca user-ul exista */
+        if (tempRefference == null) {
+            if (command.getCommand().equals("addUser")) {
+                /* Se va adauga user-ul */
+
+            } else {
+                /* User-ul nu exista si nu se doreste adaugat pe platforma */
+                result.add(OutputClassFactory.getOutput(command, OutputClassFactory.UserState.NOEXIST));
+                return null;
+            }
+        }  else {
+            /* User-ul exista, verificam daca user-ul este offline*/
+            if (tempRefference.isNormalUser()) {
+                if (!((NormalUser) tempRefference).getState()) { /*online = true; offline = false*/
+                    /* User-ul este offline */
+                    if (command.getCommand().contains("switchConnection")) {
+                        /* Se schimba starea user-ului  */
+                        result.add(tempRefference.changeConnectionStatus(command));
+                    } else if (command.getCommand().contains("status")) {
+                        // Se afiseaza starea player-ului, intrucat nu se sterge daca user-ul este offline
+                        result.add(Stats.statusFunc(command, (NormalUser) tempRefference));
+                    } else {
+                        result.add(OutputClassFactory.getOutput(command, OutputClassFactory.UserState.OFFLINE));
+                    }
+                    return null;
+                }
+            }
+        }
+
+        /* User-ul este fie online, fie artist sau host */
+        return tempRefference;
+    }
+
 }
