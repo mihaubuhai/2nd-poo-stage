@@ -31,8 +31,8 @@ public final class Test {
             Scanner scanner = new Scanner(System.in);
             String fileName = scanner.next();
             for (File file : inputDir) {
-                if (file.getName().equalsIgnoreCase(fileName)) {
-                    Main.action(file.getAbsolutePath(), CheckerConstants.OUT_FILE);
+                if (file.getName().contains(fileName)) {
+                    Main.action(file.getName(), CheckerConstants.OUT_FILE);
                     break;
                 }
             }
