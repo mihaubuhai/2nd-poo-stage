@@ -18,11 +18,14 @@ public final class UserFactory {
             case "user" -> {
                 return new NormalUser(userInfo);
             }
-//            case "artist" ->
+            case "artist" -> {
+                return new Artist(userInfo);
+            }
 //            case "host" ->
             default -> {
                 return null;
             }
         }
     }
+
 }

@@ -4,6 +4,7 @@ import input.commands.CommandIn;
 import main.users.UserInfo;
 import main.users.NormalUser;
 import playlist.commands.collections.Playlist;
+import output.SongsCollOutput;
 
 import java.util.ArrayList;
 
@@ -18,11 +19,10 @@ public class ResultShowPlaylists extends  ResultCommand {
         result = new ArrayList<>();
     }
 
-    public ResultShowPlaylists(final CommandIn command, final UserInfo user) {
+    public ResultShowPlaylists(final CommandIn command, final NormalUser user) {
         super(command);
         result = new ArrayList<>();
-        ((NormalUser)user).getPlaylists().forEach(playlist ->
-                result.add(new PlaylistOutput(playlist)));
+        user.getPlaylists().forEach(playlist -> result.add(new PlaylistOutput(playlist)));
     }
 
     /** Getter */
@@ -31,39 +31,25 @@ public class ResultShowPlaylists extends  ResultCommand {
     }
 
     /** Clasa de mai jos este necesara pentru executarea comenzii de afisare a playlist-urilor */
-    private class PlaylistOutput {
-        private String name;
-        private ArrayList<String> songs;
+    private class PlaylistOutput extends SongsCollOutput {
         private String visibility;
         private int followers;
 
         public PlaylistOutput(final Playlist playlist) {
-            name = playlist.getName();
+            super(playlist);
             visibility = playlist.getVisibility();
             followers = playlist.getFollowers();
-            songs = new ArrayList<>();
-            playlist.getSongs().forEach(song -> songs.add(song.getName()));
         }
 
-        /** Getter */
-        public String getName() {
-            return name;
-        }
+            /** Getter */
+            public String getVisibility() {
+                return visibility;
+            }
 
-        /** Getter */
-        public ArrayList<String> getSongs() {
-            return songs;
+            /** Getter */
+            public int getFollowers() {
+                return followers;
+            }
         }
-
-        /** Getter */
-        public String getVisibility() {
-            return visibility;
-        }
-
-        /** Getter */
-        public int getFollowers() {
-            return followers;
-        }
-    }
 
 }

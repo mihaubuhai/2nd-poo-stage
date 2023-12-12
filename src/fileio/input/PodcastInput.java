@@ -33,4 +33,13 @@ public final class PodcastInput {
     public void setEpisodes(final ArrayList<EpisodeInput> episodes) {
         this.episodes = episodes;
     }
+
+    @Override
+    public String toString() {
+        return "PodcastInput{"
+                + "name='" + name + '\''
+                + ", owner='" + owner + '\''
+                + ", episodes=" + episodes
+                + '}';
+    }
 }

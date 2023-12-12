@@ -4,9 +4,11 @@ import fileio.input.LibraryInput;
 import fileio.input.PodcastInput;
 import input.commands.CommandIn;
 import input.commands.Filters;
+import main.users.Artist;
 import main.users.NormalUser;
 import main.users.UserInfo;
 import output.result.ResultOutSearch;
+import playlist.commands.collections.Album;
 import playlist.commands.collections.Playlist;
 
 import java.util.ArrayList;
@@ -29,18 +31,19 @@ public final class Search {
 
     /**
      *   Aceasta metoda implementeaza comanda "search".
-     *   Aceasta returneaza o clasa de forma mesajului de output cautat
+     *   <p>
+     *   Aceasta returneaza un obiect de forma mesajului de output cautat
      */
-    public ResultOutSearch searchFunc(final LibraryInput library, final CommandIn command,
+    public ResultOutSearch searchFunc(final LibraryInput library, final CommandIn cmd,
                                        final ArrayList<UserInfo> users) {
-        ResultOutSearch output = new ResultOutSearch(command);
+        ResultOutSearch output = new ResultOutSearch(cmd);
         final int maxSize = 5;
 
         /* Verifica tipul comenzii pentru a utiliza functia de verificare de filtre corespunzator*/
-        if (command.getType().contains("song")) {
+        if (cmd.getType().contains("song")) {
             /* Itereaza prin lista de melodii din librarie */
             for (SongInput song: library.getSongs()) {
-                SongInput result = checkFiltersSongs(command.getFilters(), song);
+                SongInput result = checkFiltersSongs(cmd.getFilters(), song);
 
                 /*
                 *   Se intampla ca melodia curenta sa nu respecte cel putin un filtru impus,
@@ -58,11 +61,10 @@ public final class Search {
                     break;
                 }
             }
-
-        } else if (command.getType().contains("podcast")) {
+        } else if (cmd.getType().contains("podcast")) {
             /* Iterare prin lista de podcasturi din librarie */
             for (PodcastInput podcast: library.getPodcasts()) {
-                PodcastInput result = checkFiltersPodcasts(command.getFilters(), podcast);
+                PodcastInput result = checkFiltersPodcasts(cmd.getFilters(), podcast);
 
                 if (result != null) {
                     output.addResult(result.getName());
@@ -71,22 +73,43 @@ public final class Search {
                     break;
                 }
             }
-        } else {
-            for (UserInfo commandsUser: users) {
-                for (Playlist playlist : ((NormalUser)commandsUser).getPlaylists()) {
-                    Playlist result = checkFiltersPlaylist(command.getFilters(), playlist);
+        } else if (cmd.getType().equals("playlist")) {
+            /* Se va cauta un playlist */
+            for (UserInfo user: users) {
+                if (user.isNormalUser()) {
+                    NormalUser normalUser = (NormalUser) user;
+                    for (Playlist playlist : normalUser.getPlaylists()) {
+                        Playlist result = checkFiltersPlaylist(cmd.getFilters(), playlist);
 
-                    /*Macar un filtru nerespectat rezulta in "result" fiind initializat cu null */
-                    if (result != null) {
-                        String visibility = result.getVisibility().toLowerCase();
-                        if (checkVisibility(command.getUsername(), result)) {
-                            /* Rezultatele cautarii se afiseaza doar daca playlist-ul este public */
-                            output.addResult(result.getName());
+                        /*Macar un filtru nerespectat rezulta in "result" fiind initializat cu null */
+                        if (result != null) {
+                            if (checkVisibility(cmd.getUsername(), result)) {
+                                /* Rezultatele cautarii se afiseaza doar daca playlist-ul este public */
+                                output.addResult(result.getName());
+                            }
+                        }
+
+                        if (output.getResults().size() == maxSize) {
+                            break;
                         }
                     }
+                }
+            }
+        } else {
+            /* Se va cauta un album */
+            for (UserInfo user: users) {
+                if (user.isArtist()) {
+                    Artist artist = (Artist) user;
+                    for (Album album : artist.getAlbums()) {
+                        Album result = checkFiltersAlbum(cmd.getFilters(), album);
 
-                    if (output.getResults().size() == maxSize) {
-                        break;
+                        if (result != null) {
+                            output.addResult(result.getName());
+                        }
+
+                        if (output.getResults().size() == maxSize) {
+                            break;
+                        }
                     }
                 }
             }
@@ -102,7 +125,7 @@ public final class Search {
      */
     private boolean checkVisibility(final String username, final Playlist playlist) {
         String visibility = playlist.getVisibility();
-        String owner = playlist.getUser();
+        String owner = playlist.getOwner();
 
         /* Indiferent de vizibilitate, user-ul care a creat playlist-ul il poate accesa */
         if (owner.equals(username)) {
@@ -123,13 +146,16 @@ public final class Search {
     /**
      * Metoda de mai jos verifica daca "song" satisface cautarea conditionata de "filters".
      * Variabila "valid_filters" este raspunzatoare de validarea filtrelor comenzii curente.
-     * Adica, daca una din conditiile "impuse" de "filters" nu este respectata, melodia
-     * nu satisface cererea utilizatorului, lucru sustinut si bazat pe valoarea "valid_filters",
+     * <p>
+     * Adica, daca una din conditiile impuse de "filters" nu este respectata, melodia
+     * nu satisface cererea utilizatorului, lucru sustinut si bazat pe valoarea "validFilters",
      * deci aceasta melodie nu va fi adaugata in rezultatul comenzii "search".
-     * Este necesar si scopul cautarii ca "valid_filters" sa fie egal cu ..
-     * .. numarul de campuri nenule ale "filters"
+     * </p>
+     * <p>
+     * Este necesar si scopul cautarii ca "validFilters" sa fie egal cu
+     * numarul de campuri nenule ale "filters"
      */
-    private static SongInput checkFiltersSongs(final Filters filters, final SongInput song) {
+    private SongInput checkFiltersSongs(final Filters filters, final SongInput song) {
         int validFilters = 0;
 
         if (filters.getName() != null) {
@@ -203,11 +229,11 @@ public final class Search {
      *  Metoda de mai jos verifica conditiile impuse de user-ul care ..
      *  .. a solicitat "search" pentru un playlist
      *  */
-    private static Playlist checkFiltersPlaylist(final Filters filters, final Playlist playlist) {
+    private Playlist checkFiltersPlaylist(final Filters filters, final Playlist playlist) {
         int validFilters = 0;
 
         if (filters.getOwner() != null) {
-            if (playlist.getUser().contains(filters.getOwner())) {
+            if (playlist.getOwner().contains(filters.getOwner())) {
                 validFilters++;
             }
         }
@@ -230,7 +256,7 @@ public final class Search {
     *   Metoda verifica campurile lui "podcast", in parte, relativ la campurile ...
      *  ... conditionarii "filters".
      */
-    private static PodcastInput checkFiltersPodcasts(final Filters filters,
+    private PodcastInput checkFiltersPodcasts(final Filters filters,
                                                                     final PodcastInput podcast) {
         int validFilters = 0;
 
@@ -251,4 +277,37 @@ public final class Search {
         }
         return null;
     }
+
+    /**     <p>
+     *  Metoda de mai jos verifica conditiile impuse de cautare pentru un album.
+     *      </p>
+     *  Metoda va returna parametrul "album" daca se respecta filtrele cerute, altfel null
+     * */
+    private Album checkFiltersAlbum(final Filters filters, final Album album) {
+        int validFilters = 0;
+
+        if (filters.getOwner() != null) {
+            if (album.getOwner().contains(filters.getOwner())) {
+                validFilters++;
+            }
+        }
+
+        if (filters.getName() != null) {
+            if (album.getName().contains(filters.getName())) {
+                validFilters++;
+            }
+        }
+
+        if (filters.getDescription() != null) {
+            if (album.getDescription().contains(filters.getDescription())) {
+                validFilters++;
+            }
+        }
+
+        if (validFilters == filters.getNonNullFields()) {
+            return album;
+        }
+        return null;
+    }
+
 }

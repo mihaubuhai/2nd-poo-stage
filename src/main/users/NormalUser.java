@@ -5,7 +5,6 @@ import fileio.input.PodcastInput;
 import fileio.input.SongInput;
 import fileio.input.UserInput;
 import input.commands.CommandIn;
-import output.result.ResultOut;
 import player.Player;
 import playlist.commands.collections.Playlist;
 import playlist.commands.collections.SongsCollection;
@@ -29,7 +28,7 @@ public final class NormalUser extends UserInfo {
         playlists = new ArrayList<>();          /* Instantiem lista de playlist-uri */
         likedSongs = new ArrayList<>();
         fwdPlaylits = new ArrayList<>();
-        userType = UserType.NORMALUSER;     /* Retinem ca aceasta clasa reprezinta un user normal */
+        userType = UserType.NORMALUSER;   /* Retinem ca aceasta clasa reprezinta un user normal */
         state = true;   /* <-- Utilizatorul este "Online" atunci cand este adaugat pe platforma */
     }
 

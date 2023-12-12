@@ -4,9 +4,11 @@ import fileio.input.LibraryInput;
 import fileio.input.PodcastInput;
 import fileio.input.SongInput;
 import input.commands.CommandIn;
+import main.users.Artist;
 import main.users.UserInfo;
 import main.users.NormalUser;
 import output.result.ResultOut;
+import playlist.commands.collections.Album;
 import playlist.commands.collections.Playlist;
 import playlist.commands.collections.SongsCollection;
 
@@ -29,7 +31,6 @@ public class Select {
     private int resultType;                 // <-- Contorizeaza ce anume este incarcat in player
     /* 1 - melodie      2 - podcast     3 - playlist / album */
     public Select() {
-
     }
 
     public Select(final CommandIn command, final ArrayList<String> result) {
@@ -47,7 +48,7 @@ public class Select {
         setUser(otherSelect.getUser());
         setSong(otherSelect.getSong());
         setPodcast(otherSelect.getPodcast());
-        setPlaylist(otherSelect.getPlaylist());
+        setSongsCollection(otherSelect.getSongsCollection());
         setSearchResult(otherSelect.getSearchResult());
     }
 
@@ -129,8 +130,8 @@ public class Select {
     }
 
     /** Setter */
-    public void setPlaylist(final Playlist playlist) {
-        songsCollection = playlist;
+    public void setSongsCollection(final SongsCollection collection) {
+        songsCollection = collection;
     }
 
     /** Getter */
@@ -144,8 +145,9 @@ public class Select {
     }
 
     /**
-     *    Aceasta metoda implementeaza comanda "select"
-     *    Aceasta returneaza o clasa pe tiparul output-ului comenzii.
+     *    Aceasta metoda implementeaza comanda "select".
+     *    <p>
+     *    Aceasta returneaza un obiect pe tiparul output-ului comenzii.
      * */
     public ResultOut selectFunc(final CommandIn command, final LibraryInput library,
                                                 final ArrayList<UserInfo> users) {
@@ -157,7 +159,7 @@ public class Select {
         if (command.getItemNumber() > getSearchResult().size()) {
             result.setMessage("The selected ID is too high.");
         } else {
-            /* In acest moment, melodia / podcast este selectata si gata pentru "load", "like" */
+            /* In acest moment, melodia / podcast este selectata */
             setSelected(true);
             if (resultType == songId) {
                         /*  v--- Melodia ce se vrea selectata */
@@ -183,28 +185,47 @@ public class Select {
                         break;
                     }
                 }
+                /* TO DO */
             } else {
-                /*
-                *      Se foloseste itemNumber din command
-                *   Iteram prin lista de playlisturi a fiecarui user si
-                *   cautam pe cel desemnat de itemNumber
-                */
+                /* Aici se selecteaza fie playlist, fie album */
                 int id = command.getItemNumber();
+                String potentialName = getSearchResult().get(id - 1);
+                String msg;
+
                 for (UserInfo user: users) {
-                    for (Playlist playlist : ((NormalUser)user).getPlaylists()) {
-                        String namePlaylist = playlist.getName();
-                        String potentialPlaylistName = getSearchResult().get(id - 1);
-                        if (namePlaylist.equals(potentialPlaylistName)) {
-                            setPlaylist(playlist);
-                            String succes = "Successfully selected ";
-                            result.setMessage(succes + playlist.getName() + ".");
-                            break;
+                    /* Verificam intai daca se da select la un playlist */
+                    if (user.isNormalUser()) {
+                        for (Playlist playlist: ((NormalUser) user).getPlaylists()) {
+                            if ((msg = verifyCollection(playlist, potentialName)) != null) {
+                                result.setMessage(msg);
+                                break;
+                            }
+                        }
+                    } else {
+                        /* Verificam daca se da select la un album */
+                        for (Album album: ((Artist) user).getAlbums()) {
+                            if ((msg = verifyCollection(album, potentialName)) != null) {
+                                result.setMessage(msg);
+                                break;
+                            }
                         }
                     }
                 }
+
+
             }
         }
 
         return result;
     }
+
+    private String verifyCollection(final SongsCollection collection, final String potentialName) {
+        String collectionName = collection.getName();
+        if (collectionName.equals(potentialName)) {
+            setSongsCollection(collection);
+            return "Successfully selected " + collectionName + ".";
+        }
+        return null;
+    }
+
 }

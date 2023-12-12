@@ -31,4 +31,13 @@ public final class EpisodeInput {
     public void setDescription(final String description) {
         this.description = description;
     }
+
+    @Override
+    public String toString() {
+        return "EpisodeInput{"
+                + "name='" + name + '\''
+                + ", description='" + description + '\''
+                + ", duration=" + duration
+                + '}';
+    }
 }

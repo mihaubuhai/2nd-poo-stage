@@ -7,59 +7,26 @@ import main.users.NormalUser;
 import java.util.ArrayList;
 
 /**
- *      Aceasta clasa reprezinta conceptul de "colectie de melodii", ..
- *      .. lucru 'implementat' de clasele "Playlist" si "Album"
+ *      Aceasta clasa reprezinta conceptul de "colectie de melodii",
+ *       extinsa de clasele "Playlist" si "Album"
  * */
 public class SongsCollection {
+    private String owner;
     private String name;      // <-- Numele colectiei de melodii
     private ArrayList<SongInput> songs; // <-- Melodiile pe care le stocheaza
     private ArrayList<Integer> shuffledIndices; // <-- Vectorul de indici amestecati
     private int timeOfCreation;   // <-- Camp folosit pentru sortarea topului de playlist-uri
 
     public SongsCollection(final CommandIn command) {
-        setName(command.getPlaylistName());
         setTimeOfCreation(command.getTimestamp());
         setSongs(new ArrayList<>());
     }
 
-    /** Setter */
-    public void setName(String name) {
-        this.name = name;
-    }
-    /** Setter */
-    public void setSongs(ArrayList<SongInput> songs) {
-        this.songs = songs;
-    }
-    /** Setter */
-    public void setShuffledIndices(ArrayList<Integer> idxes) {
-        shuffledIndices = idxes;
-    }
-    /** Setter */
-    public void setTimeOfCreation(int time) {
-        timeOfCreation = time;
-    }
-
-    /** Getter */
-    public String getName() {
-        return name;
-    }
-    /** Getter */
-    public ArrayList<SongInput> getSongs() {
-        return songs;
-    }
-    /** Getter */
-    public ArrayList<Integer> getShuffledIndices() {
-        return shuffledIndices;
-    }
-    /** Getter */
-    public int getTimeOfCreation() {
-        return timeOfCreation;
-    }
-
-
-    /**             ---- Metoda va fi apelata de playlist-ul / albumul user-ului curent ----
-     *      Valoarea returnata stocheaza indicele urmatoarei melodii care ar trebui sa se ruleze ..
-     *      .. relativ la cea care se ruleaza in player
+    /**     <p>
+     *               ---- Metoda va fi apelata de playlist-ul / albumul user-ului curent ----
+     *      </p>
+     *      Valoarea returnata stocheaza indicele urmatoarei melodii care ar trebui sa se ruleze
+     *      relativ la cea care se ruleaza in player
      * */
     public int findNextIdxSong(final NormalUser user) {
         /* Cautam indicele melodiei care ruleaza */
@@ -118,4 +85,57 @@ public class SongsCollection {
             return getShuffledIndices().get(currShuffledIdx + 1);
         }
     }
+
+    /** Setter */
+    public void setName(final String name) {
+        this.name = name;
+    }
+    /** Setter */
+    public void setSongs(final ArrayList<SongInput> songs) {
+        this.songs = songs;
+    }
+    /** Setter */
+    public void setShuffledIndices(final ArrayList<Integer> idxes) {
+        shuffledIndices = idxes;
+    }
+    /** Setter */
+    public void setTimeOfCreation(final int time) {
+        timeOfCreation = time;
+    }
+    /** Setter */
+    public void setOwner(final String owner) {
+        this.owner = owner;
+    }
+
+
+    /** Getter */
+    public String getName() {
+        return name;
+    }
+    /** Getter */
+    public ArrayList<SongInput> getSongs() {
+        return songs;
+    }
+    /** Getter */
+    public ArrayList<Integer> getShuffledIndices() {
+        return shuffledIndices;
+    }
+    /** Getter */
+    public int getTimeOfCreation() {
+        return timeOfCreation;
+    }
+    /** Getter */
+    public String getOwner() {
+        return owner;
+    }
+
+    /** Getter */
+    public ArrayList<String> getSongNames() {
+        ArrayList<String> result = new ArrayList<>();
+
+        songs.forEach(song -> result.add(song.getName()));
+
+        return result;
+    }
+
 }

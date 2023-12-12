@@ -8,8 +8,8 @@ public final class UserInput {
     public UserInput() {
     }
 
-    public UserInput(final String username, final int age, final String city) {
-        setUsername(username);
+    public UserInput(String name, int age, String city) {
+        setUsername(name);
         setAge(age);
         setCity(city);
     }
@@ -36,5 +36,14 @@ public final class UserInput {
 
     public void setCity(final String city) {
         this.city = city;
+    }
+
+    @Override
+    public String toString() {
+        return "UserInput{"
+                + "username='" + username + '\''
+                + ", age=" + age
+                + ", city='" + city + '\''
+                + '}';
     }
 }

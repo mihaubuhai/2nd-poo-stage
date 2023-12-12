@@ -47,7 +47,8 @@ public class NP extends FBNP {
     }
 
     /**
-     *      Metoda care returneaza indicele melodiei din player care ruleaza
+     *      Metoda care returneaza indicele melodiei din player, relativ la playlist / album
+     *      de care apartine, care ruleaza
      * */
     public int findInPlaylistOrAlbum() {
         ArrayList<SongInput> songs = currentUser.getSongsCollection().getSongs();

@@ -11,6 +11,7 @@ public class Filters {
     private String releaseYear;
     private String artist;
     private String owner;               // Pentru playlist / podcast
+    private String description;
     private int notnullfields = 0;   // Pentru comanda "search"
 
     public Filters() {
@@ -70,6 +71,12 @@ public class Filters {
         notnullfields++;
     }
 
+    /** Setter */
+    public void setDescription(final String description) {
+        this.description = description;
+        notnullfields++;
+    }
+
     /** Getter */
     public String getOwner() {
         return owner;
@@ -108,5 +115,10 @@ public class Filters {
     /** Getter */
     public String getName() {
         return name;
+    }
+
+    /** Getter */
+    public String getDescription() {
+        return description;
     }
 }

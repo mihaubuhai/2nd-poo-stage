@@ -2,8 +2,9 @@ package main.users;
 
 import fileio.input.UserInput;
 import input.commands.CommandIn;
-import output.OutputClassFactory;
 import output.result.ResultOut;
+
+import java.util.ArrayList;
 
 /** Aceasta clasa contine campul comun tuturor user-ilor programului */
 public class UserInfo {
@@ -19,11 +20,6 @@ public class UserInfo {
     /** Getter */
     public String getUsername() {
         return userInfo.getUsername();
-    }
-
-    /** Getter */
-    public UserType getUserType() {
-        return userType;
     }
 
     /** Setter */
@@ -55,7 +51,7 @@ public class UserInfo {
 
         /*
             Cazul cu "user does not exist" este acoperit de
-            metoda "analyzeUser" din clasa "AnalyzeCommands"
+            metoda "analyseUser" din clasa "AnalyseCommands"
         */
         if (!isNormalUser()) {
             result.setMessage(getUsername() + " is not a normal user.");
@@ -67,4 +63,30 @@ public class UserInfo {
 
         return result;
     }
+
+    /**
+            *      Aceasta metoda implementeaza comanda "addUser"
+            *      <p>
+            *      Returneaza un obiect de tipul rezultatului asteptat pentru comanda "addUser"
+            *
+            *      @param currUser este variabila "tempReference" din metoda "analyseUser"
+     * */
+    public static ResultOut addUser(final ArrayList<UserInfo> users, final UserInfo currUser,
+                                    final CommandIn cmd) {
+        ResultOut result = new ResultOut(cmd);
+
+        /* Verificam daca referinta este nula (caz in care user-ul nu exista) */
+        if (currUser == null) {
+            UserInput currUserInfo = new UserInput(cmd.getUsername(), cmd.getAge(), cmd.getCity());
+            users.add(UserFactory.getUser(cmd.getType(), currUserInfo));
+            result.setMessage("The username " + cmd.getUsername() +
+                    " has been added successfully.");
+        } else {
+            /* Daca referinta nu este nula, cu siguranta "currUser" se gaseste in lista "users" */
+            result.setMessage("The username " + cmd.getUsername() + " is already taken.");
+        }
+
+        return result;
+    }
+
 }

@@ -4,11 +4,14 @@ import input.commands.CommandIn;
 import output.result.*;
 
 /**
- *          Aceasta clasa contine o singura metoda care va intoarce un obiect pentru ..
- *      .. afisarea rezultatului unei comenzi corespunzator comenzii care se executa
- *
- *          Intrucat toate clasele pomenite mai sus mostenesc clasa "Output", prin aceasta ..
- *      .. clasa finalizam design pattern-ul Factory pentru clasele de rezultate a comenzilor
+ *          <p>
+ *          Aceasta clasa contine o singura metoda care va intoarce un obiect pentru
+ *       afisarea rezultatului unei comenzi corespunzator comenzii care se executa
+ *          </p>
+ *          <p>
+ *          Intrucat toate clasele pomenite mai sus mostenesc clasa "Output", prin aceasta
+ *      clasa finalizam design pattern-ul Factory pentru clasele de rezultate ale comenzilor
+ *          </p>
  * */
 public class OutputClassFactory {
     /** Constructor privat, intrucat nu instantiem aceasta clasa nicaieri */
@@ -22,11 +25,11 @@ public class OutputClassFactory {
 
     /** Metoda returneaza o referinta de tipul superclasei extinsa de toate clasele "de output" */
     public static Output getOutput(final CommandIn command, final UserState state) {
-        String failMessage;
+        String failMsg;
         switch (state) {
-            case NOEXIST -> failMessage = "The username " + command.getUsername() + " doesn't exist.";
-            case OFFLINE -> failMessage = command.getUsername() + " is offline.";
-            default -> failMessage = null;
+            case NOEXIST -> failMsg = "The username " + command.getUsername() + " doesn't exist.";
+            case OFFLINE -> failMsg = command.getUsername() + " is offline.";
+            default -> failMsg = null;
         }
 
         /* Intai se trateaza cazuri speciale de comenzi, intrucat unele au campuri diferite */
@@ -37,10 +40,10 @@ public class OutputClassFactory {
         } else if (command.getCommand().equals("status")) {
             return new ResultStatus(command);
         } else if (command.getCommand().equals("search")) {
-            return new ResultOutSearch(command, failMessage);
+            return new ResultOutSearch(command, failMsg);
         }
 
         /* Majoritatea rezultatelor comenzilor impartasesc aceleasi campuri */
-        return new ResultOut(command, failMessage);
+        return new ResultOut(command, failMsg);
     }
 }

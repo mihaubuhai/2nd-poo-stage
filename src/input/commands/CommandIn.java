@@ -1,5 +1,9 @@
 package input.commands;
 
+import fileio.input.SongInput;
+
+import java.util.ArrayList;
+
 /**
  *      Aceasta clasa este conceputa pentru a citi comenzile
  * */
@@ -15,6 +19,46 @@ public class CommandIn {
     private String playlistName;
     private int age;
     private String city;
+    private String name;
+    private int releaseYear;
+    private String description;
+    private ArrayList<SongInput> songs;
+
+    /** Setter  */
+    public void setName(String name) {
+        this.name = name;
+    }
+    /** Getter  */
+    public String getName() {
+        return name;
+    }
+
+    /** Setter  */
+    public void setDescription(String description) {
+        this.description = description;
+    }
+    /** Getter  */
+    public String getDescription() {
+        return description;
+    }
+
+    /** Setter  */
+    public void setReleaseYear(int releaseYear) {
+        this.releaseYear = releaseYear;
+    }
+    /** Getter  */
+    public int getReleaseYear() {
+        return releaseYear;
+    }
+
+    /** Setter  */
+    public void setSongs(ArrayList<SongInput> songs) {
+        this.songs = songs;
+    }
+    /** Getter  */
+    public ArrayList<SongInput> getSongs() {
+        return songs;
+    }
 
     /** Setter  */
     public void setCommand(final String command) {
@@ -75,7 +119,7 @@ public class CommandIn {
         return seed;
     }
     /** Setter */
-    public void setSeed(int seed) {
+    public void setSeed(final int seed) {
         this.seed = seed;
     }
 

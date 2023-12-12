@@ -4,54 +4,22 @@ import fileio.input.SongInput;
 import input.commands.CommandIn;
 import main.users.NormalUser;
 import output.result.ResultOut;
+import player.commands.Like;
 import playlist.commands.FollowStats;
 
 import java.util.ArrayList;
 
 public class Playlist extends SongsCollection {
-    private String userName;        // <-- numele utilizatorului care a creat acest playlist
     private String visibility;
     private int followers;
+    private int totalLikes; // <-- camp ce contine numarul total de like-uri pentru toate piesele
 
     public Playlist(final CommandIn command) {
         super(command);
         setName(command.getPlaylistName());
-        setUser(command.getUsername());
-        setVisibility(new String("public"));
+        setVisibility("public");
         followers = 0;
-    }
-
-    /** Setter */
-    public void setUser(final String username) {
-        userName = username;
-    }
-    /** Setter */
-    public void setVisibility(final String type) {
-        visibility = type;
-    }
-
-    /** Getter */
-    public String getVisibility() {
-        return visibility;
-    }
-    /** Getter */
-    public String getUser() {
-        return userName;
-    }
-    /** Getter */
-    public int getFollowers() {
-        return followers;
-    }
-
-    /** Metoda care incrementeaza numarul de urmaritori ai playlist-ului */
-    public void incNrFollowers() {
-        followers += 1;
-    }
-    /** Metoda care decrementeaza numarul de urmaritori ai playlist-ului */
-    public void decNrFollowers() {
-        if (followers > 0) {
-            followers -= 1;
-        }
+        totalLikes = 0;
     }
 
     /**
@@ -99,13 +67,67 @@ public class Playlist extends SongsCollection {
 
         if (!isCreated) {
             // v-- Cream efectiv playlist-ul
-            Playlist newPlaylist = ((Playlist)SongsColFactory.getCollection(command));
+            Playlist newPlaylist = ((Playlist) SongsCollFactory.getCollection(command));
             currentUser.getPlaylists().add(newPlaylist);
             topFwdPlaylits.add(new FollowStats(command.getPlaylistName()));
             out.setMessage("Playlist created successfully.");
         }
 
         return out;
+    }
+
+    /** Setter */
+    public void setVisibility(final String type) {
+        visibility = type;
+    }
+    /** Metoda care incrementeaza numarul de urmaritori ai playlist-ului */
+    public void incNrFollowers() {
+        followers += 1;
+    }
+    /** Metoda care decrementeaza numarul de urmaritori ai playlist-ului */
+    public void decNrFollowers() {
+        if (followers > 0) {
+            followers -= 1;
+        }
+    }
+
+    /** Getter */
+    public String getVisibility() {
+        return visibility;
+    }
+    /** Getter */
+    public int getFollowers() {
+        return followers;
+    }
+
+    /**
+     *      <p>
+     *          Metoda returneaza numarul de like-uri total pe playlist
+     *      </p>
+     *
+     * */
+    public int getTotalLikes() {
+        return totalLikes;
+    }
+
+    /**
+     *          <p>
+     *          "topLikedSongs" contine toate melodiile apreciate de toti userii.
+     *          </p>
+     *          <p>
+     *          Astfel, vom cauta in aceasta lista melodiile care apartin de acest playlist
+     *          si le vom adauga numarul de like-uri la campul "totalLikes" din playlist
+     * */
+    public int findTotalLikes(final ArrayList<Like> topLikedSongs) {
+        for (Like songInfo : topLikedSongs) {
+            for (String songInPlist : getSongNames()) {
+                if (songInPlist.equals(songInfo.getSongName())) {
+                    totalLikes += songInfo.getUsers();
+                }
+            }
+        }
+
+        return getTotalLikes();
     }
 
 }
