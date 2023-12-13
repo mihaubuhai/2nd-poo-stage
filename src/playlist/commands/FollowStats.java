@@ -134,8 +134,8 @@ public class FollowStats implements Comparable {
                         .. cautam pe playlist selectat
                     */
                     Playlist selectedPlaylist = selectInfo.getPlaylist();
-                    for (String playlits: currUser.getFwdPlaylits()) {
-                        if (playlits.equals(currPlaylist)) {
+                    for (Playlist playlits: currUser.getFwdPlaylits()) {
+                        if (playlits.getName().equals(currPlaylist)) {
                             /* Playlist-ul era urmarit, acum nu se mai urmareste */
                             isFollowed = true;
                             currUser.getFwdPlaylits().remove(playlits);
@@ -148,7 +148,7 @@ public class FollowStats implements Comparable {
 
                     if (!isFollowed) {
                         /* Playlist-ul nu a fost urmarit inainte */
-                        currUser.getFwdPlaylits().add(currPlaylist);
+                        currUser.getFwdPlaylits().add(selectInfo.getPlaylist());
                         selectedPlaylist.incNrFollowers();
                         follows.incFollowers();
                         result.setMessage("Playlist followed successfully.");
@@ -161,9 +161,9 @@ public class FollowStats implements Comparable {
     }
 
     /** Metoda gaseste user-ul "username" in lista "users'"*/
-    public NormalUser findUser(final ArrayList<UserInfo> users, final String username) {
+    private NormalUser findUser(final ArrayList<UserInfo> users, final String username) {
         for (UserInfo user: users) {
-            if (user.getUsername().equals(username)) {
+            if (user.getUsername().equals(username) && user.isNormalUser()) {
                 return (NormalUser)user;
             }
         }

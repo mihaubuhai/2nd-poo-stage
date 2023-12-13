@@ -9,6 +9,8 @@ import player.Player;
 import playlist.commands.collections.Playlist;
 import playlist.commands.collections.SongsCollection;
 import search.bar.Select;
+import main.users.pages.HomePage;
+import main.users.pages.Page;
 
 import java.util.ArrayList;
 
@@ -20,8 +22,9 @@ public final class NormalUser extends UserInfo {
     private Player player;                                    /* Player-ul user-ului */
     private final ArrayList<Playlist> playlists;    /* Tine cont de playlist-urile user-ului */
     private final ArrayList<String> likedSongs;  /* Melodiile apreciate de user */
-    private final ArrayList<String> fwdPlaylits; /* Playlist-urile urmarite de user */
+    private final ArrayList<Playlist> fwdPlaylits; /* Playlist-urile urmarite de user */
     private boolean state;        /* <-- Starea unui utilizator: Online (true), Offline (false) */
+    private Page.PageType currentPage;  /* <-- Pagina pe care se alfa user-ul */
 
     public NormalUser(final UserInput userInfo) {
         setUserInfo(userInfo);
@@ -30,6 +33,7 @@ public final class NormalUser extends UserInfo {
         fwdPlaylits = new ArrayList<>();
         userType = UserType.NORMALUSER;   /* Retinem ca aceasta clasa reprezinta un user normal */
         state = true;   /* <-- Utilizatorul este "Online" atunci cand este adaugat pe platforma */
+        currentPage = Page.PageType.HOME;
     }
 
     /** Metoda elimina player-ul pentru user-ul care a apelat-o */
@@ -208,7 +212,7 @@ public final class NormalUser extends UserInfo {
      *      moment in care stim si ce melodie din playlist este incarcata.
      * */
     private int findFittingSong(final int idx, final boolean repeat) {
-        Playlist currPlaylist = getPlayer().getLoadInfo().getSelectInfo().getPlaylist();
+        SongsCollection currPlaylist = getPlayer().getLoadInfo().getSelectInfo().getSongsCollection();
         int remainedTime = getPlayer().getStats().getRemainedTime();
         int index = idx;
         boolean fstIter = false;    // <--- Pentru cand se face doar o singura iteratie in while
@@ -279,7 +283,7 @@ public final class NormalUser extends UserInfo {
     }
 
     /** Aceasta metoda gaseste indicele melodiei urmatoare in playlist al lui "idx" */
-    private int findNextSong(final int idx, final Playlist currentPlaylist) {
+    private int findNextSong(final int idx, final SongsCollection currentPlaylist) {
         if (!player.getStats().getShuffle()) {
             return idx + 1;
         } else {
@@ -404,6 +408,9 @@ public final class NormalUser extends UserInfo {
         player = newPlayer;
     }
 
+    /** Setter */
+    public void setCurrentPage(final Page.PageType page) { currentPage = page; }
+
     /** Getter */
     public Player getPlayer() {
         return player;
@@ -420,7 +427,7 @@ public final class NormalUser extends UserInfo {
     }
 
     /** Getter */
-    public ArrayList<String> getFwdPlaylits() {
+    public ArrayList<Playlist> getFwdPlaylits() {
         return fwdPlaylits;
     }
 
@@ -433,5 +440,8 @@ public final class NormalUser extends UserInfo {
     public boolean getState() {
         return state;
     }
+
+    /** Getter */
+    public Page.PageType getCurrentPage() { return currentPage; }
 
 }

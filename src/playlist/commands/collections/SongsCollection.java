@@ -45,7 +45,7 @@ public class SongsCollection {
         /* Verificam starea shuffle */
         if (!user.getPlayer().getStats().getShuffle()) {
             /* Verificam daca s-a ajuns la final de playlist */
-            Playlist usersPlaylist = user.getPlayer().getLoadInfo().getSelectInfo().getPlaylist();
+            SongsCollection usersPlaylist = user.getPlayer().getLoadInfo().getSelectInfo().getSongsCollection();
             if (currentIdxSong == usersPlaylist.getSongs().size() - 1) {
                 /* S-a ajuns la final de playlist, verificam starea de repeat */
                 if (repeatMode.contains("no")) {

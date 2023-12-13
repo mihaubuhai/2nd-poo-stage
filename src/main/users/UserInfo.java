@@ -68,7 +68,6 @@ public class UserInfo {
             *      Aceasta metoda implementeaza comanda "addUser"
             *      <p>
             *      Returneaza un obiect de tipul rezultatului asteptat pentru comanda "addUser"
-            *
             *      @param currUser este variabila "tempReference" din metoda "analyseUser"
      * */
     public static ResultOut addUser(final ArrayList<UserInfo> users, final UserInfo currUser,

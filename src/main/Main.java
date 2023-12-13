@@ -77,8 +77,12 @@ public final class Main {
 
         // TODO add your implementation
 
-        if (filePathInput.contains("test01")
+        if (
+                filePathInput.contains("test01")
+                || filePathInput.contains("test00")
                 || filePathInput.contains("test02")
+                        || filePathInput.contains("test03")
+                        || filePathInput.contains("test04")
                                                                                                                             ){
 //            || filePathInput.contains("test04")) {
             File filein = new File("input/" + filePathInput);

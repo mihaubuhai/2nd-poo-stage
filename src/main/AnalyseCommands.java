@@ -5,6 +5,7 @@ import main.users.Artist;
 import main.users.NormalUser;
 import main.users.UserFactory;
 import main.users.UserInfo;
+import main.users.pages.Page;
 import output.result.*;
 import top5.top5Playlists;
 import top5.top5Songs;
@@ -165,7 +166,7 @@ public final class AnalyseCommands {
 
                 if (selected != null) {
                     /* Chem functia "select" pt user curent si efectuam selectarea */
-                    result.add(selected.selectFunc(command, library, users));
+                    result.add(selected.selectFunc(command, library, users, currentUser));
                 } else {
                     ResultOut out = new ResultOut(command);
                     out.setMessage("Please conduct a search before making a selection.");
@@ -254,9 +255,17 @@ public final class AnalyseCommands {
             } else if (command.getCommand().contains("switch") && currentUser != null) {
                 result.add(currentUser.changeConnectionStatus(command));
             } else if (command.getCommand().equals("addAlbum") && currentArtist != null) {
-                result.add(currentArtist.addAlbum(command, library));
+                result.add(currentArtist.addAlbum(command));
             } else if (command.getCommand().equals("showAlbums") && currentArtist != null) {
                 result.add(new ResultShowAlbums(command, currentArtist));
+            } else if (command.getCommand().contains("Page") && currentUser != null) {
+                result.add(Page.getPage(currentUser, command, topLikedSongs, selectedList));
+            } else if (command.getCommand().contains("Event")) {
+                Artist tempArtist = new Artist(null);   // <-- pentru a apela metoda
+                result.add(tempArtist.addEvent(user, command));
+            } else if (command.getCommand().contains("Merch")) {
+                Artist tempArtist = new Artist(null);   // <-- pentru a apela metoda
+                result.add(tempArtist.addMerch(user, command));
             }
 
         }
@@ -334,6 +343,9 @@ public final class AnalyseCommands {
                 }
                 return null;
             }
+
+            /* User normal online, actualizam timpul trecut al player-ului */
+//            normalTemp.updateRemainedTime(cmd);
         }
 
         /* User-ul este fie online, fie artist sau host */

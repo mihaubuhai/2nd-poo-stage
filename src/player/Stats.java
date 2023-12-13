@@ -7,6 +7,7 @@ import input.commands.CommandIn;
 import main.users.NormalUser;
 import output.result.ResultStatus;
 import playlist.commands.collections.Playlist;
+import playlist.commands.collections.SongsCollection;
 
 /**
  *      Aceasta clasa este folosita pentru afisarea output-ului comenzii "status";
@@ -98,9 +99,9 @@ public class Stats {
             setRemainedTime(episodeInfo.getDuration());
             setName(episodeInfo.getName());
         } else {
-            /* Se incarca o melodie dintr-un playlist */
-            Playlist playlist = loadInfo.getSelectInfo().getPlaylist();
-            SongInput songInfo = playlist.getSongs().get(0);
+            /* Se incarca o melodie dintr-un playlist / album */
+            SongsCollection collection = loadInfo.getSelectInfo().getSongsCollection();
+            SongInput songInfo = collection.getSongs().get(0);
             setRemainedTime(songInfo.getDuration());
             setName(songInfo.getName());
         }

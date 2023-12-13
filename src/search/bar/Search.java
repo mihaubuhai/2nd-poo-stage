@@ -16,7 +16,6 @@ import java.util.ArrayList;
 /** Aceasta clasa are un unic scop si anume executarea comenzii "Search" */
 public final class Search {
     private static Search instance = null;
-
     private Search() {
 
     }
@@ -41,26 +40,23 @@ public final class Search {
 
         /* Verifica tipul comenzii pentru a utiliza functia de verificare de filtre corespunzator*/
         if (cmd.getType().contains("song")) {
-            /* Itereaza prin lista de melodii din librarie */
-            for (SongInput song: library.getSongs()) {
-                SongInput result = checkFiltersSongs(cmd.getFilters(), song);
+            findFittingSong(cmd, output, maxSize, library.getSongs());
 
-                /*
-                *   Se intampla ca melodia curenta sa nu respecte cel putin un filtru impus,
-                *   deci functia "checkFilters_Songs" returneaza "null".
-                */
-                if (result != null) {
-                    output.addResult(result.getName());
-                }
-
-                /*
-                    Precum in cerinta specificat, mai mult de ..
-                    ..5 rezultate nu pot fi afisate pentru o cautare.
-                */
-                if (output.getResults().size() == maxSize) {
-                    break;
+            /*
+                Iteram prin lista de albume a fiecarui artist si cautam ..
+                .. doar daca nu s-a atins maximul de cautari
+            */
+            if (output.getResults().size() < maxSize) {
+                for (UserInfo tempUser: users) {
+                    if (tempUser.isArtist()) {
+                        Artist artist = (Artist) tempUser;
+                        for (Album album: artist.getAlbums()) {
+                            findFittingSong(cmd, output, maxSize, album.getSongs());
+                        }
+                    }
                 }
             }
+
         } else if (cmd.getType().contains("podcast")) {
             /* Iterare prin lista de podcasturi din librarie */
             for (PodcastInput podcast: library.getPodcasts()) {
@@ -95,7 +91,7 @@ public final class Search {
                     }
                 }
             }
-        } else {
+        } else if (cmd.getType().equals("album")) {
             /* Se va cauta un album */
             for (UserInfo user: users) {
                 if (user.isArtist()) {
@@ -113,10 +109,42 @@ public final class Search {
                     }
                 }
             }
+        } else {
+            /* Se cauta un artist */
+            for (UserInfo user: users) {
+                String filter = cmd.getFilters().getName();
+                if (user.isArtist() && user.getUsername().startsWith(filter)) {
+                    output.addResult(user.getUsername());
+                }
+
+                if (output.getResults().size() > maxSize) {
+                    break;
+                }
+            }
         }
 
         output.setMessage("Search returned " + output.getResults().size() + " results");
         return output;
+    }
+
+    private void findFittingSong(CommandIn cmd, ResultOutSearch output, int maxSize, ArrayList<SongInput> songs) {
+        /* Itereaza prin lista de melodii din librarie / album */
+        for (SongInput song: songs) {
+            SongInput result = checkFiltersSongs(cmd.getFilters(), song);
+
+            /*
+             *   Se intampla ca melodia curenta sa nu respecte cel putin un filtru impus, ..
+             *   .. deci functia "checkFilters_Songs" returneaza "null".
+             */
+            if (result != null) {
+                output.addResult(result.getName());
+            }
+
+            /* Mai mult de 5 rezultate nu se pot afisa, deci cautarea se opreste */
+            if (output.getResults().size() == maxSize) {
+                break;
+            }
+        }
     }
 
     /**

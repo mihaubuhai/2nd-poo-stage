@@ -4,6 +4,7 @@ import fileio.input.SongInput;
 import main.users.NormalUser;
 import output.result.ResultOut;
 import playlist.commands.collections.Playlist;
+import playlist.commands.collections.SongsCollection;
 import search.bar.Select;
 
 import java.util.ArrayList;
@@ -61,7 +62,7 @@ public class Load {
             currentUser.getPlayer().setStats(this);
         }
 
-        Playlist playlist = getSelectInfo().getPlaylist();
+        SongsCollection playlist = getSelectInfo().getSongsCollection();
         /* In cazul in care ceea ce este selectat este un playlist */
         if (getSelectInfo().getResultType() == playlistID) {
             /* Verificam daca playlist este gol */

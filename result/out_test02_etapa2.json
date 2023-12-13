@@ -96,6 +96,11 @@
   "user" : "alice22",
   "message" : "Like registered successfully."
 }, {
+  "command" : "printCurrentPage",
+  "timestamp" : 480,
+  "user" : "alice22",
+  "message" : "Liked songs:\n\t[Melodic Mirage]\n\nFollowed playlists:\n\t[]"
+}, {
   "command" : "addAlbum",
   "timestamp" : 515,
   "user" : "melodymaster",

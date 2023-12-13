@@ -20,11 +20,11 @@ public class Like implements Comparable {
 
     /** Implementare pentru sortarea listei "top5Songs" */
     public int compareTo(final Object otherLike) {
-        int compareNoUsers = ((Like) otherLike).getUsers();
-        if (users == compareNoUsers) {
+        int compareNrUsers = ((Like) otherLike).getUsers();
+        if (users == compareNrUsers) {
             return idx - ((Like) otherLike).getIdx();
         }
-        return compareNoUsers - users;
+        return compareNrUsers - users;
     }
 
     /**

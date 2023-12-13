@@ -23,6 +23,8 @@ public class CommandIn {
     private int releaseYear;
     private String description;
     private ArrayList<SongInput> songs;
+    private String date;
+    private int price;
 
     /** Setter  */
     public void setName(String name) {
@@ -157,6 +159,26 @@ public class CommandIn {
     /** Getter */
     public String getCity() {
         return city;
+    }
+
+    /** Setter */
+    public void setDate(final String date) {
+        this.date = date;
+    }
+
+    /** Getter */
+    public String getDate() {
+        return date;
+    }
+
+    /** Setter */
+    public void setPrice(final int price) {
+        this.price = price;
+    }
+
+    /** Getter */
+    public int getPrice() {
+        return price;
     }
 
 }

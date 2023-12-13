@@ -12,7 +12,7 @@ import java.util.ArrayList;
 public class Playlist extends SongsCollection {
     private String visibility;
     private int followers;
-    private int totalLikes; // <-- camp ce contine numarul total de like-uri pentru toate piesele
+    private int totalLikes; // <-- Contine numarul total de like-uri pentru toate piesele
 
     public Playlist(final CommandIn command) {
         super(command);
@@ -68,6 +68,7 @@ public class Playlist extends SongsCollection {
         if (!isCreated) {
             // v-- Cream efectiv playlist-ul
             Playlist newPlaylist = ((Playlist) SongsCollFactory.getCollection(command));
+            newPlaylist.setOwner(currentUser.getUsername());
             currentUser.getPlaylists().add(newPlaylist);
             topFwdPlaylits.add(new FollowStats(command.getPlaylistName()));
             out.setMessage("Playlist created successfully.");
@@ -120,8 +121,8 @@ public class Playlist extends SongsCollection {
      * */
     public int findTotalLikes(final ArrayList<Like> topLikedSongs) {
         for (Like songInfo : topLikedSongs) {
-            for (String songInPlist : getSongNames()) {
-                if (songInPlist.equals(songInfo.getSongName())) {
+            for (String songInPlaylist : getSongNames()) {
+                if (songInPlaylist.equals(songInfo.getSongName())) {
                     totalLikes += songInfo.getUsers();
                 }
             }
