@@ -29,38 +29,43 @@ public class Host extends UserInfo {
      *  </p>
      *  Returneaza un obiect de tipul rezultatului asteptat la comanda "cmd"
      * */
-    public ResultOut addPodcast(final CommandIn cmd) {
+    public ResultOut addPodcast(final CommandIn cmd, final UserInfo user) {
         ResultOut result = new ResultOut(cmd);
 
-        String newPodcastName = cmd.getName();
-        /* Verificam daca host-ul mai are un album cu acelasi nume */
-        for (PodcastInput podcast : podcasts) {
-            if (podcast.getName().equals(newPodcastName)) {
-                result.setMessage(getUsername() + " has another podcast with the same name.");
-                return result;
+        if (!user.isHost()) {
+            result.setMessage(user.getUsername() + " is not a host.");
+        } else {
+            Host host = (Host) user;
+            String newPodcastName = cmd.getName();
+            /* Verificam daca host-ul mai are un album cu acelasi nume */
+            for (PodcastInput podcast : host.getPodcasts()) {
+                if (podcast.getName().equals(newPodcastName)) {
+                    result.setMessage(host.getUsername() + " has another podcast with the same name.");
+                    return result;
+                }
             }
-        }
 
         /*
             Adaugam pe rand episoadele intr-un podcast nou si verificam
             la fiecare pas daca mai exista unul cu acelasi nume
         */
-        PodcastInput newPodcast = new PodcastInput();
-        newPodcast.setEpisodes(new ArrayList<>());
-        for (EpisodeInput episode : cmd.getEpisodes()) {
-            if (!newPodcast.isInPodcast(episode, newPodcast)) {
-                newPodcast.getEpisodes().add(episode);
-            } else {
-                result.setMessage(getUsername() + " has the same episode in this podcast.");
-                return result;
+            PodcastInput newPodcast = new PodcastInput();
+            newPodcast.setEpisodes(new ArrayList<>());
+            for (EpisodeInput episode : cmd.getEpisodes()) {
+                if (!newPodcast.isInPodcast(episode, newPodcast)) {
+                    newPodcast.getEpisodes().add(episode);
+                } else {
+                    result.setMessage(host.getUsername() + " has the same episode in this podcast.");
+                    return result;
+                }
             }
-        }
 
-        /* Podcast-ul nu prezinta probleme, il vom adauga in lista host-ului */
-        newPodcast.setName(cmd.getName());
-        newPodcast.setOwner(getUsername());
-        podcasts.add(newPodcast);
-        result.setMessage(getUsername() + " has added new podcast successfully.");
+            /* Podcast-ul nu prezinta probleme, il vom adauga in lista host-ului */
+            newPodcast.setName(cmd.getName());
+            newPodcast.setOwner(host.getUsername());
+            host.getPodcasts().add(newPodcast);
+            result.setMessage(host.getUsername() + " has added new podcast successfully.");
+        }
 
         return result;
     }
@@ -72,24 +77,29 @@ public class Host extends UserInfo {
      *      Primeste ca parametru comanda invocata si returneaza rezultatul precum
      *      se doreste in fisierele .json
      * */
-    public ResultOut addAnnouncement(final CommandIn cmd) {
+    public ResultOut addAnnouncement(final CommandIn cmd, final UserInfo user) {
         ResultOut result = new ResultOut(cmd);
         String newAnnounceName = cmd.getName();
 
-        /* Verificam daca mai exista un anunt cu acelasi nume */
-        for (String news : announcementsName) {
-            if (news.equals(newAnnounceName)) {
-                result.setMessage(getUsername() +
-                        " has already added an announcement with this name.");
-                return result;
+        if (!user.isHost()) {
+            result.setMessage(user.getUsername() + " is not a host.");
+        } else {
+            Host host = (Host) user;
+            /* Verificam daca mai exista un anunt cu acelasi nume */
+            for (String news : host.getAnnouncementsName()) {
+                if (news.equals(newAnnounceName)) {
+                    result.setMessage(host.getUsername() +
+                            " has already added an announcement with this name.");
+                    return result;
+                }
             }
-        }
 
-        /* Anuntul nu prezinta probleme; va fi adaugat in lista de anunturi */
-        announcementsName.add(newAnnounceName);
-        announcementsDescription.add(cmd.getDescription());
-        result.setMessage(getUsername() + " has successfully added new announcement.");
-        return result;
+            /* Anuntul nu prezinta probleme; va fi adaugat in lista de anunturi */
+            host.getAnnouncementsName().add(newAnnounceName);
+            host.getAnnouncementsDescription().add(cmd.getDescription());
+            result.setMessage(host.getUsername() + " has successfully added new announcement.");
+        }
+            return result;
     }
 
     public ResultOut removeAnnouncement(final CommandIn cmd) {

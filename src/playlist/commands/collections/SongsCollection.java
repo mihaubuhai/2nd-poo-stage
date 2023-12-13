@@ -17,6 +17,7 @@ public class SongsCollection {
     private ArrayList<Integer> shuffledIndices; // <-- Vectorul de indici amestecati
     private int timeOfCreation;   // <-- Camp folosit pentru sortarea topului de playlist-uri
     private int nrListeners; //<-- Numarul de ascultatori, la un moment, al unei colectii audio
+    protected boolean isAlbum;
 
     public SongsCollection(final CommandIn command) {
         setTimeOfCreation(command.getTimestamp());
@@ -154,6 +155,11 @@ public class SongsCollection {
         if (nrListeners > 0) {
             nrListeners--;
         }
+    }
+
+    /** Getter */
+    public boolean isAlbum() {
+        return isAlbum;
     }
 
 }

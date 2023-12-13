@@ -5,6 +5,7 @@ import fileio.input.SongInput;
 import input.commands.CommandIn;
 import main.users.NormalUser;
 import output.result.ResultOut;
+import search.bar.Select;
 
 import java.util.ArrayList;
 
@@ -98,13 +99,13 @@ public class Like implements Comparable {
             boolean deletedSong = false;
 
             /* Verificam daca in lista de aprecieri ale user-ului se gaseste melodia care ruleaza */
-            for (String song: currentUser.getLikedSongs()) {
+            for (String song: currentUser.getLikedSongsNames()) {
                 if (song.equals(currentSong)) {
                     /*
                         Daca se gaseste, o vom elimina si marcam ..
                      .. aceasta eliminare (pentru lista topLikedSongs)
                      */
-                    currentUser.getLikedSongs().remove(song);
+                    currentUser.getLikedSongs().removeIf(tempSong -> tempSong.getName().equals(song));
                     deletedSong = true;
                     break;
                 }
@@ -125,7 +126,7 @@ public class Like implements Comparable {
                 result.setMessage("Unlike registered successfully.");
             } else {
                 /* Melodia nu a fost apreciata de user*/
-                currentUser.getLikedSongs().add(currentSong);
+                currentUser.getLikedSongs().add(findSong(currentUser));
                 boolean created = false;
                 /*
                     O cautam in lista si incrementam numarul de aprecieri; daca nu o gasim,
@@ -145,5 +146,24 @@ public class Like implements Comparable {
             }
         }
         return result;
+    }
+
+
+    private static SongInput findSong(final NormalUser user) {
+        String songToFind = user.getPlayer().getStats().getName();
+        Select usersInfo = user.getPlayer().getLoadInfo().getSelectInfo();
+
+        if (usersInfo.getSong() != null) {
+            return usersInfo.getSong();
+        } else {
+            SongInput song = null;
+            for (SongInput tempSong : usersInfo.getSongsCollection().getSongs()) {
+                if (tempSong.getName().equals(songToFind)) {
+                    song = tempSong;
+                    break;
+                }
+            }
+            return song;
+        }
     }
 }

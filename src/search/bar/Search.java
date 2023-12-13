@@ -293,7 +293,7 @@ public final class Search {
         int validFilters = 0;
 
         if (filters.getOwner() != null) {
-            if (playlist.getOwner().contains(filters.getOwner())) {
+            if (playlist.getOwner().equals(filters.getOwner())) {
                 validFilters++;
             }
         }
@@ -321,7 +321,7 @@ public final class Search {
         int validFilters = 0;
 
         if (filters.getOwner() != null) {
-            if (podcast.getOwner().contains(filters.getOwner())) {
+            if (podcast.getOwner().equals(filters.getOwner())) {
                 validFilters++;
             }
         }

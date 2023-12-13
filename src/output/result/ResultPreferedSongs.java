@@ -1,5 +1,6 @@
 package output.result;
 
+import fileio.input.SongInput;
 import input.commands.CommandIn;
 
 import java.util.ArrayList;
@@ -11,9 +12,9 @@ import java.util.ArrayList;
 public class ResultPreferedSongs extends ResultCommand {
     private ArrayList<String> result;
 
-    public ResultPreferedSongs(final CommandIn command, final ArrayList<String> result) {
+    public ResultPreferedSongs(final CommandIn command, final ArrayList<SongInput> likes) {
         super(command);
-        setResult(result);
+        likes.forEach(song -> result.add(song.getName()));
     }
 
     /** Setter */

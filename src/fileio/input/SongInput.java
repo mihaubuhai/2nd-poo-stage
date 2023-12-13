@@ -11,8 +11,19 @@ public final class SongInput {
     private String genre;
     private Integer releaseYear;
     private String artist;
+    private boolean isInAlbumClass;
+    //^-- Daca se instantiaza un album si melodia este apartenenta
 
     public SongInput() {
+        isInAlbumClass = false;
+    }
+
+    public void changeState() {
+        isInAlbumClass ^= true;
+    }
+
+    public boolean getIsInAlbum() {
+        return isInAlbumClass;
     }
 
     public String getName() {

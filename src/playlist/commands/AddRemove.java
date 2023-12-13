@@ -4,7 +4,9 @@ import fileio.input.SongInput;
 import input.commands.CommandIn;
 import main.users.NormalUser;
 import output.result.ResultOut;
+import playlist.commands.collections.Album;
 import playlist.commands.collections.Playlist;
+import playlist.commands.collections.SongsCollection;
 
 import java.util.ArrayList;
 
@@ -25,12 +27,19 @@ public final class AddRemove {
             result.setMessage(out);
             return result;
         }
-        final int songId = 1;
-        /*Verificam daca player-ul ruleaza o melodie (prin resultType al selectInfo ne dam seama)*/
-        if (user.getPlayer().getLoadInfo().getSelectInfo().getResultType() != songId) {
+        final int podcastId = 2;
+
+        /*
+            Verificam daca s-a selectat un podcast sau un playlist,
+            intrucat functionalitatea acestei metode nu suporta si aceste optiuni
+        */
+        SongsCollection col = user.getPlayer().getLoadInfo().getSelectInfo().getSongsCollection();
+        if (user.getPlayer().getLoadInfo().getSelectInfo().getResultType() == podcastId ||
+                (col != null && !col.isAlbum())) {
             result.setMessage("The loaded source is not a song.");
             return result;
         }
+
         /* Verificam daca prin comanda s-a dat un playlistId invalid */
         if (user.getPlaylists().size() < command.getPlaylistId() - 1) {
             result.setMessage("The specified playlist does not exist.");
@@ -38,26 +47,40 @@ public final class AddRemove {
         }
 
         Playlist playlist = user.getPlaylists().get(command.getPlaylistId() - 1);
-        String currentSong = user.getPlayer().getLoadInfo().getSelectInfo().getSong().getName();
+        String loadedSong = user.getPlayer().getStats().getName();
+        Album album = (Album) col;
         /*
             Iteram prin lista de melodii ale playlist-ului si
             cautam melodia care este incarcata in player
         */
         for (SongInput song: playlist.getSongs()) {
-            if (song.getName().contains(currentSong)) {
+            if (song.getName().contains(loadedSong)) {
                 playlist.getSongs().remove(song);
+                if (song.getIsInAlbum()) {
+                    album.decrementNrSongsUsed();
+                }
                 result.setMessage("Successfully removed from playlist.");
                 return result;
             }
         }
 
         /* Ajunsi aici inseamna ca melodia nu se gaseste in playlist, asa ca trebuie adaugata */
-        for (SongInput song: librarySongs) {
-            if (song.getName().contains(currentSong)) {
-                playlist.getSongs().add(song);
-                break;
+        if (user.getPlayer().getLoadInfo().getSelectInfo().getArtistHostName() == null) {
+            /* Este incarcata o melodie din librarie */
+            playlist.getSongs().add(user.getPlayer().getLoadInfo().getSelectInfo().getSong());
+        } else {
+            /* Este incarcata o melodie dintr-un album */
+            for (SongInput song : album.getSongs()) {
+                if (song.getName().equals(loadedSong)) {
+                    playlist.getSongs().add(song);
+                    break;
+                }
             }
+
+            /* v-- Se contorizeaza faptul ca o piesa a albumului este folosita */
+            album.incrementNrSongsUsed();
         }
+
         result.setMessage("Successfully added to playlist.");
         return result;
     }

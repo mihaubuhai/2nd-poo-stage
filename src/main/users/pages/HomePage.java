@@ -28,7 +28,7 @@ public class HomePage extends Page {
         /* Compunem lista de clase Like corespunzatoare melodiilor apreciate de user curent */
         ArrayList<Like> tempLikes = new ArrayList<>();
         for (Like song: topLikedSongs) {
-            for (String userLikes: user.getLikedSongs()) {
+            for (String userLikes: user.getLikedSongsNames()) {
                 if (userLikes.equals(song.getSongName())) {
                     tempLikes.add(song);
                 }

@@ -60,6 +60,7 @@ public final class Artist extends UserInfo {
         for (SongInput song: command.getSongs()) {
             if (!newAlbum.isInAlbum(song)) {
                 newAlbum.getSongs().add(song);
+                song.changeState();
             } else {
                 result.setMessage(getUsername() +
                         " has the same song at least twice in this album.");
@@ -71,6 +72,41 @@ public final class Artist extends UserInfo {
         newAlbum.setOwner(this.getUsername());
         albums.add(newAlbum);
         result.setMessage(getUsername() + " has added new album successfully.");
+        return result;
+    }
+
+    // TODO Adaug si daca e vreo melodie folosita intr-un playlist
+    public ResultOut removeAlbum(final CommandIn cmd, final UserInfo user) {
+        ResultOut result = new ResultOut(cmd);
+        Album toRemoveAlbum = null;
+
+        if (!user.isArtist()) {
+            result.setMessage(user.getUsername() + " is not an artist.");
+        } else {
+            Artist artist = (Artist) user;
+            /* Cautam albumul specificat in comanda si retinem referinta catre acesta */
+            for (Album album : artist.getAlbums()) {
+                if (album.getName().equals(cmd.getName())) {
+                    toRemoveAlbum = album;
+                    break;
+                }
+            }
+
+            /* Verificam daca artistul are un album cu numele dat in cmd */
+            if (toRemoveAlbum == null) {
+                result.setMessage(artist.getUsername() + " doesn't have an album with the given name.");
+            } else {
+                /* Albumul exista, verificam daca sunt ascultatori al lui / al vreunei piese */
+                if (toRemoveAlbum.getNrListeners() > 0 || toRemoveAlbum.getNrSongsUsed() > 0) {
+                    result.setMessage(artist.getUsername() + " can't delete this album.");
+                } else {
+                    /* Albumul poate fi sters */
+                    artist.getAlbums().remove(toRemoveAlbum);
+                    result.setMessage(artist.getUsername() + " deleted the album successfully.");
+                }
+            }
+        }
+
         return result;
     }
 

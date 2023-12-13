@@ -115,6 +115,7 @@ public class Select {
                                 if (albumSongName.equals(selectedSong)) {
                                     setSong(song);
                                     setArtistHostName(artist);
+                                    setSongsCollection(album);
                                     // ^-- Se retine faptul ca user-ul asculta ceva ce nu este in librarie
                                     result.setMessage("Successfully selected " + albumSongName + ".");
                                     break;

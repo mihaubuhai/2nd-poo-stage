@@ -20,6 +20,7 @@ public class Playlist extends SongsCollection {
         setVisibility("public");
         followers = 0;
         totalLikes = 0;
+        isAlbum= false;
     }
 
     /**

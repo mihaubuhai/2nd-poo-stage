@@ -21,7 +21,7 @@ import java.util.ArrayList;
 public final class NormalUser extends UserInfo {
     private Player player;                                    /* Player-ul user-ului */
     private final ArrayList<Playlist> playlists;    /* Tine cont de playlist-urile user-ului */
-    private final ArrayList<String> likedSongs;  /* Melodiile apreciate de user */
+    private final ArrayList<SongInput> likedSongs;  /* Melodiile apreciate de user */
     private final ArrayList<Playlist> fwdPlaylits; /* Playlist-urile urmarite de user */
     private boolean state;        /* <-- Starea unui utilizator: Online (true), Offline (false) */
     private Page currentPage;  /* <-- Pagina pe care se afla user-ul */
@@ -187,6 +187,8 @@ public final class NormalUser extends UserInfo {
 
         /* Abordam cazul "repeat current song" */
         if (repeatMode.contains("current")) {
+            /* nextIdx va fi chiar indicele corepunzator melodiei care ruleaza pt acest caz */
+            currSong = currSongsColl.getSongs().get(nextIdx);
             int initialDuration = currSong.getDuration();
             int remainedTime = player.getStats().getRemainedTime();
             player.getStats().setRemainedTime(evaluateLeftTime(remainedTime, initialDuration));
@@ -424,8 +426,15 @@ public final class NormalUser extends UserInfo {
     }
 
     /** Getter */
-    public ArrayList<String> getLikedSongs() {
+    public ArrayList<SongInput> getLikedSongs() {
         return likedSongs;
+    }
+
+    /** Metoda returneaza lista cu numele melodiilor apreciate de user */
+    public ArrayList<String> getLikedSongsNames() {
+        ArrayList<String> tempRef = new ArrayList<>();
+        likedSongs.forEach(song -> tempRef.add(song.getName()));
+        return tempRef;
     }
 
     /** Getter */

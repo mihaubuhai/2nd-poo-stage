@@ -286,7 +286,7 @@ public final class AnalyseCommands {
                 }
             } else if (command.getCommand().equals("showAlbums")) {
                 result.add(new ResultShowAlbums(command, currentArtist));
-            } else if (command.getCommand().contains("Page") && currentUser != null) {
+            } else if (command.getCommand().equals("printCurrentPage") && currentUser != null) {
                 result.add(currentUser.getCurrentPage().getPage(currentUser, command, topLikedSongs));
             } else if (command.getCommand().contains("Event")) {
                 Artist tempArtist = new Artist(null);   // <-- pentru a apela metoda
@@ -297,21 +297,11 @@ public final class AnalyseCommands {
             } else if (command.getCommand().contains("delete")) {
                 result.add(UserInfo.deleteUser(users, user, command, topLikedSongs, topFwdPlaylits));
             } else if (command.getCommand().equals("addPodcast")) {
-                if (!user.isHost()) {
-                    ResultOut out = new ResultOut(command);
-                    out.setMessage(user.getUsername() + " is not a host.");
-                    result.add(out);
-                } else {
-                    result.add(currentHost.addPodcast(command));
-                }
+                Host tempRef = new Host(null);
+                result.add(tempRef.addPodcast(command, user));
             } else if (command.getCommand().equals("addAnnouncement")) {
-                if (!user.isHost()) {
-                    ResultOut out = new ResultOut(command);
-                    out.setMessage(user.getUsername() + " is not a host.");
-                    result.add(out);
-                } else {
-                    result.add(currentHost.addAnnouncement(command));
-                }
+                Host tempRef = new Host(null);
+                result.add(tempRef.addAnnouncement(command, user));
             } else if (command.getCommand().equals("showPodcasts")) {
                 result.add(new ResultShowPodcasts(command, currentHost));
             } else if (command.getCommand().equals("removeAnnouncement")) {
@@ -322,6 +312,10 @@ public final class AnalyseCommands {
                 } else {
                     result.add(currentHost.removeAnnouncement(command));
                 }
+            } else if (command.getCommand().equals("removeAlbum")) {
+                result.add(((Artist) user).removeAlbum(command, user));
+            } else if (command.getCommand().equals("changePage") && currentUser != null) {
+                result.add(currentUser.getCurrentPage().changePage(command, currentUser));
             }
 
         }

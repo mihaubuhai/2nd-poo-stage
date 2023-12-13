@@ -27,6 +27,7 @@ public class CommandIn {
     private String date;
     private int price;
     private ArrayList<EpisodeInput> episodes;
+    private String nextPage;
 
     /** Setter  */
     public void setName(String name) {
@@ -191,6 +192,16 @@ public class CommandIn {
     /** Getter */
     public ArrayList<EpisodeInput> getEpisodes() {
         return episodes;
+    }
+
+    /** Setter */
+    public void setNextPage(final String nextPage) {
+        this.nextPage = nextPage;
+    }
+
+    /** Getter */
+    public String getNextPage() {
+        return nextPage;
     }
 
 }
