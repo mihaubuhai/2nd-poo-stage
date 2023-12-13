@@ -1,10 +1,7 @@
 package main;
 
 import fileio.input.UserInput;
-import main.users.Artist;
-import main.users.NormalUser;
-import main.users.UserFactory;
-import main.users.UserInfo;
+import main.users.*;
 import main.users.pages.Page;
 import output.result.*;
 import top5.top5Playlists;
@@ -95,11 +92,30 @@ public final class AnalyseCommands {
                 });
                 result.add(output);
                 continue;
+            } else if (command.getCommand().contains("AllUsers")) {
+                ResultGetTop5 output = new ResultGetTop5(command);
+                users.forEach(user -> {
+                    if (user.isNormalUser()) {
+                        output.getResult().add(user.getUsername());
+                    }
+                });
+                users.forEach(user -> {
+                    if (user.isArtist()) {
+                        output.getResult().add(user.getUsername());
+                    }
+                });
+                users.forEach(user -> {
+                    if (user.isHost()) {
+                        output.getResult().add(user.getUsername());
+                    }
+                });
+                result.add(output);
+                continue;
             }
 
             NormalUser currentUser = null;
             Artist currentArtist = null;
-            //Host
+            Host currentHost = null;
 
             /*
                 Actualizez pentru orice player (care ruleaza) timpul relativ la ..
@@ -124,6 +140,8 @@ public final class AnalyseCommands {
                 currentUser = (NormalUser) user;
             } else if (user.isArtist()) {
                 currentArtist = (Artist) user;
+            } else {
+                currentHost = (Host) user;
             }
 
             /* ------------------------------  Verificare comenzi ------------------------------ */
@@ -136,6 +154,9 @@ public final class AnalyseCommands {
                         currentUser.updateRemainedTime(command);    // <-- se actualizeaza timpul
                         podcastPlayers.add(currentUser.getPlayer());
                     }
+
+                    /* Decrementez numarul de ascultatori al colectiei audio ascultata de user */
+                    currentUser.getPlayer().getLoadInfo().getSelectInfo().decrementNrListeners();
                 }
                 currentUser.setPlayer(null);        // <--- se goleste efectiv player-ul
 
@@ -254,9 +275,16 @@ public final class AnalyseCommands {
                 result.add(temp.followPlaylist(command, users, selectInfo, topFwdPlaylits));
             } else if (command.getCommand().contains("switch") && currentUser != null) {
                 result.add(currentUser.changeConnectionStatus(command));
-            } else if (command.getCommand().equals("addAlbum") && currentArtist != null) {
-                result.add(currentArtist.addAlbum(command));
-            } else if (command.getCommand().equals("showAlbums") && currentArtist != null) {
+            } else if (command.getCommand().equals("addAlbum")) {
+                if (!user.isArtist()) {
+                    /* Verificam daca user-ul care a apelat aceasta metoda este artist */
+                    ResultOut out = new ResultOut(command);
+                    out.setMessage(user.getUsername() + " is not an artist.");
+                    result.add(out);
+                } else {
+                    result.add(currentArtist.addAlbum(command));
+                }
+            } else if (command.getCommand().equals("showAlbums")) {
                 result.add(new ResultShowAlbums(command, currentArtist));
             } else if (command.getCommand().contains("Page") && currentUser != null) {
                 result.add(Page.getPage(currentUser, command, topLikedSongs, selectedList));
@@ -266,6 +294,16 @@ public final class AnalyseCommands {
             } else if (command.getCommand().contains("Merch")) {
                 Artist tempArtist = new Artist(null);   // <-- pentru a apela metoda
                 result.add(tempArtist.addMerch(user, command));
+            } else if (command.getCommand().contains("delete")) {
+                result.add(UserInfo.deleteUser(users, user, command, topLikedSongs, topFwdPlaylits));
+            } else if (command.getCommand().equals("addPodcast")) {
+                if (!user.isHost()) {
+                    ResultOut out = new ResultOut(command);
+                    out.setMessage(user.getUsername() + " is not a host.");
+                    result.add(out);
+                } else {
+                    result.add(currentHost.addPodcast(command));
+                }
             }
 
         }

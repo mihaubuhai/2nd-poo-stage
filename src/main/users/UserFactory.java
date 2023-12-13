@@ -21,7 +21,9 @@ public final class UserFactory {
             case "artist" -> {
                 return new Artist(userInfo);
             }
-//            case "host" ->
+            case "host" -> {
+                return new Host(userInfo);
+            }
             default -> {
                 return null;
             }

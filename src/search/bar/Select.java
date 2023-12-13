@@ -41,6 +41,7 @@ public class Select {
         setSearchResult(result);
         /* Linia de mai sus salveaza rezultatul efectiv al cautarii (nume melodii / podcast) */
         setResultType(command);
+        artistHostName = null;
     }
 
     public Select(final Select otherSelect) {
@@ -52,6 +53,7 @@ public class Select {
         setPodcast(otherSelect.getPodcast());
         setSongsCollection(otherSelect.getSongsCollection());
         setSearchResult(otherSelect.getSearchResult());
+        setArtistHostName(otherSelect.getArtistHostName());
     }
 
     /** Setter */
@@ -109,6 +111,8 @@ public class Select {
                                 String albumSongName = song.getName();
                                 if (albumSongName.equals(selectedSong)) {
                                     setSong(song);
+                                    setArtistHostName(artist);
+                                    // ^-- Se retine faptul ca user-ul asculta ceva ce nu este in librarie
                                     result.setMessage("Successfully selected " + albumSongName + ".");
                                     break;
                                 }
@@ -116,7 +120,6 @@ public class Select {
                         }
                     }
                 }
-
             } else if (resultType == podcastId) {
                 /* Similar cu cazul "result_type == 1" */
                 String selectedPodcast = getSearchResult().get(command.getItemNumber() - 1);
@@ -141,6 +144,7 @@ public class Select {
                     if (user.isNormalUser()) {
                         for (Playlist playlist: ((NormalUser) user).getPlaylists()) {
                             if ((msg = verifyCollection(playlist, potentialName)) != null) {
+                                setArtistHostName(user);
                                 result.setMessage(msg);
                                 break;
                             }
@@ -149,6 +153,7 @@ public class Select {
                         /* Verificam daca se da select la un album */
                         for (Album album: ((Artist) user).getAlbums()) {
                             if ((msg = verifyCollection(album, potentialName)) != null) {
+                                setArtistHostName(user);
                                 result.setMessage(msg);
                                 break;
                             }
@@ -172,7 +177,7 @@ public class Select {
                             currUser.setCurrentPage(Page.PageType.HOST);
                         }
                         result.setMessage("Successfully selected " + name + "'s page.");
-                        setArtistHostName(user);    // <-- Pentru a contoriza daca se poate sterge artist / host
+                        setArtistHostName(user);
                     }
                 }
             }
@@ -194,6 +199,61 @@ public class Select {
             return "Successfully selected " + collectionName + ".";
         }
         return null;
+    }
+
+    /**
+     *  <p>
+     *  Metoda are rolul de a decrementa numarul de ascultatori al unui podcast / playlist / album
+     *  <p>
+     *  In functie de ce este incarcat, metoda va accesa obiectul corespunzator,
+     *  lucru verificabil prin campul resultType
+     */
+    public void decrementNrListeners() {
+        if (artistHostName == null) {
+            // ^-- Ceea ce este incarcat in player este din librarie, nu influenteaza pe nimeni
+            return;
+        }
+        switch (resultType) {
+            case 1 -> {
+                /* S-a selectat o melodie dintr-un album / playlist */
+                String album = song.getAlbum();
+                SongsCollection tempRef = findAlbum(album);
+                tempRef.decrementNrListeners();
+            }
+            case 2 -> {
+                // TODO
+            }
+            /* Pentru cazul 3, ceea ce ruleaza este o colectie de melodii; Se apeleaza direct metoda */
+            case 3 -> songsCollection.decrementNrListeners();
+        }
+    }
+
+    /** Metoda similara cu "decrementNrListeners" */
+    public void incrementNrListeners() {
+        if (artistHostName == null) {
+            return;
+        }
+
+        switch (resultType) {
+            case 1 -> {
+                String album = song.getAlbum();
+                Album tempRef = findAlbum(album);
+                tempRef.incrementNrListeners();
+            }
+            case 2 -> {
+                // TODO
+            }
+            case 3 -> songsCollection.incrementNrListeners();
+        }
+    }
+
+    private Album findAlbum(final String albumName) {
+        for (Album album: ((Artist) artistHostName).getAlbums()) {
+            if (album.getName().equals(albumName)) {
+                return album;
+            }
+        }
+        return new Album(null);
     }
 
     /** Getter */

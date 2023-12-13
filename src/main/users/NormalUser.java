@@ -16,7 +16,7 @@ import java.util.ArrayList;
 
 /**
  *      Aceasta clasa este folosita pentru a executa comenzile corespunzatoare
- *      unui utilizator
+ *      unui utilizator normal
  * */
 public final class NormalUser extends UserInfo {
     private Player player;                                    /* Player-ul user-ului */
@@ -38,6 +38,8 @@ public final class NormalUser extends UserInfo {
 
     /** Metoda elimina player-ul pentru user-ul care a apelat-o */
     public void removePlayer() {
+        /* v--- Decrementez numarul de ascultatori al albumului / playlist / podcast */
+        player.getLoadInfo().getSelectInfo().decrementNrListeners();
         getPlayer().setLoadInfo(null);
         getPlayer().removeStats();
     }

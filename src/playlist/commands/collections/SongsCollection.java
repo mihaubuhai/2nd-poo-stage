@@ -16,6 +16,7 @@ public class SongsCollection {
     private ArrayList<SongInput> songs; // <-- Melodiile pe care le stocheaza
     private ArrayList<Integer> shuffledIndices; // <-- Vectorul de indici amestecati
     private int timeOfCreation;   // <-- Camp folosit pentru sortarea topului de playlist-uri
+    private int nrListeners; //<-- Numarul de ascultatori, la un moment, al unei colectii audio
 
     public SongsCollection(final CommandIn command) {
         setTimeOfCreation(command.getTimestamp());
@@ -136,6 +137,23 @@ public class SongsCollection {
         songs.forEach(song -> result.add(song.getName()));
 
         return result;
+    }
+
+    /** Getter */
+    public int getNrListeners() {
+        return nrListeners;
+    }
+
+    /** Metoda incrementeaza numarul de ascultatori al unui user */
+    public void incrementNrListeners() {
+        nrListeners++;
+    }
+
+    /** Metoda decrementeaza numarul de ascultatori al unui user */
+    public void decrementNrListeners() {
+        if (nrListeners > 0) {
+            nrListeners--;
+        }
     }
 
 }

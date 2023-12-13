@@ -10,6 +10,15 @@ public final class PodcastInput {
     public PodcastInput() {
     }
 
+    public boolean isInPodcast(final EpisodeInput currEpisode, final PodcastInput podcast) {
+        for (EpisodeInput episode: podcast.getEpisodes()) {
+            if (episode.getName().equals(currEpisode.getName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public String getName() {
         return name;
     }

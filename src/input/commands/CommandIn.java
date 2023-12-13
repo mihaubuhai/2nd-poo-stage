@@ -1,5 +1,6 @@
 package input.commands;
 
+import fileio.input.EpisodeInput;
 import fileio.input.SongInput;
 
 import java.util.ArrayList;
@@ -25,6 +26,7 @@ public class CommandIn {
     private ArrayList<SongInput> songs;
     private String date;
     private int price;
+    private ArrayList<EpisodeInput> episodes;
 
     /** Setter  */
     public void setName(String name) {
@@ -179,6 +181,16 @@ public class CommandIn {
     /** Getter */
     public int getPrice() {
         return price;
+    }
+
+    /** Setter */
+    public void setEpisodes(final ArrayList<EpisodeInput> episodes) {
+        this.episodes = episodes;
+    }
+
+    /** Getter */
+    public ArrayList<EpisodeInput> getEpisodes() {
+        return episodes;
     }
 
 }

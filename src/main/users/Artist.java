@@ -43,12 +43,6 @@ public final class Artist extends UserInfo {
     public ResultOut addAlbum(final CommandIn command) {
         ResultOut result = new ResultOut(command);
 
-        /* Verificam daca user-ul care a apelat aceasta metoda este artist */
-        if (!isArtist()) {
-            result.setMessage(getUsername() + " is not an artist.");
-            return result;
-        }
-
         /* Verificam daca artistul are in colectia sa de albume inca unul cu acelasi nume */
         String currAlbum = command.getName();
         for (Album album: albums) {
