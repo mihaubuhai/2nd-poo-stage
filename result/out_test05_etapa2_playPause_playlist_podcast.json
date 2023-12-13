@@ -54,18 +54,23 @@
   "command" : "search",
   "timestamp" : 55,
   "user" : "alice22",
-  "message" : "Search returned 0 results",
-  "results" : [ ]
+  "message" : "Search returned 1 results",
+  "results" : [ "soundseeker" ]
+}, {
+  "command" : "addAnnouncement",
+  "timestamp" : 56,
+  "user" : "soundseeker",
+  "message" : "soundseeker has successfully added new announcement."
 }, {
   "command" : "select",
   "timestamp" : 57,
   "user" : "alice22",
-  "message" : "The selected ID is too high."
+  "message" : "Successfully selected soundseeker's page."
 }, {
   "command" : "printCurrentPage",
   "timestamp" : 58,
   "user" : "alice22",
-  "message" : "Liked songs:\n\t[]\n\nFollowed playlists:\n\t[]"
+  "message" : "Podcasts:\n\t[Auditory Adventures:\n\t[Exploring Sonic Landscapes - Journey through the world's most unique auditory experiences., The Future of Music Technology - A look into the innovations shaping the future of music production and listening., Cultural Beats - An exploration of how different cultures influence music genres.]\n, Harmony & History:\n\t[The Roots of Blues - Tracing the origins and evolution of blues music., Classical Music's Modern Impact - Discussing how classical music continues to influence contemporary artists., Jazz Journeys - Exploring the rich history and vibrant present of jazz music., The Folk Revival - Examining the resurgence of folk music in modern times.]\n]\n\nAnnouncements:\n\t[Announcement1:\n\tPrimul anunt adaugat!\n]"
 }, {
   "command" : "search",
   "timestamp" : 60,
@@ -97,41 +102,41 @@
   "command" : "search",
   "timestamp" : 75,
   "user" : "alice22",
-  "message" : "Search returned 0 results",
-  "results" : [ ]
+  "message" : "Search returned 1 results",
+  "results" : [ "Auditory Adventures" ]
 }, {
   "command" : "select",
   "timestamp" : 80,
   "user" : "alice22",
-  "message" : "The selected ID is too high."
+  "message" : "Successfully selected Auditory Adventures."
 }, {
   "command" : "load",
   "timestamp" : 85,
   "user" : "alice22",
-  "message" : "Please select a source before attempting to load."
+  "message" : "Playback loaded successfully."
 }, {
   "command" : "status",
   "timestamp" : 86,
   "user" : "alice22",
   "stats" : {
-    "name" : "",
-    "remainedTime" : 0,
+    "name" : "Exploring Sonic Landscapes",
+    "remainedTime" : 2699,
     "repeat" : "No Repeat",
     "shuffle" : false,
-    "paused" : true
+    "paused" : false
   }
 }, {
   "command" : "playPause",
   "timestamp" : 3200,
   "user" : "alice22",
-  "message" : "Please load a source before attempting to pause or resume playback."
+  "message" : "Playback paused successfully."
 }, {
   "command" : "status",
   "timestamp" : 3201,
   "user" : "alice22",
   "stats" : {
-    "name" : "",
-    "remainedTime" : 0,
+    "name" : "The Future of Music Technology",
+    "remainedTime" : 2785,
     "repeat" : "No Repeat",
     "shuffle" : false,
     "paused" : true
@@ -158,6 +163,11 @@
   "user" : "alice22",
   "message" : "Playback loaded successfully."
 }, {
+  "command" : "addAnnouncement",
+  "timestamp" : 3226,
+  "user" : "soundseeker",
+  "message" : "soundseeker has successfully added new announcement."
+}, {
   "command" : "addRemoveInPlaylist",
   "timestamp" : 3230,
   "user" : "alice22",
@@ -179,6 +189,11 @@
   "user" : "alice22",
   "message" : "Playback loaded successfully."
 }, {
+  "command" : "removeAnnouncement",
+  "timestamp" : 3246,
+  "user" : "soundseeker",
+  "message" : "soundseeker has no announcement with the given name."
+}, {
   "command" : "addUser",
   "timestamp" : 3247,
   "user" : "magichost",
@@ -189,10 +204,26 @@
   "user" : "magichost",
   "message" : "The username magichost is already taken."
 }, {
+  "command" : "showPodcasts",
+  "timestamp" : 3250,
+  "user" : "soundseeker",
+  "result" : [ {
+    "name" : "Auditory Adventures",
+    "episodes" : [ "Exploring Sonic Landscapes", "The Future of Music Technology", "Cultural Beats" ]
+  }, {
+    "name" : "Harmony & History",
+    "episodes" : [ "The Roots of Blues", "Classical Music's Modern Impact", "Jazz Journeys", "The Folk Revival" ]
+  } ]
+}, {
   "command" : "addRemoveInPlaylist",
   "timestamp" : 3250,
   "user" : "alice22",
   "message" : "Successfully added to playlist."
+}, {
+  "command" : "removeAnnouncement",
+  "timestamp" : 3251,
+  "user" : "soundseeker",
+  "message" : "soundseeker has successfully deleted the announcement."
 }, {
   "command" : "search",
   "timestamp" : 3255,
@@ -224,7 +255,7 @@
   "command" : "printCurrentPage",
   "timestamp" : 3275,
   "user" : "alice22",
-  "message" : "Liked songs:\n\t[]\n\nFollowed playlists:\n\t[]"
+  "message" : "Podcasts:\n\t[Auditory Adventures:\n\t[Exploring Sonic Landscapes - Journey through the world's most unique auditory experiences., The Future of Music Technology - A look into the innovations shaping the future of music production and listening., Cultural Beats - An exploration of how different cultures influence music genres.]\n, Harmony & History:\n\t[The Roots of Blues - Tracing the origins and evolution of blues music., Classical Music's Modern Impact - Discussing how classical music continues to influence contemporary artists., Jazz Journeys - Exploring the rich history and vibrant present of jazz music., The Folk Revival - Examining the resurgence of folk music in modern times.]\n]\n\nAnnouncements:\n\t[Announcement2:\n\tAl doilea anunt adaugat!\n]"
 }, {
   "command" : "status",
   "timestamp" : 3448,

@@ -11,7 +11,8 @@ import java.util.ArrayList;
 
 /** Clasa care implementeaza pagina Home a unui user normal */
 public class HomePage extends Page {
-    private HomePage() {
+    public HomePage(final PageType type) {
+        super(type);
     }
 
     /**
@@ -20,7 +21,7 @@ public class HomePage extends Page {
      *      </p>
      *      Primeste ca parametrii user-ul care a invocat comanda
      * */
-    public static ResultOut printPage(final NormalUser user, final ArrayList<Like> topLikedSongs, final CommandIn cmd) {
+    public ResultOut printPage(final NormalUser user, final ArrayList<Like> topLikedSongs, final CommandIn cmd) {
         ResultOut result = new ResultOut(cmd);
         pageContent = new StringBuilder("Liked songs:\n\t[");
 

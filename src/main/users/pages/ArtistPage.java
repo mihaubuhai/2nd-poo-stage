@@ -2,11 +2,13 @@ package main.users.pages;
 
 import input.commands.CommandIn;
 import main.users.Artist;
+import main.users.UserInfo;
 import output.result.ResultOut;
 
 /** Aceasta clasa contine metoda care creeaza pagina unui artist */
 public class ArtistPage extends Page {
-    private ArtistPage() {
+    public ArtistPage(final UserInfo user, final PageType type) {
+        super(user, type);
     }
 
     /**
@@ -15,7 +17,7 @@ public class ArtistPage extends Page {
      *      Primeste ca parametrii artistul a carei pagina sa se afiseze si comanda care a invocat metoda </p>
      *      Returneaza un obiect de forma mesajului de output al comenzii
      * */
-    public static ResultOut printPage(final Artist artist, final CommandIn cmd) {
+    public ResultOut printPage(final Artist artist, final CommandIn cmd) {
         ResultOut result = new ResultOut(cmd);
         pageContent = new StringBuilder("Albums:\n\t[");
         int pageLength = 0;

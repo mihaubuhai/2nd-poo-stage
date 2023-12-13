@@ -24,7 +24,7 @@ public final class NormalUser extends UserInfo {
     private final ArrayList<String> likedSongs;  /* Melodiile apreciate de user */
     private final ArrayList<Playlist> fwdPlaylits; /* Playlist-urile urmarite de user */
     private boolean state;        /* <-- Starea unui utilizator: Online (true), Offline (false) */
-    private Page.PageType currentPage;  /* <-- Pagina pe care se alfa user-ul */
+    private Page currentPage;  /* <-- Pagina pe care se afla user-ul */
 
     public NormalUser(final UserInput userInfo) {
         setUserInfo(userInfo);
@@ -33,7 +33,7 @@ public final class NormalUser extends UserInfo {
         fwdPlaylits = new ArrayList<>();
         userType = UserType.NORMALUSER;   /* Retinem ca aceasta clasa reprezinta un user normal */
         state = true;   /* <-- Utilizatorul este "Online" atunci cand este adaugat pe platforma */
-        currentPage = Page.PageType.HOME;
+        currentPage = new HomePage(Page.PageType.HOME); // <-- Pagina initiala este "HOME"
     }
 
     /** Metoda elimina player-ul pentru user-ul care a apelat-o */
@@ -411,7 +411,7 @@ public final class NormalUser extends UserInfo {
     }
 
     /** Setter */
-    public void setCurrentPage(final Page.PageType page) { currentPage = page; }
+    public void setCurrentPage(final Page page) { currentPage = page; }
 
     /** Getter */
     public Player getPlayer() {
@@ -444,6 +444,6 @@ public final class NormalUser extends UserInfo {
     }
 
     /** Getter */
-    public Page.PageType getCurrentPage() { return currentPage; }
+    public Page getCurrentPage() { return currentPage; }
 
 }

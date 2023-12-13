@@ -5,8 +5,11 @@ import fileio.input.PodcastInput;
 import fileio.input.SongInput;
 import input.commands.CommandIn;
 import main.users.Artist;
+import main.users.Host;
 import main.users.UserInfo;
 import main.users.NormalUser;
+import main.users.pages.ArtistPage;
+import main.users.pages.HostPage;
 import main.users.pages.Page;
 import output.result.ResultOut;
 import playlist.commands.collections.Album;
@@ -132,7 +135,21 @@ public class Select {
                         break;
                     }
                 }
-                /* TO DO */
+
+                /* Podcastul care se vrea selectat nu se afla in librarie; cautam la hosts */
+                for (UserInfo user : users) {
+                    if (user.isHost()) {
+                        for (PodcastInput podcast : ((Host) user).getPodcasts()) {
+                            if (podcast.getName().equals(selectedPodcast)) {
+                                setPodcast(podcast);
+                                setArtistHostName(user);
+                                result.setMessage("Successfully selected " + podcast.getName() +
+                                        ".");
+                                break;
+                            }
+                        }
+                    }
+                }
             } else if (resultType == songCollId) {
                 /* Aici se selecteaza fie playlist, fie album */
                 int id = command.getItemNumber();
@@ -172,17 +189,15 @@ public class Select {
                             .. pagina al user-ului care a invocat comanda
                         */
                         if (user.isArtist()) {
-                            currUser.setCurrentPage(Page.PageType.ARTIST);
+                            currUser.setCurrentPage(new ArtistPage(user, Page.PageType.ARTIST));
                         } else {
-                            currUser.setCurrentPage(Page.PageType.HOST);
+                            currUser.setCurrentPage(new HostPage(user, Page.PageType.HOST));
                         }
                         result.setMessage("Successfully selected " + name + "'s page.");
                         setArtistHostName(user);
                     }
                 }
             }
-
-
         }
 
         return result;

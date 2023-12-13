@@ -5,6 +5,7 @@ import fileio.input.PodcastInput;
 import input.commands.CommandIn;
 import input.commands.Filters;
 import main.users.Artist;
+import main.users.Host;
 import main.users.NormalUser;
 import main.users.UserInfo;
 import output.result.ResultOutSearch;
@@ -69,6 +70,25 @@ public final class Search {
                     break;
                 }
             }
+
+            /* Se prea poate ca user-ul sa caute podcast-ul unui host; Vom cauta si acolo */
+            if (output.getResults().size() < maxSize) {
+                for (UserInfo user : users) {
+                    if (user.isHost()) {
+                        for (PodcastInput podcast : ((Host) user).getPodcasts()) {
+                            PodcastInput result = checkFiltersPodcasts(cmd.getFilters(), podcast);
+
+                            if (result != null) {
+                                output.addResult(result.getName());
+                            }
+                            if (output.getResults().size() == maxSize) {
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
         } else if (cmd.getType().equals("playlist")) {
             /* Se va cauta un playlist */
             for (UserInfo user: users) {
@@ -109,11 +129,23 @@ public final class Search {
                     }
                 }
             }
-        } else {
+        } else if (cmd.getType().equals("artist")) {
             /* Se cauta un artist */
             for (UserInfo user: users) {
                 String filter = cmd.getFilters().getName();
                 if (user.isArtist() && user.getUsername().startsWith(filter)) {
+                    output.addResult(user.getUsername());
+                }
+
+                if (output.getResults().size() > maxSize) {
+                    break;
+                }
+            }
+        } else {
+            /* Se cauta un host */
+            for (UserInfo user: users) {
+                String filter = cmd.getFilters().getName();
+                if (user.isHost() && user.getUsername().startsWith(filter)) {
                     output.addResult(user.getUsername());
                 }
 

@@ -2,7 +2,9 @@ package main.users.pages;
 
 import input.commands.CommandIn;
 import main.users.Artist;
+import main.users.Host;
 import main.users.NormalUser;
+import main.users.UserInfo;
 import output.result.ResultOut;
 import player.commands.Like;
 import search.bar.Select;
@@ -11,6 +13,17 @@ import java.util.ArrayList;
 
 public class Page {
     protected static StringBuilder pageContent;
+    protected UserInfo usersPage;
+    private PageType pageType;
+
+    public Page(final PageType type) {
+        pageType = type;
+    }
+
+    public Page(final UserInfo usersPage, final PageType type) {
+        this(type);
+        this.usersPage = usersPage;
+    }
 
     public enum PageType {
         HOME,
@@ -33,39 +46,27 @@ public class Page {
      *      --> lista de selectii pentru fiecare user
      *      </p>
      * */
-    public static ResultOut getPage(final NormalUser user, final CommandIn cmd,
-                                    final ArrayList<Like> topLikedSongs,
-                                    final ArrayList<Select> selects) {
+    public ResultOut getPage(final NormalUser user, final CommandIn cmd,
+                                    final ArrayList<Like> topLikedSongs) {
 
-        switch (user.getCurrentPage()) {
-            case HOME -> {
-                return HomePage.printPage(user, topLikedSongs, cmd);
+        if (user.getCurrentPage().getPageType() == PageType.HOME) {
+            return ((HomePage) this).printPage(user, topLikedSongs, cmd);
+        } else {
+            /* Cazurile ARTIST si HOST */
+            if (usersPage.isArtist()) {
+                return ((ArtistPage) this).printPage((Artist) usersPage, cmd);
             }
-
-            case ARTIST -> {
-                /* Se cauta informatiile de selectie ale user-ului "user" */
-                Select currUserSelectInfo = null;
-                for (Select info : selects) {
-                    if (info.getUser().equals(user.getUsername())) {
-                        currUserSelectInfo = info;
-                        break;
-                    }
-                }
-
-                /* Se garanteaza ca acestea exista.. */
-                if (currUserSelectInfo != null) {
-                    return ArtistPage.printPage((Artist) currUserSelectInfo.getArtistHostName(),
-                            cmd);
-                } else {
-                    return new ResultOut(cmd);
-                }
-            }
-
-
-            default -> {
-                return new ResultOut(cmd);
-            }
+            return ((HostPage) this).printPage((Host) usersPage, cmd);
         }
     }
 
+    /** Setter */
+    public void setUsersPage(final UserInfo user) {
+        usersPage = user;
+    }
+
+    /** Getter */
+    public PageType getPageType() {
+        return pageType;
+    }
 }
