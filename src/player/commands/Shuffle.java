@@ -1,10 +1,10 @@
 package player.commands;
 
 import input.commands.CommandIn;
-import main.users.NormalUser;
+import users.NormalUser;
 import output.result.ResultOut;
 import player.Player;
-import playlist.commands.collections.SongsCollection;
+import songcollections.collections.SongsCollection;
 
 import java.util.ArrayList;
 import java.util.Collections;

@@ -1,9 +1,5 @@
 package player;
 
-import input.commands.CommandIn;
-import main.users.NormalUser;
-import output.result.ResultStatus;
-
 /**
  *      Aceasta clasa reprezinta player-ul unui user.
  * */

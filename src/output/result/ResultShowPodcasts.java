@@ -1,7 +1,7 @@
 package output.result;
 
 import input.commands.CommandIn;
-import main.users.Host;
+import users.Host;
 import output.PodcastOutput;
 
 import java.util.ArrayList;

@@ -1,31 +1,37 @@
 package main;
 
 import fileio.input.UserInput;
-import main.users.*;
-import top5.top5Albums;
+import users.*;
+import top5.getTopAlbums;
 import output.result.*;
-import playlist.commands.collections.Album;
-import top5.top5Playlists;
-import top5.top5Songs;
+import songcollections.collections.Album;
+import top5.getTopPlaylists;
+import top5.getTopSongs;
 import fileio.input.LibraryInput;
 import input.commands.CommandIn;
 import player.Player;
-import player.commands.rewounding.Prev;
-import player.commands.rewounding.Next;
-import player.commands.rewounding.Forward;
-import player.commands.rewounding.Backward;
+import player.commands.rewind.Prev;
+import player.commands.rewind.Next;
+import player.commands.rewind.Forward;
+import player.commands.rewind.Backward;
 import player.commands.Shuffle;
 import player.commands.Repeat;
 import player.Stats;
 import player.Load;
 import player.commands.PlayPause;
 import player.commands.Like;
-import playlist.commands.AddRemove;
-import playlist.commands.FollowStats;
-import playlist.commands.collections.Playlist;
+import songcollections.commands.AddRemove;
+import songcollections.commands.FollowStats;
+import songcollections.collections.Playlist;
 import search.bar.Search;
 import search.bar.Select;
 import output.OutputClassFactory;
+import top5.topCreatorVisitor;
+import top5.getTop;
+import top5.getTopSongs;
+import top5.getTopOfUsers;
+import top5.getTopAlbums;
+import top5.getTopPlaylists;
 
 import java.util.ArrayList;
 /**
@@ -75,49 +81,35 @@ public final class AnalyseCommands {
 
         /* Itereaza prin lista de comenzi si verifica ce tip este aceasta */
         for (CommandIn cmd: commands) {
-            if (cmd.getCommand().equals("getTop5Playlists")) {
-                top5Playlists top = top5Playlists.getInstance();
-                result.add(top.getTop5Playlists(cmd, topFwdPlaylits));
-                continue;
-            } else if (cmd.getCommand().equals("getTop5Songs")) {
-                top5Songs top = top5Songs.getInstance();
-                result.add(top.getTop5Songs(cmd, topLikedSongs, library));
-                continue;
-            } else if (cmd.getCommand().contains("getOnline")) {
-                ResultGetTop5 output = new ResultGetTop5(cmd);
-                /* Iteram prin lista "users" */
-                users.forEach(utilizator -> {
-                    /* Verificam daca sunt user-i normali, apoi daca sunt online */
-                    if (utilizator.isNormalUser()) {
-                        if (((NormalUser) utilizator).getState()) {
-                            output.getResult().add(utilizator.getUsername());
-                        }
+            if (cmd.getCommand().contains("get")) {
+                topCreatorVisitor v  = new topCreatorVisitor();
+                getTop top;
+                ResultGetTop5 output;
+
+                switch (cmd.getCommand()) {
+                    case "getTop5Albums" ->  {
+                        top = new getTopAlbums(cmd, topAlbums);
+                        output = ((getTopAlbums) top).accept(v);
                     }
-                });
+                    case "getAllUsers" -> {
+                        top = new getTopOfUsers(cmd, users, false);
+                        output = ((getTopOfUsers) top).accept(v);
+                    }
+                    case "getOnlineUsers" -> {
+                        top = new getTopOfUsers(cmd, users, true);
+                        output = ((getTopOfUsers) top).accept(v);
+                    }
+                    case "getTop5Songs" -> {
+                        top = new getTopSongs(cmd, library, topLikedSongs);
+                        output = ((getTopSongs) top).accept(v);
+                    }
+                    default -> {
+                        top = new getTopPlaylists(cmd, topFwdPlaylits);
+                        output = ((getTopPlaylists) top).accept(v);
+                    }
+                }
+
                 result.add(output);
-                continue;
-            } else if (cmd.getCommand().contains("AllUsers")) {
-                ResultGetTop5 output = new ResultGetTop5(cmd);
-                users.forEach(user -> {
-                    if (user.isNormalUser()) {
-                        output.getResult().add(user.getUsername());
-                    }
-                });
-                users.forEach(user -> {
-                    if (user.isArtist()) {
-                        output.getResult().add(user.getUsername());
-                    }
-                });
-                users.forEach(user -> {
-                    if (user.isHost()) {
-                        output.getResult().add(user.getUsername());
-                    }
-                });
-                result.add(output);
-                continue;
-            } else if (cmd.getCommand().equals("getTop5Albums")) {
-                top5Albums tempRef = top5Albums.getInstance();
-                result.add(tempRef.getTop5(cmd, topAlbums));
                 continue;
             }
 
@@ -262,9 +254,7 @@ public final class AnalyseCommands {
             } else if (cmd.getCommand().equals("switchVisibility") && currentUser != null) {
                 result.add(Playlist.switchVisibility(cmd, currentUser));
             } else if (cmd.getCommand().contains("follow") && currentUser != null) {
-                /* Se cauta "selected" in "selected_list" aferent user-ului curent */
                 Select selectInfo = currentUser.getSelectInfo();
-
                 FollowStats temp = new FollowStats(null);       // <-- doar pentru a apela metoda
                 result.add(temp.followPlaylist(cmd, users, selectInfo, topFwdPlaylits));
             } else if (cmd.getCommand().contains("switch") && currentUser != null) {
@@ -289,7 +279,7 @@ public final class AnalyseCommands {
                 Artist tempArtist = new Artist(null);   // <-- pentru a apela metoda
                 result.add(tempArtist.addMerch(user, cmd));
             } else if (cmd.getCommand().contains("delete")) {
-                result.add(UserInfo.deleteUser(users, user, cmd, topLikedSongs, topFwdPlaylits, selectedList));
+                result.add(UserInfo.deleteUser(users, user, cmd, topLikedSongs, topFwdPlaylits));
             } else if (cmd.getCommand().equals("addPodcast")) {
                 Host tempRef = new Host(null);
                 result.add(tempRef.addPodcast(cmd, user));

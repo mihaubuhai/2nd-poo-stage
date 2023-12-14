@@ -1,10 +1,9 @@
 package player;
 
 import fileio.input.SongInput;
-import main.users.NormalUser;
+import users.NormalUser;
 import output.result.ResultOut;
-import playlist.commands.collections.Playlist;
-import playlist.commands.collections.SongsCollection;
+import songcollections.collections.SongsCollection;
 import search.bar.Select;
 
 import java.util.ArrayList;

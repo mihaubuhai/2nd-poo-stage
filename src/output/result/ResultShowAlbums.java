@@ -1,7 +1,7 @@
 package output.result;
 
 import input.commands.CommandIn;
-import main.users.Artist;
+import users.Artist;
 import output.SongsCollOutput;
 
 import java.util.ArrayList;

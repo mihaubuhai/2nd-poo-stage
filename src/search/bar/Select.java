@@ -4,17 +4,17 @@ import fileio.input.LibraryInput;
 import fileio.input.PodcastInput;
 import fileio.input.SongInput;
 import input.commands.CommandIn;
-import main.users.Artist;
-import main.users.Host;
-import main.users.UserInfo;
-import main.users.NormalUser;
-import main.users.pages.ArtistPage;
-import main.users.pages.HostPage;
-import main.users.pages.Page;
+import users.Artist;
+import users.Host;
+import users.UserInfo;
+import users.NormalUser;
+import users.pages.ArtistPage;
+import users.pages.HostPage;
+import users.pages.Page;
 import output.result.ResultOut;
-import playlist.commands.collections.Album;
-import playlist.commands.collections.Playlist;
-import playlist.commands.collections.SongsCollection;
+import songcollections.collections.Album;
+import songcollections.collections.Playlist;
+import songcollections.collections.SongsCollection;
 
 import java.util.ArrayList;
 
@@ -238,7 +238,7 @@ public class Select {
                 tempRef.decrementNrListeners();
             }
             case 2 -> podcast.decrementNrListeners();
-            /* Pentru cazul 3, ceea ce ruleaza este o colectie de melodii; Se apeleaza direct metoda */
+            /* Pentru cazul 2 si 3, ceea ce ruleaza este o colectie audio; Se apeleaza direct metoda */
             case 3 -> songsCollection.decrementNrListeners();
         }
     }

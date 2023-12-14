@@ -4,10 +4,9 @@ package player;
 import fileio.input.EpisodeInput;
 import fileio.input.SongInput;
 import input.commands.CommandIn;
-import main.users.NormalUser;
+import users.NormalUser;
 import output.result.ResultStatus;
-import playlist.commands.collections.Playlist;
-import playlist.commands.collections.SongsCollection;
+import songcollections.collections.SongsCollection;
 
 /**
  *      Aceasta clasa este folosita pentru afisarea output-ului comenzii "status";

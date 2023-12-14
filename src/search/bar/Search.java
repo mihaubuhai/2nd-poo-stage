@@ -4,13 +4,13 @@ import fileio.input.LibraryInput;
 import fileio.input.PodcastInput;
 import input.commands.CommandIn;
 import input.commands.Filters;
-import main.users.Artist;
-import main.users.Host;
-import main.users.NormalUser;
-import main.users.UserInfo;
+import users.Artist;
+import users.Host;
+import users.NormalUser;
+import users.UserInfo;
 import output.result.ResultOutSearch;
-import playlist.commands.collections.Album;
-import playlist.commands.collections.Playlist;
+import songcollections.collections.Album;
+import songcollections.collections.Playlist;
 
 import java.util.ArrayList;
 

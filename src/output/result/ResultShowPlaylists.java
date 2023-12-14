@@ -1,9 +1,8 @@
 package output.result;
 
 import input.commands.CommandIn;
-import main.users.UserInfo;
-import main.users.NormalUser;
-import playlist.commands.collections.Playlist;
+import users.NormalUser;
+import songcollections.collections.Playlist;
 import output.SongsCollOutput;
 
 import java.util.ArrayList;

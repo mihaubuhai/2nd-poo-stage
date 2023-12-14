@@ -1,7 +1,7 @@
 package player.commands;
 
 import input.commands.CommandIn;
-import main.users.NormalUser;
+import users.NormalUser;
 import output.result.ResultOut;
 import player.Player;
 import player.Stats;

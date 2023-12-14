@@ -1,6 +1,6 @@
 package output;
 
-import playlist.commands.collections.SongsCollection;
+import songcollections.collections.SongsCollection;
 
 import java.util.ArrayList;
 

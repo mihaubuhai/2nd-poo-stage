@@ -3,9 +3,9 @@ package player.commands;
 import fileio.input.LibraryInput;
 import fileio.input.SongInput;
 import input.commands.CommandIn;
-import main.users.NormalUser;
+import users.NormalUser;
 import output.result.ResultOut;
-import playlist.commands.collections.SongsCollection;
+import songcollections.collections.SongsCollection;
 import search.bar.Select;
 
 import java.util.ArrayList;
