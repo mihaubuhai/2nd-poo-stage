@@ -65,6 +65,7 @@ public class Load {
 
         setLoaded(true);
         verifyIfNotInLib(currentSelectInfo);
+        selectInfo.setSearchDone(false);
         result.setMessage("Playback loaded successfully.");
     }
 

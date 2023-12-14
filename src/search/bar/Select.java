@@ -201,6 +201,7 @@ public class Select {
             }
         }
 
+        currUser.setSelectInfo(this);
         return result;
     }
 

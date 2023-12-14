@@ -298,6 +298,5 @@
 }, {
   "command" : "getTop5Albums",
   "timestamp" : 3480,
-  "user" : null,
-  "message" : "The username null doesn't exist."
+  "result" : [ "Harmonic Horizons", "Harmonic Horizons 2" ]
 } ]

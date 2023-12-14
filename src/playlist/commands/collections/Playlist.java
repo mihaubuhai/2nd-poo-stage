@@ -12,15 +12,13 @@ import java.util.ArrayList;
 public class Playlist extends SongsCollection {
     private String visibility;
     private int followers;
-    private int totalLikes; // <-- Contine numarul total de like-uri pentru toate piesele
 
     public Playlist(final CommandIn command) {
         super(command);
         setName(command.getPlaylistName());
         setVisibility("public");
         followers = 0;
-        totalLikes = 0;
-        isAlbum= false;
+        isAlbum = false;
     }
 
     /**
@@ -101,36 +99,6 @@ public class Playlist extends SongsCollection {
     /** Getter */
     public int getFollowers() {
         return followers;
-    }
-
-    /**
-     *      <p>
-     *          Metoda returneaza numarul de like-uri total pe playlist
-     *      </p>
-     *
-     * */
-    public int getTotalLikes() {
-        return totalLikes;
-    }
-
-    /**
-     *          <p>
-     *          "topLikedSongs" contine toate melodiile apreciate de toti userii.
-     *          </p>
-     *          <p>
-     *          Astfel, vom cauta in aceasta lista melodiile care apartin de acest playlist
-     *          si le vom adauga numarul de like-uri la campul "totalLikes" din playlist
-     * */
-    public int findTotalLikes(final ArrayList<Like> topLikedSongs) {
-        for (Like songInfo : topLikedSongs) {
-            for (String songInPlaylist : getSongNames()) {
-                if (songInPlaylist.equals(songInfo.getSongName())) {
-                    totalLikes += songInfo.getUsers();
-                }
-            }
-        }
-
-        return getTotalLikes();
     }
 
 }

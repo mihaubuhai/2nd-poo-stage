@@ -40,7 +40,7 @@ public final class Artist extends UserInfo {
      *    </p>
      *    Returneaza un obiect de tipul rezultatului corespunzator comenzii
      * */
-    public ResultOut addAlbum(final CommandIn command) {
+    public ResultOut addAlbum(final CommandIn command, final ArrayList<Album> topAlbums) {
         ResultOut result = new ResultOut(command);
 
         /* Verificam daca artistul are in colectia sa de albume inca unul cu acelasi nume */
@@ -58,7 +58,7 @@ public final class Artist extends UserInfo {
          */
         Album newAlbum = (Album) SongsCollFactory.getCollection(command);
         for (SongInput song: command.getSongs()) {
-            if (!newAlbum.isInAlbum(song)) {
+            if (!newAlbum.isInAlbum(song.getName())) {
                 newAlbum.getSongs().add(song);
                 song.changeState();
             } else {
@@ -71,6 +71,7 @@ public final class Artist extends UserInfo {
         /* Ajunsi aici, albumul nu prezinta nici o problema, va fi adaugat in lista de albume */
         newAlbum.setOwner(this.getUsername());
         albums.add(newAlbum);
+        topAlbums.add(newAlbum);
         result.setMessage(getUsername() + " has added new album successfully.");
         return result;
     }

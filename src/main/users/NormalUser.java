@@ -25,6 +25,7 @@ public final class NormalUser extends UserInfo {
     private final ArrayList<Playlist> fwdPlaylits; /* Playlist-urile urmarite de user */
     private boolean state;        /* <-- Starea unui utilizator: Online (true), Offline (false) */
     private Page currentPage;  /* <-- Pagina pe care se afla user-ul */
+    private Select selectInfo;
 
     public NormalUser(final UserInput userInfo) {
         setUserInfo(userInfo);
@@ -42,6 +43,7 @@ public final class NormalUser extends UserInfo {
         player.getLoadInfo().getSelectInfo().decrementNrListeners();
         getPlayer().setLoadInfo(null);
         getPlayer().removeStats();
+        selectInfo = null;
     }
 
     /**
@@ -77,7 +79,7 @@ public final class NormalUser extends UserInfo {
                     /* Se verifica daca episodul se repeta */
                     if (!repeatSongEpisode(currentIdxEpisode)) {
                         /* Se incerca rularea urmatorului episod (daca exista) */
-                        if (findFittingEpisode(currentIdxEpisode + 1) < 0) {
+                        if (findFittingEpisode(currentIdxEpisode) < 0) {
                             removePlayer();
                             return;
                         }
@@ -182,7 +184,7 @@ public final class NormalUser extends UserInfo {
         int nextIdx = currSongsColl.findNextIdxSong(this);
         // "idxSong"  ----^ stoca indicele melodiei care urma dupa cea care se rula in player
         int currIdx = findPrevSong(nextIdx, currSongsColl);
-        SongInput currSong = currSongsColl.getSongs().get(currIdx);
+        SongInput currSong;
         //  ^--- Melodia care ruleaza in player
 
         /* Abordam cazul "repeat current song" */
@@ -384,18 +386,18 @@ public final class NormalUser extends UserInfo {
 
         while (remainedTime <= 0) {
             /* Verificam daca am ajuns la final de podcast */
-            if (index == currentPodcast.getEpisodes().size() - 1) {
+            if (index >= currentPodcast.getEpisodes().size() - 1) {
                 return -1;      // <-- Se va goli player-ul
             }
 
+            index += 1;
             EpisodeInput episode = currentPodcast.getEpisodes().get(index);
             int initDuration = episode.getDuration();
             remainedTime += initDuration;
-            index += 1;
         }
 
         /* La finalul while-ului, idxEpisode va fi inainte cu o pozitie */
-        EpisodeInput currentEpisode = currentPodcast.getEpisodes().get(index - 1);
+        EpisodeInput currentEpisode = currentPodcast.getEpisodes().get(index);
         player.getStats().setRemainedTime(remainedTime);
         player.getStats().setName(currentEpisode.getName());
 
@@ -454,5 +456,15 @@ public final class NormalUser extends UserInfo {
 
     /** Getter */
     public Page getCurrentPage() { return currentPage; }
+
+    /** Setter */
+    public void setSelectInfo(final Select selectInfo) {
+        this.selectInfo = selectInfo;
+    }
+
+    /** Getter */
+    public Select getSelectInfo() {
+        return selectInfo;
+    }
 
 }

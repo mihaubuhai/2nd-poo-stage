@@ -2,8 +2,9 @@ package main;
 
 import fileio.input.UserInput;
 import main.users.*;
-import main.users.pages.Page;
+import top5.top5Albums;
 import output.result.*;
+import playlist.commands.collections.Album;
 import top5.top5Playlists;
 import top5.top5Songs;
 import fileio.input.LibraryInput;
@@ -66,21 +67,24 @@ public final class AnalyseCommands {
         /* Lista cu toate playlist-urile urmarite la un moment dat */
         ArrayList<FollowStats> topFwdPlaylits = new ArrayList<>();
 
+        /* Lista cu toate albumele din program */
+        ArrayList<Album> topAlbums = new ArrayList<>();
+
         /* Lista cu podcast-uri care au fost incarcate la un moment dat si acum nu mai ruleaza */
         ArrayList<Player> podcastPlayers = new ArrayList<>();
 
         /* Itereaza prin lista de comenzi si verifica ce tip este aceasta */
-        for (CommandIn command: commands) {
-            if (command.getCommand().equals("getTop5Playlists")) {
+        for (CommandIn cmd: commands) {
+            if (cmd.getCommand().equals("getTop5Playlists")) {
                 top5Playlists top = top5Playlists.getInstance();
-                result.add(top.getTop5Playlists(command, topFwdPlaylits));
+                result.add(top.getTop5Playlists(cmd, topFwdPlaylits));
                 continue;
-            } else if (command.getCommand().equals("getTop5Songs")) {
+            } else if (cmd.getCommand().equals("getTop5Songs")) {
                 top5Songs top = top5Songs.getInstance();
-                result.add(top.getTop5Songs(command, topLikedSongs, library));
+                result.add(top.getTop5Songs(cmd, topLikedSongs, library));
                 continue;
-            } else if (command.getCommand().contains("getOnline")) {
-                ResultGetTop5 output = new ResultGetTop5(command);
+            } else if (cmd.getCommand().contains("getOnline")) {
+                ResultGetTop5 output = new ResultGetTop5(cmd);
                 /* Iteram prin lista "users" */
                 users.forEach(utilizator -> {
                     /* Verificam daca sunt user-i normali, apoi daca sunt online */
@@ -92,8 +96,8 @@ public final class AnalyseCommands {
                 });
                 result.add(output);
                 continue;
-            } else if (command.getCommand().contains("AllUsers")) {
-                ResultGetTop5 output = new ResultGetTop5(command);
+            } else if (cmd.getCommand().contains("AllUsers")) {
+                ResultGetTop5 output = new ResultGetTop5(cmd);
                 users.forEach(user -> {
                     if (user.isNormalUser()) {
                         output.getResult().add(user.getUsername());
@@ -111,6 +115,10 @@ public final class AnalyseCommands {
                 });
                 result.add(output);
                 continue;
+            } else if (cmd.getCommand().equals("getTop5Albums")) {
+                top5Albums tempRef = top5Albums.getInstance();
+                result.add(tempRef.getTop5(cmd, topAlbums));
+                continue;
             }
 
             NormalUser currentUser = null;
@@ -125,14 +133,14 @@ public final class AnalyseCommands {
                 if (updateTimer.isNormalUser()) {
                     NormalUser iter = (NormalUser) updateTimer;
                     if (iter.getPlayer() != null && iter.getState()) {
-                        iter.updateRemainedTime(command);
+                        iter.updateRemainedTime(cmd);
                     }
                 }
             }
 
             /* Cautam in lista "users" pe user-ul care a invocat o comanda */
             UserInfo user;
-            if ((user = analyseUser(users, command, result)) == null) {
+            if ((user = analyseUser(users, cmd, result)) == null) {
                 continue;
             }
 
@@ -145,13 +153,13 @@ public final class AnalyseCommands {
             }
 
             /* ------------------------------  Verificare comenzi ------------------------------ */
-            if (command.getCommand().contains("search") && currentUser != null) {
+            if (cmd.getCommand().contains("search") && currentUser != null) {
                 /* Player-ul pentru user care da "search" trebuie sa dispara !! */
                 Player player = currentUser.getPlayer();
                 if (player != null && player.getLoadInfo() != null) {
                     if (player.getLoadInfo().getSelectInfo().getResultType() == 2) {
                         /* Daca se rula un podcast, se salveaza statisticile curente */
-                        currentUser.updateRemainedTime(command);    // <-- se actualizeaza timpul
+                        currentUser.updateRemainedTime(cmd);    // <-- se actualizeaza timpul
                         podcastPlayers.add(currentUser.getPlayer());
                     }
 
@@ -161,25 +169,25 @@ public final class AnalyseCommands {
                 currentUser.setPlayer(null);        // <--- se goleste efectiv player-ul
 
                 Search search = Search.getInstance();
-                ResultOutSearch temporary = search.searchFunc(library, command, users);
+                ResultOutSearch temporary = search.searchFunc(library, cmd, users);
                 /* v-- Valid deoarece clasa "ResultOutSearch" este o subclasa a "ResultCommand" */
                 result.add(temporary);
 
                 /* Ne asiguram ca nu mai exista rezultatul search-ului anterior */
                 for (Select iter : selectedList) {
-                    if (iter.getUser().contains(command.getUsername())) {
+                    if (iter.getUser().contains(cmd.getUsername())) {
                         selectedList.remove(iter);
                         break;
                     }
                 }
 
                 /* Adaug si faptul ca s-a efectuat search */
-                selectedList.add(new Select(command, temporary.getResults()));
-            } else if (command.getCommand().contains("select") && currentUser != null) {
+                selectedList.add(new Select(cmd, temporary.getResults()));
+            } else if (cmd.getCommand().contains("select") && currentUser != null) {
                 /* Caut nodul din lista "selected_list" corespunzator user-ului ce a dat comanda */
                 Select selected = null;
                 for (Select iter : selectedList) {
-                    if (iter.getUser().contains(command.getUsername())) {
+                    if (iter.getUser().contains(cmd.getUsername())) {
                         selected = iter;
                         break;
                     }
@@ -187,140 +195,126 @@ public final class AnalyseCommands {
 
                 if (selected != null) {
                     /* Chem functia "select" pt user curent si efectuam selectarea */
-                    result.add(selected.selectFunc(command, library, users, currentUser));
+                    result.add(selected.selectFunc(cmd, library, users, currentUser));
+                    selectedList.remove(selected);
                 } else {
-                    ResultOut out = new ResultOut(command);
+                    ResultOut out = new ResultOut(cmd);
                     out.setMessage("Please conduct a search before making a selection.");
                     result.add(out);
                 }
-            } else if (command.getCommand().contains("load") && currentUser != null) {
-                ResultOut resultLoad = new ResultOut(command);
-                boolean succes = false;    /* <-- Arata daca s-a dat "select" inainte de "load" */
-                for (Select selected: selectedList) {
-                    if (selected.getUser().equals(currentUser.getUsername())) {
-                        if (selected.getSelected()) {
-                            Player player = new Player(new Load(selected), command.getTimestamp());
-                            currentUser.setPlayer(player);
-                            selectedList.remove(selected);
-                        }
-                        break;
-                    }
+            } else if (cmd.getCommand().contains("load") && currentUser != null) {
+                ResultOut resultLoad = new ResultOut(cmd);
+
+                Player player = currentUser.getPlayer();
+                Select selected = currentUser.getSelectInfo();
+                if (selected == null || player != null) {
+                    resultLoad.setMessage("Please select a source before attempting to load.");
+                } else if (selected.getSelected()) {
+                    player = new Player(new Load(selected), cmd.getTimestamp());
+                    currentUser.setPlayer(player);
                 }
 
                 /* Daca player ruleaza, nu se efectueaza comanda  "load" */
-                Player player = currentUser.getPlayer();
                 if (player != null && player.getLoadInfo() != null) {
                     Load loadInfo = player.getLoadInfo();
                     if (!loadInfo.getLoaded()) {
                         /* Chem functie load */
                         loadInfo.loadFunc(resultLoad, currentUser, podcastPlayers);
-                        currentUser.getPlayer().setLastLoadTime(command.getTimestamp());
-                        succes = true;
+                        currentUser.getPlayer().setLastLoadTime(cmd.getTimestamp());
                     }
-                }
-
-                if (!succes) {
-                    resultLoad.setMessage("Please select a source before attempting to load.");
                 }
 
                 result.add(resultLoad);
-            } else if (command.getCommand().contains("status") && currentUser != null) {
-                result.add(Stats.statusFunc(command, currentUser));
-            } else if (command.getCommand().contains("playPause") && currentUser != null) {
+            } else if (cmd.getCommand().contains("status") && currentUser != null) {
+                result.add(Stats.statusFunc(cmd, currentUser));
+            } else if (cmd.getCommand().contains("playPause") && currentUser != null) {
                 PlayPause func = PlayPause.getInstance();
                 Player player = currentUser.getPlayer();
-                result.add((func.playPauseFunc(player, command, currentUser)));
-            } else if (command.getCommand().contains("createPlaylist") && currentUser != null) {
-                result.add(Playlist.createPlaylist(currentUser, command, topFwdPlaylits));
-            } else if (command.getCommand().contains("addRemoveInPlaylist") && currentUser != null) {
-                result.add(AddRemove.addRemoveInPlaylist(currentUser, command, library.getSongs()));
-            } else if (command.getCommand().equals("like") && currentUser != null) {
-                result.add(Like.likeCommand(topLikedSongs, currentUser, command, library));
-            } else if (command.getCommand().equals("showPreferredSongs") && currentUser != null) {
-                result.add(new ResultPreferedSongs(command, currentUser.getLikedSongs()));
-            } else if (command.getCommand().equals("showPlaylists") && currentUser != null) {
-                result.add(new ResultShowPlaylists(command, currentUser));
-            } else if (command.getCommand().equals("repeat") && currentUser != null) {
+                result.add((func.playPauseFunc(player, cmd, currentUser)));
+            } else if (cmd.getCommand().contains("createPlaylist") && currentUser != null) {
+                result.add(Playlist.createPlaylist(currentUser, cmd, topFwdPlaylits));
+            } else if (cmd.getCommand().contains("addRemoveInPlaylist") && currentUser != null) {
+                result.add(AddRemove.addRemoveInPlaylist(currentUser, cmd, library.getSongs()));
+            } else if (cmd.getCommand().equals("like") && currentUser != null) {
+                result.add(Like.likeCommand(topLikedSongs, currentUser, cmd, library));
+            } else if (cmd.getCommand().equals("showPreferredSongs") && currentUser != null) {
+                result.add(new ResultPreferedSongs(cmd, currentUser.getLikedSongs()));
+            } else if (cmd.getCommand().equals("showPlaylists") && currentUser != null) {
+                result.add(new ResultShowPlaylists(cmd, currentUser));
+            } else if (cmd.getCommand().equals("repeat") && currentUser != null) {
                 Repeat repeatChanger = new Repeat();
-                result.add(repeatChanger.changeRepeatMode(command, currentUser));
-            } else if (command.getCommand().equals("shuffle") && currentUser != null) {
+                result.add(repeatChanger.changeRepeatMode(cmd, currentUser));
+            } else if (cmd.getCommand().equals("shuffle") && currentUser != null) {
                 Shuffle shuffles = Shuffle.getInstance();
-                result.add(shuffles.shuffleFunc(command, currentUser));
-            } else if (command.getCommand().equals("forward") && currentUser != null) {
+                result.add(shuffles.shuffleFunc(cmd, currentUser));
+            } else if (cmd.getCommand().equals("forward") && currentUser != null) {
                 Forward forward = new Forward(currentUser.getPlayer());
-                result.add(forward.forwardFunc(command));
-            } else if (command.getCommand().equals("backward") && currentUser != null) {
+                result.add(forward.forwardFunc(cmd));
+            } else if (cmd.getCommand().equals("backward") && currentUser != null) {
                 Backward backward = new Backward(currentUser.getPlayer());
-                result.add(backward.backwardFunc(command));
-            } else if (command.getCommand().equals("next") && currentUser != null) {
+                result.add(backward.backwardFunc(cmd));
+            } else if (cmd.getCommand().equals("next") && currentUser != null) {
                 Next next = new Next(currentUser);
-                result.add(next.nextFunc(command, library));
-            } else if (command.getCommand().equals("prev") && currentUser != null) {
+                result.add(next.nextFunc(cmd, library));
+            } else if (cmd.getCommand().equals("prev") && currentUser != null) {
                 Prev prev = new Prev(currentUser);
-                result.add(prev.prevFunc(command, library));
-            } else if (command.getCommand().equals("switchVisibility") && currentUser != null) {
-                result.add(Playlist.switchVisibility(command, currentUser));
-            } else if (command.getCommand().contains("follow") && currentUser != null) {
+                result.add(prev.prevFunc(cmd, library));
+            } else if (cmd.getCommand().equals("switchVisibility") && currentUser != null) {
+                result.add(Playlist.switchVisibility(cmd, currentUser));
+            } else if (cmd.getCommand().contains("follow") && currentUser != null) {
                 /* Se cauta "selected" in "selected_list" aferent user-ului curent */
-                Select selectInfo = null;
-                String userName = command.getUsername();
-                for (Select selection: selectedList) {
-                    if (selection.getUser().equals(userName)) {
-                        selectInfo = selection;
-                        break;
-                    }
-                }
+                Select selectInfo = currentUser.getSelectInfo();
 
                 FollowStats temp = new FollowStats(null);       // <-- doar pentru a apela metoda
-                result.add(temp.followPlaylist(command, users, selectInfo, topFwdPlaylits));
-            } else if (command.getCommand().contains("switch") && currentUser != null) {
-                result.add(currentUser.changeConnectionStatus(command));
-            } else if (command.getCommand().equals("addAlbum")) {
+                result.add(temp.followPlaylist(cmd, users, selectInfo, topFwdPlaylits));
+            } else if (cmd.getCommand().contains("switch") && currentUser != null) {
+                result.add(currentUser.changeConnectionStatus(cmd));
+            } else if (cmd.getCommand().equals("addAlbum")) {
                 if (!user.isArtist()) {
                     /* Verificam daca user-ul care a apelat aceasta metoda este artist */
-                    ResultOut out = new ResultOut(command);
+                    ResultOut out = new ResultOut(cmd);
                     out.setMessage(user.getUsername() + " is not an artist.");
                     result.add(out);
                 } else {
-                    result.add(currentArtist.addAlbum(command));
+                    result.add(currentArtist.addAlbum(cmd, topAlbums));
                 }
-            } else if (command.getCommand().equals("showAlbums")) {
-                result.add(new ResultShowAlbums(command, currentArtist));
-            } else if (command.getCommand().equals("printCurrentPage") && currentUser != null) {
-                result.add(currentUser.getCurrentPage().getPage(currentUser, command, topLikedSongs));
-            } else if (command.getCommand().equals("addEvent")) {
+            } else if (cmd.getCommand().equals("showAlbums")) {
+                result.add(new ResultShowAlbums(cmd, currentArtist));
+            } else if (cmd.getCommand().equals("printCurrentPage") && currentUser != null) {
+                result.add(currentUser.getCurrentPage().getPage(currentUser, cmd, topLikedSongs));
+            } else if (cmd.getCommand().equals("addEvent")) {
                 Artist tempArtist = new Artist(null);   // <-- pentru a apela metoda
-                result.add(tempArtist.addEvent(user, command));
-            } else if (command.getCommand().contains("Merch")) {
+                result.add(tempArtist.addEvent(user, cmd));
+            } else if (cmd.getCommand().contains("Merch")) {
                 Artist tempArtist = new Artist(null);   // <-- pentru a apela metoda
-                result.add(tempArtist.addMerch(user, command));
-            } else if (command.getCommand().contains("delete")) {
-                result.add(UserInfo.deleteUser(users, user, command, topLikedSongs, topFwdPlaylits));
-            } else if (command.getCommand().equals("addPodcast")) {
+                result.add(tempArtist.addMerch(user, cmd));
+            } else if (cmd.getCommand().contains("delete")) {
+                result.add(UserInfo.deleteUser(users, user, cmd, topLikedSongs, topFwdPlaylits, selectedList));
+            } else if (cmd.getCommand().equals("addPodcast")) {
                 Host tempRef = new Host(null);
-                result.add(tempRef.addPodcast(command, user));
-            } else if (command.getCommand().equals("addAnnouncement")) {
+                result.add(tempRef.addPodcast(cmd, user));
+            } else if (cmd.getCommand().equals("addAnnouncement")) {
                 Host tempRef = new Host(null);
-                result.add(tempRef.addAnnouncement(command, user));
-            } else if (command.getCommand().equals("showPodcasts")) {
-                result.add(new ResultShowPodcasts(command, currentHost));
-            } else if (command.getCommand().equals("removeAnnouncement")) {
+                result.add(tempRef.addAnnouncement(cmd, user));
+            } else if (cmd.getCommand().equals("showPodcasts")) {
+                result.add(new ResultShowPodcasts(cmd, currentHost));
+            } else if (cmd.getCommand().equals("removeAnnouncement")) {
                 if (!user.isHost()) {
-                    ResultOut out = new ResultOut(command);
+                    ResultOut out = new ResultOut(cmd);
                     out.setMessage(user.getUsername() + " is not a host.");
                     result.add(out);
                 } else {
-                    result.add(currentHost.removeAnnouncement(command));
+                    result.add(currentHost.removeAnnouncement(cmd));
                 }
-            } else if (command.getCommand().equals("removeAlbum")) {
-                result.add(((Artist) user).removeAlbum(command, user));
-            } else if (command.getCommand().equals("changePage") && currentUser != null) {
-                result.add(currentUser.getCurrentPage().changePage(command, currentUser));
-            } else if (command.getCommand().equals("removePodcast")) {
-                result.add(((Host) user).removePodcast(command, user));
-            } else if (command.getCommand().equals("removeEvent")) {
+            } else if (cmd.getCommand().equals("removeAlbum")) {
+                result.add(((Artist) user).removeAlbum(cmd, user));
+            } else if (cmd.getCommand().equals("changePage") && currentUser != null) {
+                result.add(currentUser.getCurrentPage().changePage(cmd, currentUser));
+            } else if (cmd.getCommand().equals("removePodcast")) {
+                result.add(((Host) user).removePodcast(cmd, user));
+            } else if (cmd.getCommand().equals("removeEvent")) {
                 Artist tempRef = new Artist(null);
-                result.add(tempRef.removeEvent(user, command));
+                result.add(tempRef.removeEvent(user, cmd));
             }
 
         }

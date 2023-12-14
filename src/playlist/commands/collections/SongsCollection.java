@@ -18,6 +18,7 @@ public class SongsCollection {
     private int timeOfCreation;   // <-- Camp folosit pentru sortarea topului de playlist-uri
     private int nrListeners; //<-- Numarul de ascultatori, la un moment, al unei colectii audio
     protected boolean isAlbum;
+    private int totalLikes; // <-- Contine numarul total de like-uri pentru toate piesele
 
     public SongsCollection(final CommandIn command) {
         setTimeOfCreation(command.getTimestamp());
@@ -160,6 +161,23 @@ public class SongsCollection {
     /** Getter */
     public boolean isAlbum() {
         return isAlbum;
+    }
+
+    /** Getter */
+    public int getTotalLikes() {
+        return totalLikes;
+    }
+
+    /** Metoda incrementeaza numarul de like-uri total al colectiei */
+    public void incrementTotalLikes() {
+        totalLikes++;
+    }
+
+    /** Metoda care decrementeaza numarul total de like-uri */
+    public void decrementTotalLikes() {
+        if (totalLikes > 0) {
+            totalLikes--;
+        }
     }
 
 }

@@ -78,10 +78,12 @@ public class Page {
         switch (cmd.getNextPage()) {
             case "Home" -> {
                 user.setCurrentPage(new HomePage(PageType.HOME));
+                user.getSelectInfo().setArtistHostName(null);
                 result.setMessage(user.getUsername() + " accessed " + cmd.getNextPage() + " successfully.");
             }
             case "LikedContent" -> {
                 user.setCurrentPage(new LikedContentPage(PageType.LIKEDCONTENT));
+                user.getSelectInfo().setArtistHostName(null);
                 result.setMessage(user.getUsername() + " accessed " + cmd.getNextPage() + " successfully.");
             }
             default -> result.setMessage(user + " is trying to access a non-existent page.");

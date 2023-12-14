@@ -9,6 +9,7 @@ import player.commands.Like;
 import playlist.commands.FollowStats;
 import playlist.commands.collections.Album;
 import playlist.commands.collections.Playlist;
+import search.bar.Select;
 
 import java.util.ArrayList;
 
@@ -89,11 +90,17 @@ public class UserInfo {
      * */
     public static ResultOut deleteUser(final ArrayList<UserInfo> users, final UserInfo currUser,
                                        final CommandIn cmd, final ArrayList<Like> topLikedSongs,
-                                        final ArrayList<FollowStats> topFwdPlaylits) {
+                                        final ArrayList<FollowStats> topFwdPlaylits,
+                                        final ArrayList<Select> searchResults) {
         ResultOut result = new ResultOut(cmd);
 
         /* Verificam daca exista cel mult un user care asculta o colectie audio a user-ului */
-        if (currUser.checkIfListenedTo() || currUser.checkIfSelected(users)) {
+        if (currUser.checkIfListenedTo() || currUser.checkIfSmthIsSel(users)) {
+            result.setMessage(currUser.getUsername() + " can't be deleted.");
+        } else if (!currUser.isNormalUser() && currUser.checkIfSelected(users)) {
+            /* Verificam daca un user normal se afla pe pagina user-ului care se vrea sters */
+            result.setMessage(currUser.getUsername() + " can't be deleted.");
+        } else if (!currUser.isNormalUser() && currUser.checkIfSearched(searchResults)) {
             result.setMessage(currUser.getUsername() + " can't be deleted.");
         } else {
             /* User-ul poate fi eliminat cu succes */
@@ -128,10 +135,10 @@ public class UserInfo {
                         userToDel.getFwdPlaylits().forEach(Playlist::decNrFollowers);
 
                         /*
-                        *   Iteram prin lista de melodii apreciate pe tot programul si ..
-                        * .. decrementez nr de like-uri al unei melodii pe care aces user ..
-                        * .. o aprecia
-                        * */
+                         *   Iteram prin lista de melodii apreciate pe tot programul si ..
+                         * .. decrementez nr de like-uri al unei melodii pe care aces user ..
+                         * .. o aprecia
+                         * */
                         for (Like song : topLikedSongs) {
                             for (SongInput usersSong : userToDel.getLikedSongs()) {
                                 if (song.getSongName().equals(usersSong.getName())) {
@@ -193,9 +200,11 @@ public class UserInfo {
                 /* Doar un user normal poate selecta un artist / host */
                 if (user.isNormalUser()) {
                     NormalUser tempRef = (NormalUser) user;
+
                     /* Clasa "Page" are un camp ce retine referinta catre artist / host-ul selectat */
                     UserInfo selectedUser = tempRef.getCurrentPage().getUsersPage();
                     /* ^-- Poate fi null daca user-ul este pe pagina Home / LikedContent */
+
                     if (selectedUser != null && selectedUser.equals(this)) {
                         return true;
                     }
@@ -204,6 +213,41 @@ public class UserInfo {
 
             return false;
         }
+    }
+
+    /**
+     *  Metoda verifica daca un user normal a selectat o colectie audio sau un fisier audio
+     *  al user-ului care a invocat comanda
+     * */
+    public boolean checkIfSmthIsSel(final ArrayList<UserInfo> users) {
+        for (UserInfo user : users) {
+            /* Doar un user normal poate selecta o colectie audio */
+            if (user.isNormalUser() && !user.equals(this)) {
+                /* Verificam daca are o colectie audio selectata (sau o melodie dintr-un album) */
+                NormalUser tempRef = (NormalUser) user;
+                if (tempRef.getSelectInfo() == null || tempRef.getSelectInfo().getArtistHostName() == null) {
+                    /*
+                        Verificarea interactiunii unui user normal cu alt user se face
+                        prin compararea campului "artistHostName" cu obicetul care a apelat metoda
+                    */
+                    return false;
+                } else if (tempRef.getSelectInfo().getArtistHostName().equals(this)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean checkIfSearched(final ArrayList<Select> searchResults) {
+        for (Select selection : searchResults) {
+            for (String result : selection.getSearchResult()) {
+                if (result.equals(this.getUsername())) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /** Getter */

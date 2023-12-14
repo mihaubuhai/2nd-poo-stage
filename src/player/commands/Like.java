@@ -5,6 +5,7 @@ import fileio.input.SongInput;
 import input.commands.CommandIn;
 import main.users.NormalUser;
 import output.result.ResultOut;
+import playlist.commands.collections.SongsCollection;
 import search.bar.Select;
 
 import java.util.ArrayList;
@@ -87,6 +88,7 @@ public class Like implements Comparable {
                                                                    final LibraryInput library) {
 
         ResultOut result = new ResultOut(command);
+
         /* Verificam daca player ruleaza */
         if (currentUser.getPlayer() == null || currentUser.getPlayer().getLoadInfo() == null
                 || !currentUser.getPlayer().getLoadInfo().getLoaded()) {
@@ -97,6 +99,8 @@ public class Like implements Comparable {
         } else {
             String currentSong = currentUser.getPlayer().getStats().getName();
             boolean deletedSong = false;
+            SongsCollection col = currentUser.getPlayer().getLoadInfo()
+                    .getSelectInfo().getSongsCollection();
 
             /* Verificam daca in lista de aprecieri ale user-ului se gaseste melodia care ruleaza */
             for (String song: currentUser.getLikedSongsNames()) {
@@ -123,6 +127,14 @@ public class Like implements Comparable {
                         break;
                     }
                 }
+
+                /*
+                    Vom decrementa numarul total de like-uri al
+                    colectiei din care currentSong face parte (daca face parte)
+                */
+                if (col != null) {
+                    col.decrementTotalLikes();
+                }
                 result.setMessage("Unlike registered successfully.");
             } else {
                 /* Melodia nu a fost apreciata de user*/
@@ -141,6 +153,14 @@ public class Like implements Comparable {
                 }
                 if (!created) {
                     topLikedSongs.add(new Like(currentSong, library));
+                }
+
+                /*
+                    Incrementam numarul total de like-uri al colectiei din care
+                    "currentSong" face parte (daca apartine de vreuna)
+                */
+                if (col != null) {
+                    col.incrementTotalLikes();
                 }
                 result.setMessage("Like registered successfully.");
             }

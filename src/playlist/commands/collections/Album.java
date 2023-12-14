@@ -17,9 +17,9 @@ public class Album extends SongsCollection {
     }
 
     /** Metoda verifica daca in album se mai gaseste o melodie cu acelasi nume ca "song" */
-    public boolean isInAlbum(SongInput song) {
+    public boolean isInAlbum(String song) {
         for (SongInput track: getSongs()) {
-            if (track.getName().equals(song.getName())) {
+            if (track.getName().equals(song)) {
                 return true;
             }
         }
