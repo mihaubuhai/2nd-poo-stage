@@ -6,6 +6,7 @@ public final class PodcastInput {
     private String name;
     private String owner;
     private ArrayList<EpisodeInput> episodes;
+    private int nrListeners;    // <-- Nr de ascultatori al acestui podcast
 
     public PodcastInput() {
     }
@@ -17,6 +18,20 @@ public final class PodcastInput {
             }
         }
         return false;
+    }
+
+    public void incrementNrListeners() {
+        nrListeners++;
+    }
+
+    public void decrementNrListeners() {
+        if (nrListeners > 0) {
+            nrListeners--;
+        }
+    }
+
+    public int retrieveNrListeners() {
+        return nrListeners;
     }
 
     public String getName() {

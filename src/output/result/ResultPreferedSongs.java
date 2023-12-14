@@ -14,6 +14,7 @@ public class ResultPreferedSongs extends ResultCommand {
 
     public ResultPreferedSongs(final CommandIn command, final ArrayList<SongInput> likes) {
         super(command);
+        result = new ArrayList<>();
         likes.forEach(song -> result.add(song.getName()));
     }
 

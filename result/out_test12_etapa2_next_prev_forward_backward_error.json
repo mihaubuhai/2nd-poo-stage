@@ -1,0 +1,243 @@
+[ {
+  "command" : "createPlaylist",
+  "timestamp" : 150,
+  "user" : "emily30",
+  "message" : "Playlist created successfully."
+}, {
+  "command" : "addUser",
+  "timestamp" : 152,
+  "user" : "melodymaster",
+  "message" : "The username melodymaster has been added successfully."
+}, {
+  "command" : "addAlbum",
+  "timestamp" : 152,
+  "user" : "melodymaster",
+  "message" : "melodymaster has added new album successfully."
+}, {
+  "command" : "search",
+  "timestamp" : 170,
+  "user" : "emily30",
+  "message" : "Search returned 1 results",
+  "results" : [ "Digital Dreams" ]
+}, {
+  "command" : "select",
+  "timestamp" : 190,
+  "user" : "emily30",
+  "message" : "Successfully selected Digital Dreams."
+}, {
+  "command" : "load",
+  "timestamp" : 195,
+  "user" : "emily30",
+  "message" : "Playback loaded successfully."
+}, {
+  "command" : "addRemoveInPlaylist",
+  "timestamp" : 240,
+  "user" : "emily30",
+  "message" : "Successfully added to playlist."
+}, {
+  "command" : "search",
+  "timestamp" : 270,
+  "user" : "emily30",
+  "message" : "Search returned 1 results",
+  "results" : [ "Swimming Pools (Drank)" ]
+}, {
+  "command" : "select",
+  "timestamp" : 290,
+  "user" : "emily30",
+  "message" : "Successfully selected Swimming Pools (Drank)."
+}, {
+  "command" : "load",
+  "timestamp" : 300,
+  "user" : "emily30",
+  "message" : "Playback loaded successfully."
+}, {
+  "command" : "addRemoveInPlaylist",
+  "timestamp" : 340,
+  "user" : "emily30",
+  "message" : "Successfully added to playlist."
+}, {
+  "command" : "search",
+  "timestamp" : 1000,
+  "user" : "emily30",
+  "message" : "Search returned 1 results",
+  "results" : [ "My favourite songs" ]
+}, {
+  "command" : "prev",
+  "timestamp" : 1120,
+  "user" : "emily30",
+  "message" : "Please load a source before returning to the previous track."
+}, {
+  "command" : "next",
+  "timestamp" : 1130,
+  "user" : "emily30",
+  "message" : "Please load a source before skipping to the next track."
+}, {
+  "command" : "status",
+  "timestamp" : 1140,
+  "user" : "emily30",
+  "stats" : {
+    "name" : "",
+    "remainedTime" : 0,
+    "repeat" : "No Repeat",
+    "shuffle" : false,
+    "paused" : true
+  }
+}, {
+  "command" : "select",
+  "timestamp" : 1190,
+  "user" : "emily30",
+  "message" : "Successfully selected My favourite songs."
+}, {
+  "command" : "load",
+  "timestamp" : 1195,
+  "user" : "emily30",
+  "message" : "Playback loaded successfully."
+}, {
+  "command" : "status",
+  "timestamp" : 1220,
+  "user" : "emily30",
+  "stats" : {
+    "name" : "Digital Dreams",
+    "remainedTime" : 235,
+    "repeat" : "No Repeat",
+    "shuffle" : false,
+    "paused" : false
+  }
+}, {
+  "command" : "next",
+  "timestamp" : 1240,
+  "user" : "emily30",
+  "message" : "Skipped to next track successfully. The current track is Swimming Pools (Drank)."
+}, {
+  "command" : "status",
+  "timestamp" : 1250,
+  "user" : "emily30",
+  "stats" : {
+    "name" : "Swimming Pools (Drank)",
+    "remainedTime" : 237,
+    "repeat" : "No Repeat",
+    "shuffle" : false,
+    "paused" : false
+  }
+}, {
+  "command" : "prev",
+  "timestamp" : 1260,
+  "user" : "emily30",
+  "message" : "Returned to previous track successfully. The current track is Swimming Pools (Drank)."
+}, {
+  "command" : "status",
+  "timestamp" : 1320,
+  "user" : "emily30",
+  "stats" : {
+    "name" : "Swimming Pools (Drank)",
+    "remainedTime" : 187,
+    "repeat" : "No Repeat",
+    "shuffle" : false,
+    "paused" : false
+  }
+}, {
+  "command" : "forward",
+  "timestamp" : 1350,
+  "user" : "emily30",
+  "message" : "The loaded source is not a podcast."
+}, {
+  "command" : "backward",
+  "timestamp" : 1390,
+  "user" : "emily30",
+  "message" : "The loaded source is not a podcast."
+}, {
+  "command" : "search",
+  "timestamp" : 2000,
+  "user" : "emily30",
+  "message" : "Search returned 1 results",
+  "results" : [ "Harmonic Horizons" ]
+}, {
+  "command" : "forward",
+  "timestamp" : 2120,
+  "user" : "emily30",
+  "message" : "Please load a source before attempting to forward."
+}, {
+  "command" : "select",
+  "timestamp" : 2190,
+  "user" : "emily30",
+  "message" : "Successfully selected Harmonic Horizons."
+}, {
+  "command" : "load",
+  "timestamp" : 2200,
+  "user" : "emily30",
+  "message" : "Playback loaded successfully."
+}, {
+  "command" : "forward",
+  "timestamp" : 3120,
+  "user" : "emily30",
+  "message" : "The loaded source is not a podcast."
+}, {
+  "command" : "status",
+  "timestamp" : 3220,
+  "user" : "emily30",
+  "stats" : {
+    "name" : "Digital Dreams",
+    "remainedTime" : 10,
+    "repeat" : "No Repeat",
+    "shuffle" : false,
+    "paused" : false
+  }
+}, {
+  "command" : "forward",
+  "timestamp" : 3520,
+  "user" : "emily30",
+  "message" : "Please load a source before attempting to forward."
+}, {
+  "command" : "status",
+  "timestamp" : 3920,
+  "user" : "emily30",
+  "stats" : {
+    "name" : "",
+    "remainedTime" : 0,
+    "repeat" : "No Repeat",
+    "shuffle" : false,
+    "paused" : true
+  }
+}, {
+  "command" : "next",
+  "timestamp" : 4120,
+  "user" : "emily30",
+  "message" : "Please load a source before skipping to the next track."
+}, {
+  "command" : "search",
+  "timestamp" : 4200,
+  "user" : "emily30",
+  "message" : "Search returned 3 results",
+  "results" : [ "DNA.", "Championships", "99 Problems" ]
+}, {
+  "command" : "select",
+  "timestamp" : 4220,
+  "user" : "emily30",
+  "message" : "Successfully selected Championships."
+}, {
+  "command" : "forward",
+  "timestamp" : 4290,
+  "user" : "emily30",
+  "message" : "Please load a source before attempting to forward."
+}, {
+  "command" : "status",
+  "timestamp" : 4330,
+  "user" : "emily30",
+  "stats" : {
+    "name" : "",
+    "remainedTime" : 0,
+    "repeat" : "No Repeat",
+    "shuffle" : false,
+    "paused" : true
+  }
+}, {
+  "command" : "load",
+  "timestamp" : 4350,
+  "user" : "emily30",
+  "message" : "Playback loaded successfully."
+}, {
+  "command" : "backward",
+  "timestamp" : 4390,
+  "user" : "emily30",
+  "message" : "The loaded source is not a podcast."
+} ]

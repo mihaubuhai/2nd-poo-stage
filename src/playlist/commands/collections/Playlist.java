@@ -87,10 +87,11 @@ public class Playlist extends SongsCollection {
         followers += 1;
     }
     /** Metoda care decrementeaza numarul de urmaritori ai playlist-ului */
-    public void decNrFollowers() {
+    public boolean decNrFollowers() {
         if (followers > 0) {
             followers -= 1;
         }
+        return true;
     }
 
     /** Getter */

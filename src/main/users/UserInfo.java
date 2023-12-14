@@ -1,5 +1,6 @@
 package main.users;
 
+import fileio.input.PodcastInput;
 import fileio.input.SongInput;
 import fileio.input.UserInput;
 import input.commands.CommandIn;
@@ -71,8 +72,20 @@ public class UserInfo {
 
     /**
      *   Metoda implementeaza comanda "deleteUser"
-     *   Primeste ca parametrii lista de useri, user-ul care trebuie sters si comanda
-     *   Va returna un obiect pe tiparul output-ului comenzii
+     *   <p>
+     *   Primeste ca parametrii:
+     *   <p>
+     *       --> lista de useri totali ai programului
+     *       <p>
+     *           --> user-ul care trebuie sters
+     *           <p>
+     *               --> comanda care a fost data
+     *               <p>
+     *                   --> lista de melodii apreciate pe tot programul
+     *                   <p>
+     *                       --> lista de playlist-uri urmarite pe tot programul
+     *   <p>
+     *       Va returna un obiect de tipul rezultatului asteptat la output-ul comenzii "cmd"
      * */
     public static ResultOut deleteUser(final ArrayList<UserInfo> users, final UserInfo currUser,
                                        final CommandIn cmd, final ArrayList<Like> topLikedSongs,
@@ -80,11 +93,11 @@ public class UserInfo {
         ResultOut result = new ResultOut(cmd);
 
         /* Verificam daca exista cel mult un user care asculta o colectie audio a user-ului */
-        if (currUser.checkIfListenedTo()) {
+        if (currUser.checkIfListenedTo() || currUser.checkIfSelected(users)) {
             result.setMessage(currUser.getUsername() + " can't be deleted.");
         } else {
             /* User-ul poate fi eliminat cu succes */
-            users.removeIf(user -> user.getUsername().equals(currUser.getUsername()));
+            users.removeIf(user -> user.equals(currUser));
 
             /* Trebuie eliminata orice tine de user-ul eliminat */
             if (currUser.isArtist()) {
@@ -94,15 +107,42 @@ public class UserInfo {
                         topLikedSongs.removeIf(like -> like.getSongName().equals(song.getName()));
                     }
                 }
-            } else {
+            } else if (currUser.isNormalUser()) {
                 /* User normal */
-                for (Playlist playlist : ((NormalUser) currUser).getPlaylists()) {
-                    topFwdPlaylits.removeIf(tempRef ->
-                            tempRef.getPlaylistName().equals(playlist.getName()));
-                    for (SongInput song : playlist.getSongs()) {
-                        topLikedSongs.removeIf(like -> like.getSongName().equals(song.getName()));
+                for (UserInfo user : users) {
+                    if (user.isNormalUser()) {
+                        NormalUser someUser = (NormalUser) user;
+                        NormalUser userToDel  = (NormalUser) currUser;
+
+                        /*
+                            Iteram prin playlist-urile user-ului care se sterge si le elimin,
+                            pentru fiecare user normal, daca le urmareste pe vreunele.
+                            Apoi, din lista totala de playlist-uri urmarite, il eliminam.
+                        */
+                        for (Playlist playlist : userToDel.getPlaylists()) {
+                            someUser.getFwdPlaylits().removeIf(tmpPlaylist -> tmpPlaylist.equals(playlist));
+                            topFwdPlaylits.removeIf(tmpPlaylist -> tmpPlaylist.getPlaylistName().equals(playlist.getName()));
+                            playlist.decNrFollowers();
+                        }
+
+                        userToDel.getFwdPlaylits().forEach(Playlist::decNrFollowers);
+
+                        /*
+                        *   Iteram prin lista de melodii apreciate pe tot programul si ..
+                        * .. decrementez nr de like-uri al unei melodii pe care aces user ..
+                        * .. o aprecia
+                        * */
+                        for (Like song : topLikedSongs) {
+                            for (SongInput usersSong : userToDel.getLikedSongs()) {
+                                if (song.getSongName().equals(usersSong.getName())) {
+                                    song.decrementNoUsers();
+                                }
+                            }
+                        }
                     }
                 }
+            } else {
+                // TODO
             }
 
             result.setMessage(currUser.getUsername() + " was successfully deleted.");
@@ -131,8 +171,39 @@ public class UserInfo {
                     return true;
                 }
             }
+        } else {
+            for (PodcastInput podcast : ((Host) this).getPodcasts()) {
+                if (podcast.retrieveNrListeners() > 0) {
+                    return true;
+                }
+            }
         }
         return false;
+    }
+
+    /**
+     *  Metoda verifica daca user-ul care a apelat-o are pagina selectata
+     *  de un user
+     * */
+    public boolean checkIfSelected(final ArrayList<UserInfo> users) {
+        if (isNormalUser()) {
+            return false;
+        } else {
+            for (UserInfo user : users) {
+                /* Doar un user normal poate selecta un artist / host */
+                if (user.isNormalUser()) {
+                    NormalUser tempRef = (NormalUser) user;
+                    /* Clasa "Page" are un camp ce retine referinta catre artist / host-ul selectat */
+                    UserInfo selectedUser = tempRef.getCurrentPage().getUsersPage();
+                    /* ^-- Poate fi null daca user-ul este pe pagina Home / LikedContent */
+                    if (selectedUser != null && selectedUser.equals(this)) {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
     }
 
     /** Getter */

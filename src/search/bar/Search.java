@@ -55,6 +55,10 @@ public final class Search {
                             findFittingSong(cmd, output, maxSize, album.getSongs());
                         }
                     }
+
+                    if (output.getResults().size() == maxSize) {
+                        break;
+                    }
                 }
             }
 

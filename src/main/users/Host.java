@@ -12,7 +12,7 @@ public class Host extends UserInfo {
     private ArrayList<PodcastInput> podcasts;
     private ArrayList<String> announcementsName;
     private ArrayList<String> announcementsDescription;
-    private int nrListeners;
+    private int lookingAtPage;
 
     public Host(final UserInput user) {
         setUserInfo(user);
@@ -70,6 +70,37 @@ public class Host extends UserInfo {
         return result;
     }
 
+    public ResultOut removePodcast(final CommandIn cmd, final UserInfo user) {
+        ResultOut result = new ResultOut(cmd);
+
+        if (!user.isHost()) {
+            result.setMessage(user.getUsername() + " is not a host.");
+        } else {
+            /* Verificam daca host-ul are podcast-ul cu numele dat in cmd */
+            Host host = (Host) user;
+            for (PodcastInput podcast : host.getPodcasts()) {
+                if (podcast.getName().equals(cmd.getName())) {
+                    /* Verificam daca se poate sterge */
+                    if (podcast.retrieveNrListeners() != 0) {
+                        /* Un podcast se poate sterge daca nu are nici un ascultator */
+                        result.setMessage(user.getUsername() + " can't delete this podcast.");
+                        return result;
+                    } else {
+                        /* Podcast-ul nu este ascultat de nimeni, il putem sterge */
+                        host.getPodcasts().remove(podcast);
+                        result.setMessage(user.getUsername() + " deleted the podcast successfully.");
+                        return result;
+                    }
+                }
+            }
+
+            /* Ajunsi aici, inseamna ca nu exista podcast-ul cu numele dat in cmd */
+            result.setMessage(user.getUsername() + " doesn't have a podcast with the given name.");
+        }
+
+        return result;
+    }
+
     /**
      *      <p>
      *      Aceasta metoda adauga un nou anunt
@@ -102,6 +133,13 @@ public class Host extends UserInfo {
             return result;
     }
 
+    /** Metoda care elimina un anunt
+     *    <p>
+     *      Primeste ca paramentru comanda data
+     *      </p>
+     *      Returneaza rezultatul comenzii
+     *
+     *  */
     public ResultOut removeAnnouncement(final CommandIn cmd) {
         ResultOut result = new ResultOut(cmd);
         boolean isValid = false;    //<-- Contorizeaza daca exista vreun anunt cu numele dat in cmd

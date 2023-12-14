@@ -236,9 +236,7 @@ public class Select {
                 SongsCollection tempRef = findAlbum(album);
                 tempRef.decrementNrListeners();
             }
-            case 2 -> {
-                // TODO
-            }
+            case 2 -> podcast.decrementNrListeners();
             /* Pentru cazul 3, ceea ce ruleaza este o colectie de melodii; Se apeleaza direct metoda */
             case 3 -> songsCollection.decrementNrListeners();
         }
@@ -256,9 +254,7 @@ public class Select {
                 Album tempRef = findAlbum(album);
                 tempRef.incrementNrListeners();
             }
-            case 2 -> {
-                // TODO
-            }
+            case 2 -> podcast.incrementNrListeners();
             case 3 -> songsCollection.incrementNrListeners();
         }
     }
@@ -315,6 +311,7 @@ public class Select {
     /** Setter */
     public void setArtistHostName(final UserInfo name) {
         artistHostName = name;
+
     }
 
     /** Getter */

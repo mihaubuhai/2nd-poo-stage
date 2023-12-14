@@ -84,8 +84,15 @@ public final class Main {
                         || filePathInput.contains("test03")
                         || filePathInput.contains("test04")
                         || filePathInput.contains("test05")
-                        ||
-        filePathInput.contains("test06")
+                        || filePathInput.contains("test06")
+                        || filePathInput.contains("test07")
+                        || filePathInput.contains("test08")
+                        || filePathInput.contains("test09")
+                        || filePathInput.contains("test10")
+                || filePathInput.contains("test11")
+                || filePathInput.contains("test12")
+                ||
+                        filePathInput.contains("test13")
                                                                                                                             ){
             File filein = new File("input/" + filePathInput);
             ArrayList<CommandIn> commands = objectMapper.readValue(filein, new TypeReference<>() {

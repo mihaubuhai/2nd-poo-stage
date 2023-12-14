@@ -12,7 +12,7 @@ public class FB extends FBNP {
     /** Metoda verifica aplicabilitatea comenzii raportat la user-ul care a invocat-o */
     public boolean checkValidity(final CommandIn command) {
         /* Se verifica daca s-a selectat ceva sau daca player-ul ruleaza  */
-        if (currentPlayer == null || !currentPlayer.getLoadInfo().getLoaded()) {
+        if (currentPlayer == null || currentPlayer.getLoadInfo() == null) {
             setResult(command, "Please load a source before attempting to forward.");
             return false;
         }

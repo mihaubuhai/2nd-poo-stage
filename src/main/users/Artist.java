@@ -75,7 +75,6 @@ public final class Artist extends UserInfo {
         return result;
     }
 
-    // TODO Adaug si daca e vreo melodie folosita intr-un playlist
     public ResultOut removeAlbum(final CommandIn cmd, final UserInfo user) {
         ResultOut result = new ResultOut(cmd);
         Album toRemoveAlbum = null;
@@ -133,13 +132,50 @@ public final class Artist extends UserInfo {
                 result.setMessage(artist.getUsername() + " has another event with the same name.");
             } else {
                 /* Artistul nu are acest eveniment, verificam daca data este valida */
-                // TO DO //
+                String date = cmd.getDate();
+                String[] info = date.split("-");
 
-                /* Evenimentul nu prezinta probleme, va fi adaugat */
-                artist.eventsName.add(eventName);
-                artist.eventsDescription.add(cmd.getDescription());
-                artist.eventsDates.add(cmd.getDate());
-                result.setMessage(artist.getUsername() + " has added new event successfully.");
+                final int day = Integer.parseInt(info[0]);
+                final int month = Integer.parseInt(info[1]);
+                final int year = Integer.parseInt(info[2]);
+
+                if (month > 12 || year < 1900 || year > 2023 || day > 31 || (month == 2 && day > 28)) {
+                    result.setMessage("Event for " + artist.getUsername() +
+                            " does not have a valid date.");
+                } else {
+                    /* Evenimentul nu prezinta probleme, va fi adaugat */
+                    artist.eventsName.add(eventName);
+                    artist.eventsDescription.add(cmd.getDescription());
+                    artist.eventsDates.add(cmd.getDate());
+                    result.setMessage(artist.getUsername() + " has added new event successfully.");
+                }
+            }
+        }
+
+        return result;
+    }
+
+    public ResultOut removeEvent(final UserInfo user, final CommandIn cmd) {
+        ResultOut result = new ResultOut(cmd);
+
+        /* Se verifica daca user-ul este artist */
+        if (!user.isArtist()) {
+            result.setMessage(user.getUsername() + " is not an artist.");
+        } else {
+            Artist artist = (Artist) user;
+            String eventName = cmd.getName();
+
+            /* Se verifica daca artistul are un eveniment cu numele dat in cmd */
+            if (!artist.getEventsName().contains(eventName)) {
+                result.setMessage(artist.getUsername() + " doesn't have an event with the given name.");
+            } else {
+                /* Evenimentul se poate sterge cu succes */
+                int idx = artist.getEventsName().indexOf(eventName);
+
+                artist.getEventsName().remove(eventName);
+                artist.getEventsDates().remove(idx);
+                artist.getEventsDescription().remove(idx);
+                result.setMessage(artist.getUsername() + " deleted the event successfully.");
             }
         }
 

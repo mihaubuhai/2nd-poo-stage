@@ -288,7 +288,7 @@ public final class AnalyseCommands {
                 result.add(new ResultShowAlbums(command, currentArtist));
             } else if (command.getCommand().equals("printCurrentPage") && currentUser != null) {
                 result.add(currentUser.getCurrentPage().getPage(currentUser, command, topLikedSongs));
-            } else if (command.getCommand().contains("Event")) {
+            } else if (command.getCommand().equals("addEvent")) {
                 Artist tempArtist = new Artist(null);   // <-- pentru a apela metoda
                 result.add(tempArtist.addEvent(user, command));
             } else if (command.getCommand().contains("Merch")) {
@@ -316,6 +316,11 @@ public final class AnalyseCommands {
                 result.add(((Artist) user).removeAlbum(command, user));
             } else if (command.getCommand().equals("changePage") && currentUser != null) {
                 result.add(currentUser.getCurrentPage().changePage(command, currentUser));
+            } else if (command.getCommand().equals("removePodcast")) {
+                result.add(((Host) user).removePodcast(command, user));
+            } else if (command.getCommand().equals("removeEvent")) {
+                Artist tempRef = new Artist(null);
+                result.add(tempRef.removeEvent(user, command));
             }
 
         }

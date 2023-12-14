@@ -54,7 +54,7 @@ public final class Shuffle {
             result.setMessage("Please load a source before using the shuffle function.");
         } else if (currentPlayer.getLoadInfo().getSelectInfo().getResultType() != playlistID) {
             /* Se verifica daca player ruleaza altceva decat un playlist */
-            result.setMessage("The loaded source is not a playlist.");
+            result.setMessage("The loaded source is not a playlist or an album.");
         } else {
             /* Player-ul ruleaza un playlist / album; verificam daca exista shuffle activ */
             SongsCollection songCollection = currentPlayer.getLoadInfo().getSelectInfo().getSongsCollection();

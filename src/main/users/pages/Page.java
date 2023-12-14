@@ -90,9 +90,9 @@ public class Page {
         return result;
     }
 
-    /** Setter */
-    public void setUsersPage(final UserInfo user) {
-        usersPage = user;
+    /** Getter */
+    public UserInfo getUsersPage() {
+        return usersPage;
     }
 
     /** Getter */

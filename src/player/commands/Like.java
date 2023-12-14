@@ -32,7 +32,7 @@ public class Like implements Comparable {
      *        Metoda folosita pentru a gasi indicele unei melodii in librarie
      * */
     private int getIdxSong(final String song, final LibraryInput library) {
-        int index = 0;
+        int index = 999;
         ArrayList<SongInput> songs = library.getSongs();
         for (int i = 0; i < songs.size(); ++i) {
             if (songs.get(i).getName().equals(song)) {
