@@ -4,6 +4,7 @@ import fileio.input.LibraryInput;
 import fileio.input.PodcastInput;
 import input.commands.CommandIn;
 import input.commands.Filters;
+import songcollections.collections.SongsCollection;
 import users.Artist;
 import users.Host;
 import users.NormalUser;
@@ -26,8 +27,17 @@ public final class Search {
         if (instance == null) {
             instance = new Search();
         }
+        songsSearched = new ArrayList<>();
+        collectionsSearched = new ArrayList<>();
+        podcastsSearched = new ArrayList<>();
+        usersSearched = new ArrayList<>();
         return instance;
     }
+
+    private static  ArrayList<SongInput> songsSearched;
+    private static  ArrayList<SongsCollection> collectionsSearched;
+    private static  ArrayList<PodcastInput> podcastsSearched;
+    private static  ArrayList<UserInfo> usersSearched;
 
     /**
      *   Aceasta metoda implementeaza comanda "search".
@@ -69,6 +79,7 @@ public final class Search {
 
                 if (result != null) {
                     output.addResult(result.getName());
+                    podcastsSearched.add(result);
                 }
                 if (output.getResults().size() == maxSize) {
                     break;
@@ -84,6 +95,7 @@ public final class Search {
 
                             if (result != null) {
                                 output.addResult(result.getName());
+                                podcastsSearched.add(result);
                             }
                             if (output.getResults().size() == maxSize) {
                                 break;
@@ -106,6 +118,7 @@ public final class Search {
                             if (checkVisibility(cmd.getUsername(), result)) {
                                 /* Rezultatele cautarii se afiseaza doar daca playlist-ul este public */
                                 output.addResult(result.getName());
+                                collectionsSearched.add(result);
                             }
                         }
 
@@ -125,6 +138,7 @@ public final class Search {
 
                         if (result != null) {
                             output.addResult(result.getName());
+                            collectionsSearched.add(result);
                         }
 
                         if (output.getResults().size() == maxSize) {
@@ -139,6 +153,7 @@ public final class Search {
                 String filter = cmd.getFilters().getName();
                 if (user.isArtist() && user.getUsername().startsWith(filter)) {
                     output.addResult(user.getUsername());
+                    usersSearched.add(user);
                 }
 
                 if (output.getResults().size() > maxSize) {
@@ -151,6 +166,7 @@ public final class Search {
                 String filter = cmd.getFilters().getName();
                 if (user.isHost() && user.getUsername().startsWith(filter)) {
                     output.addResult(user.getUsername());
+                    usersSearched.add(user);
                 }
 
                 if (output.getResults().size() > maxSize) {
@@ -163,7 +179,8 @@ public final class Search {
         return output;
     }
 
-    private void findFittingSong(CommandIn cmd, ResultOutSearch output, int maxSize, ArrayList<SongInput> songs) {
+    private void findFittingSong(final CommandIn cmd, final ResultOutSearch output,
+                                 final int maxSize, final ArrayList<SongInput> songs) {
         /* Itereaza prin lista de melodii din librarie / album */
         for (SongInput song: songs) {
             SongInput result = checkFiltersSongs(cmd.getFilters(), song);
@@ -174,6 +191,7 @@ public final class Search {
              */
             if (result != null) {
                 output.addResult(result.getName());
+                songsSearched.add(result);
             }
 
             /* Mai mult de 5 rezultate nu se pot afisa, deci cautarea se opreste */
@@ -189,7 +207,7 @@ public final class Search {
      */
     private boolean checkVisibility(final String username, final Playlist playlist) {
         String visibility = playlist.getVisibility();
-        String owner = playlist.getOwner();
+        String owner = playlist.getOwner().getUsername();
 
         /* Indiferent de vizibilitate, user-ul care a creat playlist-ul il poate accesa */
         if (owner.equals(username)) {
@@ -297,7 +315,7 @@ public final class Search {
         int validFilters = 0;
 
         if (filters.getOwner() != null) {
-            if (playlist.getOwner().equals(filters.getOwner())) {
+            if (playlist.getOwner().getUsername().equals(filters.getOwner())) {
                 validFilters++;
             }
         }
@@ -351,7 +369,7 @@ public final class Search {
         int validFilters = 0;
 
         if (filters.getOwner() != null) {
-            if (album.getOwner().contains(filters.getOwner())) {
+            if (album.getOwner().getUsername().contains(filters.getOwner())) {
                 validFilters++;
             }
         }
@@ -372,6 +390,22 @@ public final class Search {
             return album;
         }
         return null;
+    }
+
+    public ArrayList<SongInput> getSongsSearched() {
+        return songsSearched;
+    }
+
+    public ArrayList<SongsCollection> getCollectionsSearched() {
+        return collectionsSearched;
+    }
+
+    public ArrayList<PodcastInput> getPodcastsSearched() {
+        return podcastsSearched;
+    }
+
+    public ArrayList<UserInfo> getUsersSearched() {
+        return usersSearched;
     }
 
 }

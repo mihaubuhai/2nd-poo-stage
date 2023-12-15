@@ -65,7 +65,7 @@ public class Playlist extends SongsCollection {
         if (!isCreated) {
             // v-- Cream efectiv playlist-ul
             Playlist newPlaylist = ((Playlist) SongsCollFactory.getCollection(command));
-            newPlaylist.setOwner(currentUser.getUsername());
+            newPlaylist.setOwner(currentUser);
             currentUser.getPlaylists().add(newPlaylist);
             topFwdPlaylits.add(new FollowStats(command.getPlaylistName()));
             out.setMessage("Playlist created successfully.");

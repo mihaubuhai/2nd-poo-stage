@@ -9,9 +9,10 @@ import java.util.ArrayList;
 
 public class getTopOfUsers extends getTop implements Visitable {
     private ArrayList<UserInfo> users;
-    private boolean type;       // <-- Useri online sau toti userii
+    private int type;       // <-- Useri online sau toti userii
+    /* 1 - allUsers  ;  2 - OnlineUsers  ;  3 - top5Artists */
 
-    public getTopOfUsers(final CommandIn cmd, final ArrayList<UserInfo> users, final boolean type) {
+    public getTopOfUsers(final CommandIn cmd, final ArrayList<UserInfo> users, final int type) {
         super(cmd);
         this.users = users;
         this.type = type;
@@ -25,7 +26,7 @@ public class getTopOfUsers extends getTop implements Visitable {
         return users;
     }
 
-    public boolean getType() {
+    public int getType() {
         return type;
     }
 }

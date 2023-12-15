@@ -20,6 +20,7 @@ public final class Artist extends UserInfo {
     private final ArrayList<String> eventsName;
     private final ArrayList<String> eventsDescription;
     private final ArrayList<String> eventsDates;
+    private int totalAlbumsLikes;
 
     public Artist(final UserInput userInfo) {
         setUserInfo(userInfo);
@@ -68,7 +69,7 @@ public final class Artist extends UserInfo {
         }
 
         /* Ajunsi aici, albumul nu prezinta nici o problema, va fi adaugat in lista de albume */
-        newAlbum.setOwner(this.getUsername());
+        newAlbum.setOwner(this);
         albums.add(newAlbum);
         topAlbums.add(newAlbum);
         result.setMessage(getUsername() + " has added new album successfully.");
@@ -274,6 +275,16 @@ public final class Artist extends UserInfo {
     /** Setter */
     public void addEventsName(final String event) {
         eventsName.add(event);
+    }
+
+    /** Getter */
+    public int getTotalAlbumsLikes() {
+        for (Album album : albums) {
+            for (SongInput song : album.getSongs()) {
+                totalAlbumsLikes += song.retrieveNrLikes();
+            }
+        }
+        return totalAlbumsLikes;
     }
 
 

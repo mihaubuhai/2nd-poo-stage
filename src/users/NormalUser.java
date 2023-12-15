@@ -396,7 +396,6 @@ public final class NormalUser extends UserInfo {
             remainedTime += initDuration;
         }
 
-        /* La finalul while-ului, idxEpisode va fi inainte cu o pozitie */
         EpisodeInput currentEpisode = currentPodcast.getEpisodes().get(index);
         player.getStats().setRemainedTime(remainedTime);
         player.getStats().setName(currentEpisode.getName());

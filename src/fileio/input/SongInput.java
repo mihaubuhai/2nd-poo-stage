@@ -13,13 +13,28 @@ public final class SongInput {
     private String artist;
     private boolean isInAlbumClass;
     //^-- Daca se instantiaza un album si melodia este apartenenta
+    private int songLikes;
 
     public SongInput() {
         isInAlbumClass = false;
     }
 
     public void changeState() {
-        isInAlbumClass ^= true;
+        isInAlbumClass = true;
+    }
+
+    public int retrieveNrLikes() {
+        return songLikes;
+    }
+
+    public void incNrLikes() {
+        songLikes++;
+    }
+
+    public void decNrLikes() {
+        if (songLikes > 0) {
+            songLikes--;
+        }
     }
 
     public boolean getIsInAlbum() {

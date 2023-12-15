@@ -92,16 +92,20 @@ public final class AnalyseCommands {
                         output = ((getTopAlbums) top).accept(v);
                     }
                     case "getAllUsers" -> {
-                        top = new getTopOfUsers(cmd, users, false);
+                        top = new getTopOfUsers(cmd, users, 1);
                         output = ((getTopOfUsers) top).accept(v);
                     }
                     case "getOnlineUsers" -> {
-                        top = new getTopOfUsers(cmd, users, true);
+                        top = new getTopOfUsers(cmd, users, 2);
                         output = ((getTopOfUsers) top).accept(v);
                     }
                     case "getTop5Songs" -> {
                         top = new getTopSongs(cmd, library, topLikedSongs);
                         output = ((getTopSongs) top).accept(v);
+                    }
+                    case "getTop5Artists" -> {
+                        top = new getTopOfUsers(cmd, users, 3);
+                        output = ((getTopOfUsers) top).accept(v);
                     }
                     default -> {
                         top = new getTopPlaylists(cmd, topFwdPlaylits);
@@ -113,9 +117,9 @@ public final class AnalyseCommands {
                 continue;
             }
 
-            NormalUser currentUser = null;
-            Artist currentArtist = null;
-            Host currentHost = null;
+            NormalUser currentUser = new NormalUser(null);
+            Artist currentArtist = new Artist(null);
+            Host currentHost = new Host(null);
 
             /*
                 Actualizez pentru orice player (care ruleaza) timpul relativ la ..
@@ -145,7 +149,7 @@ public final class AnalyseCommands {
             }
 
             /* ------------------------------  Verificare comenzi ------------------------------ */
-            if (cmd.getCommand().contains("search") && currentUser != null) {
+            if (cmd.getCommand().contains("search")) {
                 /* Player-ul pentru user care da "search" trebuie sa dispara !! */
                 Player player = currentUser.getPlayer();
                 if (player != null && player.getLoadInfo() != null) {
@@ -158,6 +162,7 @@ public final class AnalyseCommands {
                     /* Decrementez numarul de ascultatori al colectiei audio ascultata de user */
                     currentUser.getPlayer().getLoadInfo().getSelectInfo().decrementNrListeners();
                 }
+                currentUser.setSelectInfo(null);
                 currentUser.setPlayer(null);        // <--- se goleste efectiv player-ul
 
                 Search search = Search.getInstance();
@@ -174,7 +179,7 @@ public final class AnalyseCommands {
                 }
 
                 /* Adaug si faptul ca s-a efectuat search */
-                selectedList.add(new Select(cmd, temporary.getResults()));
+                selectedList.add(new Select(cmd, search));
             } else if (cmd.getCommand().contains("select") && currentUser != null) {
                 /* Caut nodul din lista "selected_list" corespunzator user-ului ce a dat comanda */
                 Select selected = null;
@@ -199,15 +204,12 @@ public final class AnalyseCommands {
 
                 Player player = currentUser.getPlayer();
                 Select selected = currentUser.getSelectInfo();
-                if (selected == null || player != null) {
+                /* Daca player ruleaza, nu se efectueaza comanda  "load" */
+                if (selected == null || player != null || !selected.getSelected()) {
                     resultLoad.setMessage("Please select a source before attempting to load.");
-                } else if (selected.getSelected()) {
+                } else {
                     player = new Player(new Load(selected), cmd.getTimestamp());
                     currentUser.setPlayer(player);
-                }
-
-                /* Daca player ruleaza, nu se efectueaza comanda  "load" */
-                if (player != null && player.getLoadInfo() != null) {
                     Load loadInfo = player.getLoadInfo();
                     if (!loadInfo.getLoaded()) {
                         /* Chem functie load */
@@ -226,7 +228,7 @@ public final class AnalyseCommands {
             } else if (cmd.getCommand().contains("createPlaylist") && currentUser != null) {
                 result.add(Playlist.createPlaylist(currentUser, cmd, topFwdPlaylits));
             } else if (cmd.getCommand().contains("addRemoveInPlaylist") && currentUser != null) {
-                result.add(AddRemove.addRemoveInPlaylist(currentUser, cmd, library.getSongs()));
+                result.add(AddRemove.addRemoveInPlaylist(currentUser, cmd, users));
             } else if (cmd.getCommand().equals("like") && currentUser != null) {
                 result.add(Like.likeCommand(topLikedSongs, currentUser, cmd, library));
             } else if (cmd.getCommand().equals("showPreferredSongs") && currentUser != null) {
@@ -253,11 +255,11 @@ public final class AnalyseCommands {
                 result.add(prev.prevFunc(cmd, library));
             } else if (cmd.getCommand().equals("switchVisibility") && currentUser != null) {
                 result.add(Playlist.switchVisibility(cmd, currentUser));
-            } else if (cmd.getCommand().contains("follow") && currentUser != null) {
+            } else if (cmd.getCommand().contains("follow")) {
                 Select selectInfo = currentUser.getSelectInfo();
                 FollowStats temp = new FollowStats(null);       // <-- doar pentru a apela metoda
                 result.add(temp.followPlaylist(cmd, users, selectInfo, topFwdPlaylits));
-            } else if (cmd.getCommand().contains("switch") && currentUser != null) {
+            } else if (cmd.getCommand().contains("switch")) {
                 result.add(currentUser.changeConnectionStatus(cmd));
             } else if (cmd.getCommand().equals("addAlbum")) {
                 if (!user.isArtist()) {
@@ -279,7 +281,8 @@ public final class AnalyseCommands {
                 Artist tempArtist = new Artist(null);   // <-- pentru a apela metoda
                 result.add(tempArtist.addMerch(user, cmd));
             } else if (cmd.getCommand().contains("delete")) {
-                result.add(UserInfo.deleteUser(users, user, cmd, topLikedSongs, topFwdPlaylits));
+                result.add(UserInfo.deleteUser(users, user, cmd, topLikedSongs,
+                        topFwdPlaylits, topAlbums));
             } else if (cmd.getCommand().equals("addPodcast")) {
                 Host tempRef = new Host(null);
                 result.add(tempRef.addPodcast(cmd, user));
@@ -297,14 +300,13 @@ public final class AnalyseCommands {
                     result.add(currentHost.removeAnnouncement(cmd));
                 }
             } else if (cmd.getCommand().equals("removeAlbum")) {
-                result.add(((Artist) user).removeAlbum(cmd, user));
-            } else if (cmd.getCommand().equals("changePage") && currentUser != null) {
+                result.add(currentArtist.removeAlbum(cmd, user));
+            } else if (cmd.getCommand().equals("changePage")) {
                 result.add(currentUser.getCurrentPage().changePage(cmd, currentUser));
             } else if (cmd.getCommand().equals("removePodcast")) {
-                result.add(((Host) user).removePodcast(cmd, user));
+                result.add(currentHost.removePodcast(cmd, user));
             } else if (cmd.getCommand().equals("removeEvent")) {
-                Artist tempRef = new Artist(null);
-                result.add(tempRef.removeEvent(user, cmd));
+                result.add(currentArtist.removeEvent(user, cmd));
             }
 
         }

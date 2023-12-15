@@ -41,6 +41,9 @@ public class UserInfo {
         } else {
             /* User-ul este unul normal, efectuam schimbarea de stare */
             ((NormalUser) this).changeState();
+            if (((NormalUser) this).getState() && ((NormalUser) this).getPlayer() != null) {
+                ((NormalUser) this).getPlayer().setLastLoadTime(command.getTimestamp());
+            }
             result.setMessage(getUsername() + " has changed status successfully.");
         }
 
@@ -90,7 +93,8 @@ public class UserInfo {
      * */
     public static ResultOut deleteUser(final ArrayList<UserInfo> users, final UserInfo currUser,
                                        final CommandIn cmd, final ArrayList<Like> topLikedSongs,
-                                    final ArrayList<FollowStats> topFwdPlaylits) {
+                                    final ArrayList<FollowStats> topFwdPlaylists,
+                                       final ArrayList<Album> topAlbums) {
         ResultOut result = new ResultOut(cmd);
 
         /* Verificam daca exista cel mult un user care asculta o colectie audio a user-ului */
@@ -107,10 +111,16 @@ public class UserInfo {
 
             /* Trebuie eliminata orice tine de user-ul eliminat */
             if (currUser.isArtist()) {
-                /* TODO pentru ALBUME */
-                for (Album album : ((Artist) currUser).getAlbums()) {
-                    for (SongInput song : album.getSongs()) {
-                        topLikedSongs.removeIf(like -> like.getSongName().equals(song.getName()));
+                for (UserInfo user : users) {
+                    if (user.isNormalUser()) {
+                        NormalUser tempRef = (NormalUser) user;
+                        for (Album album : ((Artist) currUser).getAlbums()) {
+                            for (SongInput song : album.getSongs()) {
+                                topLikedSongs.removeIf(like -> like.getSongName().equals(song.getName()));
+                                tempRef.getLikedSongs().remove(song);
+                            }
+                            topAlbums.remove(album);
+                        }
                     }
                 }
             } else if (currUser.isNormalUser()) {
@@ -127,7 +137,7 @@ public class UserInfo {
                         */
                         for (Playlist playlist : userToDel.getPlaylists()) {
                             someUser.getFwdPlaylits().removeIf(tmpPlaylist -> tmpPlaylist.equals(playlist));
-                            topFwdPlaylits.removeIf(tmpPlaylist -> tmpPlaylist.getPlaylistName().equals(playlist.getName()));
+                            topFwdPlaylists.removeIf(tmpPlaylist -> tmpPlaylist.getPlaylistName().equals(playlist.getName()));
                             playlist.decNrFollowers();
                         }
 
@@ -140,15 +150,14 @@ public class UserInfo {
                          * */
                         for (Like song : topLikedSongs) {
                             for (SongInput usersSong : userToDel.getLikedSongs()) {
-                                if (song.getSongName().equals(usersSong.getName())) {
+                                if (song.getSong().equals(usersSong)) {
                                     song.decrementNoUsers();
+                                    song.getSong().decNrLikes();
                                 }
                             }
                         }
                     }
                 }
-            } else {
-                // TODO
             }
 
             result.setMessage(currUser.getUsername() + " was successfully deleted.");

@@ -48,7 +48,7 @@ public class LikedContentPage extends Page {
             for (Playlist playlist : user.getFwdPlaylits()) {
                 pageContent.append(playlist.getName());
                 pageContent.append(" - ");
-                pageContent.append(playlist.getOwner());
+                pageContent.append(playlist.getOwner().getUsername());
                 pageContent.append(", ");
             }
 

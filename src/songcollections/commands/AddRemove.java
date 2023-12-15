@@ -2,11 +2,13 @@ package songcollections.commands;
 
 import fileio.input.SongInput;
 import input.commands.CommandIn;
+import users.Artist;
 import users.NormalUser;
 import output.result.ResultOut;
 import songcollections.collections.Album;
 import songcollections.collections.Playlist;
 import songcollections.collections.SongsCollection;
+import users.UserInfo;
 
 import java.util.ArrayList;
 
@@ -18,7 +20,7 @@ public final class AddRemove {
 
     /** Aceasta metoda implementeaza comanda "addRemove" */
     public static ResultOut addRemoveInPlaylist(final NormalUser user, final CommandIn command,
-                                                final ArrayList<SongInput> librarySongs) {
+                                                final ArrayList<UserInfo> users) {
         ResultOut result = new ResultOut(command);
 
         /* Verificam daca player-ul ruleaza */
@@ -33,9 +35,8 @@ public final class AddRemove {
             Verificam daca s-a selectat un podcast sau un playlist,
             intrucat functionalitatea acestei metode nu suporta si aceste optiuni
         */
-        SongsCollection col = user.getPlayer().getLoadInfo().getSelectInfo().getSongsCollection();
-        if (user.getPlayer().getLoadInfo().getSelectInfo().getResultType() == podcastId ||
-                (col != null && !col.isAlbum())) {
+        SongsCollection col = user.getSelectInfo().getSongsCollection();
+        if (user.getSelectInfo().getResultType() == podcastId || (col != null && !col.isAlbum())) {
             result.setMessage("The loaded source is not a song.");
             return result;
         }
@@ -47,14 +48,14 @@ public final class AddRemove {
         }
 
         Playlist playlist = user.getPlaylists().get(command.getPlaylistId() - 1);
-        String loadedSong = user.getPlayer().getStats().getName();
-        Album album = (Album) col;
+        SongInput loadedSong = findSong(user);
+        Album album = findAlbum(loadedSong, users);
         /*
             Iteram prin lista de melodii ale playlist-ului si
             cautam melodia care este incarcata in player
         */
         for (SongInput song: playlist.getSongs()) {
-            if (song.getName().contains(loadedSong)) {
+            if (song.equals(loadedSong)) {
                 playlist.getSongs().remove(song);
                 if (song.getIsInAlbum()) {
                     album.decrementNrSongsUsed();
@@ -65,13 +66,13 @@ public final class AddRemove {
         }
 
         /* Ajunsi aici inseamna ca melodia nu se gaseste in playlist, asa ca trebuie adaugata */
-        if (user.getPlayer().getLoadInfo().getSelectInfo().getArtistHostName() == null) {
+        if (user.getSelectInfo().getArtistHostName() == null) {
             /* Este incarcata o melodie din librarie */
             playlist.getSongs().add(user.getPlayer().getLoadInfo().getSelectInfo().getSong());
         } else {
             /* Este incarcata o melodie dintr-un album */
             for (SongInput song : album.getSongs()) {
-                if (song.getName().equals(loadedSong)) {
+                if (song.equals(loadedSong)) {
                     playlist.getSongs().add(song);
                     break;
                 }
@@ -84,4 +85,30 @@ public final class AddRemove {
         result.setMessage("Successfully added to playlist.");
         return result;
     }
+
+    private static Album findAlbum(final SongInput song, final ArrayList<UserInfo> users) {
+        for (UserInfo user : users) {
+            if (user.isArtist()) {
+                for (Album album : ((Artist) user).getAlbums()) {
+                    if (album.getName().equals(song.getAlbum())) {
+                        return album;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    private static SongInput findSong(final NormalUser user) {
+        if (user.getSelectInfo().getSongsCollection() == null) {
+            return user.getSelectInfo().getSong();
+        }
+        for (SongInput song : user.getSelectInfo().getSongsCollection().getSongs()) {
+            if (song.getName().equals(user.getPlayer().getStats().getName())) {
+                return song;
+            }
+        }
+        return new SongInput();
+    }
+
 }

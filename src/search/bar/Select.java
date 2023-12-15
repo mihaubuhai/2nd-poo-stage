@@ -31,19 +31,24 @@ public class Select {
     private SongInput song;
     private PodcastInput podcast;
     private SongsCollection songsCollection;
-    private ArrayList<String> searchResult;
-    private int resultType;                 // <-- Contorizeaza ce anume este incarcat in player
     private UserInfo artistHostName;   // <-- Numele artist-ului / host-ului selectat
+    private int resultType;                 // <-- Contorizeaza ce anume este incarcat in player
     /* 1 - melodie      2 - podcast     3 - playlist / album */
+
+    private int searchResultsize;
+
+    private ArrayList<SongInput> songsSearched;
+    private ArrayList<SongsCollection> collectionsSearched;
+    private ArrayList<PodcastInput> podcastsSearched;
+    private ArrayList<UserInfo> usersSearched;
+
     public Select() {
     }
 
-    public Select(final CommandIn command, final ArrayList<String> result) {
+    public Select(final CommandIn command, final Search searchResults) {
         setSearchDone(true);
         setUser(command.getUsername());
-        setSearchResult(result);
-        /* Linia de mai sus salveaza rezultatul efectiv al cautarii (nume melodii / podcast) */
-        setResultType(command);
+        setResultType(command, searchResults);
         artistHostName = null;
     }
 
@@ -60,16 +65,24 @@ public class Select {
     }
 
     /** Setter */
-    public void setResultType(final CommandIn command) {
+    public void setResultType(final CommandIn command, final Search searchResults) {
         /* 1 - song     2 - podcast     3 - playlist */
         if (command.getType().contains("song")) {
             resultType = 1;
+            songsSearched = searchResults.getSongsSearched();
+            searchResultsize = songsSearched.size();
         } else if (command.getType().contains("podcast")) {
             resultType = 2;
+            podcastsSearched = searchResults.getPodcastsSearched();
+            searchResultsize = podcastsSearched.size();
         } else if (command.getType().contains("playlist") || command.getType().contains("album")){
             resultType = 3;
+            collectionsSearched = searchResults.getCollectionsSearched();
+            searchResultsize = collectionsSearched.size();
         } else {
             resultType = 0;
+            usersSearched = searchResults.getUsersSearched();
+            searchResultsize = usersSearched.size();
         }
     }
 
@@ -78,142 +91,65 @@ public class Select {
      *    <p>
      *    Aceasta returneaza un obiect pe tiparul output-ului comenzii.
      * */
-    public ResultOut selectFunc(final CommandIn command, final LibraryInput library,
+    public ResultOut selectFunc(final CommandIn cmd, final LibraryInput library,
                                                 final ArrayList<UserInfo> users,
                                 final NormalUser currUser ) {
         /* Declarare + initializare valoare de retur a metodei */
-        ResultOut result = new ResultOut(command);
-        final int songId = 1;
-        final int podcastId = 2;
-        final int songCollId = 3;
+        ResultOut result = new ResultOut(cmd);
 
-        if (command.getItemNumber() > getSearchResult().size()) {
+        if (cmd.getItemNumber() > searchResultsize) {
             result.setMessage("The selected ID is too high.");
-        } else {
-            /* In acest moment, melodia / podcast este selectata */
-            setSelected(true);
-            if (resultType == songId) {
-                        /*  v--- Melodia ce se vrea selectata */
-                String selectedSong = getSearchResult().get(command.getItemNumber() - 1);
-                /* Se itereaza prin lista de melodii din biblioteca si se salveaza referinta */
-                for (SongInput song: library.getSongs()) {
-                    String libSongName = song.getName();
-                    if (libSongName.equals(selectedSong)) {
-                        setSong(song);      // <--- salvam referinta catre melodia selectata
-                        result.setMessage("Successfully selected " + libSongName + ".");
-                        break;
-                    }
-                }
+            return result;
+        }
 
-                /* Se poate ca melodia ce se vrea cautata sa nu fie in librarie; Cautam in lista artistilor */
-                for (UserInfo tempUser: users) {
-                    if (tempUser.isArtist()) {
-                        Artist artist = (Artist) tempUser;
-                        for (Album album: artist.getAlbums()) {
-                            for (SongInput song: album.getSongs()) {
-                                String albumSongName = song.getName();
-                                if (albumSongName.equals(selectedSong)) {
-                                    setSong(song);
-                                    setArtistHostName(artist);
-                                    setSongsCollection(album);
-                                    // ^-- Se retine faptul ca user-ul asculta ceva ce nu este in librarie
-                                    result.setMessage("Successfully selected " + albumSongName + ".");
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-            } else if (resultType == podcastId) {
-                /* Similar cu cazul "result_type == 1" */
-                String selectedPodcast = getSearchResult().get(command.getItemNumber() - 1);
-                /* Se itereaza prin lista de podcast-uri si se salveaza referinta catre podcast */
-                for (PodcastInput podcast: library.getPodcasts()) {
-                    String libPodcastName = podcast.getName();
-                    if (libPodcastName.equals(selectedPodcast)) {
-                        setPodcast(podcast);
-                        result.setMessage("Successfully selected " + libPodcastName + ".");
-                        break;
-                    }
-                }
+        String selectionName;
+        int idx = cmd.getItemNumber() - 1;
+        selected = true;
 
-                /* Podcastul care se vrea selectat nu se afla in librarie; cautam la hosts */
-                for (UserInfo user : users) {
-                    if (user.isHost()) {
-                        for (PodcastInput podcast : ((Host) user).getPodcasts()) {
-                            if (podcast.getName().equals(selectedPodcast)) {
-                                setPodcast(podcast);
-                                setArtistHostName(user);
-                                result.setMessage("Successfully selected " + podcast.getName() +
-                                        ".");
-                                break;
-                            }
-                        }
-                    }
+        switch (resultType) {
+            case 1 -> {
+                /* Se selecteaza o melodie */
+                song = songsSearched.get(idx);
+                selectionName = song.getName();
+                if (song.getIsInAlbum()) {
+                    artistHostName = findOwner(song.getArtist(), users);
                 }
-            } else if (resultType == songCollId) {
-                /* Aici se selecteaza fie playlist, fie album */
-                int id = command.getItemNumber();
-                String potentialName = getSearchResult().get(id - 1);
-                String msg;
-
-                for (UserInfo user: users) {
-                    /* Verificam intai daca se da select la un playlist */
-                    if (user.isNormalUser()) {
-                        for (Playlist playlist: ((NormalUser) user).getPlaylists()) {
-                            if ((msg = verifyCollection(playlist, potentialName)) != null) {
-                                setArtistHostName(user);
-                                result.setMessage(msg);
-                                break;
-                            }
-                        }
-                    } else if (user.isArtist()) {
-                        /* Verificam daca se da select la un album */
-                        for (Album album: ((Artist) user).getAlbums()) {
-                            if ((msg = verifyCollection(album, potentialName)) != null) {
-                                setArtistHostName(user);
-                                result.setMessage(msg);
-                                break;
-                            }
-                        }
-                    }
+            }
+            case 2 -> {
+                /* Se selecteaza un podcast */
+                podcast = podcastsSearched.get(idx);
+                selectionName = podcast.getName();
+                artistHostName = findOwner(podcast.getOwner(), users);
+            }
+            case 3 -> {
+                /* Se selecteaza o colectie de melodii */
+                songsCollection = collectionsSearched.get(idx);
+                selectionName = songsCollection.getName();
+                artistHostName = songsCollection.getOwner();
+            }
+            default -> {
+                /* Se selecteaza un artist / host */
+                artistHostName = usersSearched.get(idx);
+                selectionName = artistHostName.getUsername();
+                if (artistHostName.isArtist()) {
+                    currUser.setCurrentPage(new ArtistPage(artistHostName, Page.PageType.ARTIST));
+                } else {
+                    currUser.setCurrentPage(new HostPage(artistHostName, Page.PageType.HOST));
                 }
-            } else {
-                /* Se selecteaza artist / host */
-                String name = getSearchResult().get(command.getItemNumber() - 1);
-
-                /* Se cauta artist / host */
-                for (UserInfo user: users) {
-                    if (user.getUsername().equals(name)) {
-                        /*
-                            Pentru a afisa pagina corespunzator, se schimba campul ce desemneaza ..
-                            .. pagina al user-ului care a invocat comanda
-                        */
-                        if (user.isArtist()) {
-                            currUser.setCurrentPage(new ArtistPage(user, Page.PageType.ARTIST));
-                        } else {
-                            currUser.setCurrentPage(new HostPage(user, Page.PageType.HOST));
-                        }
-                        result.setMessage("Successfully selected " + name + "'s page.");
-                        setArtistHostName(user);
-                    }
-                }
+                selectionName = selectionName + "'s page";
             }
         }
 
+        result.setMessage("Successfully selected " + selectionName + ".");
         currUser.setSelectInfo(this);
         return result;
     }
 
-    /**
-     *  <p>Metoda folosita pentru selectarea unei colectii de melodii</p>
-     *  Returneaza mesajul care se afiseaza ca rezultat al comenzii "select"
-     *   */
-    private String verifyCollection(final SongsCollection collection, final String potentialName) {
-        String collectionName = collection.getName();
-        if (collectionName.equals(potentialName)) {
-            setSongsCollection(collection);
-            return "Successfully selected " + collectionName + ".";
+    private UserInfo findOwner(final String audioFileOwner, final ArrayList<UserInfo> users) {
+        for (UserInfo user : users) {
+            if (user.getUsername().equals(audioFileOwner)) {
+                return user;
+            }
         }
         return null;
     }
@@ -336,16 +272,6 @@ public class Select {
     }
 
     /** Setter */
-    public void setSearchResult(final ArrayList<String> result) {
-        searchResult = result;
-    }
-
-    /** Getter */
-    public ArrayList<String> getSearchResult() {
-        return searchResult;
-    }
-
-    /** Setter */
     public void setSongsCollection(final SongsCollection collection) {
         songsCollection = collection;
     }
@@ -358,6 +284,16 @@ public class Select {
     /** Getter */
     public SongsCollection getSongsCollection() {
         return songsCollection;
+    }
+
+    /** Setter */
+    public void setSearchResult(final int size) {
+        searchResultsize = size;
+    }
+
+    /** Getter */
+    public int getSearchResult() {
+        return searchResultsize;
     }
 
 }

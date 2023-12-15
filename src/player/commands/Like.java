@@ -16,69 +16,14 @@ import java.util.ArrayList;
  *      La comanda "GetTop5Songs", lista de mai sus va fi sortata in functie de campul "users"
  * */
 public class Like implements Comparable {
-    private String songName;            /* Numele melodiei */
+    private SongInput songName;            /* Numele melodiei */
     private int users;                          /* Numarul de user care apreciaza melodia */
     private int idx;                              /* Indicele din librarie al melodiei */
 
-    /** Implementare pentru sortarea listei "top5Songs" */
-    public int compareTo(final Object otherLike) {
-        int compareNrUsers = ((Like) otherLike).getUsers();
-        if (users == compareNrUsers) {
-            return idx - ((Like) otherLike).getIdx();
-        }
-        return compareNrUsers - users;
-    }
-
-    /**
-     *        Metoda folosita pentru a gasi indicele unei melodii in librarie
-     * */
-    private int getIdxSong(final String song, final LibraryInput library) {
-        int index = 999;
-        ArrayList<SongInput> songs = library.getSongs();
-        for (int i = 0; i < songs.size(); ++i) {
-            if (songs.get(i).getName().equals(song)) {
-                index = i;
-                break;
-            }
-        }
-        return index;
-    }
-
-    public Like(final String song, final LibraryInput library) {
+    public Like(final SongInput song, final LibraryInput library) {
         setSongName(song);
         incrementNoUsers();
-        idx = getIdxSong(song, library);
-    }
-
-    /** Setter */
-    public void setSongName(final String song) {
-        songName = song;
-    }
-    /** Getter */
-    public String getSongName() {
-        return songName;
-    }
-
-    /** Incrementeaza numarul de like-uri */
-    public void incrementNoUsers() {
-        users += 1;
-    }
-
-    /** Decrementeaza numarul de like-uri */
-    public void decrementNoUsers() {
-        if (users > 0) {
-            users -= 1;     // <--- Nu are sens sa existe numar negativ de aprecieri
-        }
-    }
-
-    /** Getter */
-    public int getUsers() {
-        return users;
-    }
-
-    /** Getter */
-    public int getIdx() {
-        return idx;
+        idx = getIdxSong(song.getName(), library);
     }
 
     /** Metoda de mai jos implementeaza comanda "like" */
@@ -101,6 +46,7 @@ public class Like implements Comparable {
             boolean deletedSong = false;
             SongsCollection col = currentUser.getPlayer().getLoadInfo()
                     .getSelectInfo().getSongsCollection();
+            SongInput currSongRef = findSong(currentUser);
 
             /* Verificam daca in lista de aprecieri ale user-ului se gaseste melodia care ruleaza */
             for (String song: currentUser.getLikedSongsNames()) {
@@ -110,6 +56,7 @@ public class Like implements Comparable {
                      .. aceasta eliminare (pentru lista topLikedSongs)
                      */
                     currentUser.getLikedSongs().removeIf(tempSong -> tempSong.getName().equals(song));
+                    currSongRef.decNrLikes();
                     deletedSong = true;
                     break;
                 }
@@ -138,7 +85,7 @@ public class Like implements Comparable {
                 result.setMessage("Unlike registered successfully.");
             } else {
                 /* Melodia nu a fost apreciata de user*/
-                currentUser.getLikedSongs().add(findSong(currentUser));
+                currentUser.getLikedSongs().add(currSongRef);
                 boolean created = false;
                 /*
                     O cautam in lista si incrementam numarul de aprecieri; daca nu o gasim,
@@ -147,12 +94,13 @@ public class Like implements Comparable {
                 for (Like iter: topLikedSongs) {
                     if (iter.getSongName().equals(currentSong)) {
                         iter.incrementNoUsers();
+                        currSongRef.incNrLikes();
                         created = true;
                         break;
                     }
                 }
                 if (!created) {
-                    topLikedSongs.add(new Like(currentSong, library));
+                    topLikedSongs.add(new Like(currSongRef, library));
                 }
 
                 /*
@@ -166,6 +114,30 @@ public class Like implements Comparable {
             }
         }
         return result;
+    }
+
+    /** Implementare pentru sortarea listei "top5Songs" */
+    public int compareTo(final Object otherLike) {
+        int compareNrUsers = ((Like) otherLike).getUsers();
+        if (users == compareNrUsers) {
+            return idx - ((Like) otherLike).getIdx();
+        }
+        return compareNrUsers - users;
+    }
+
+    /**
+     *        Metoda folosita pentru a gasi indicele unei melodii in librarie
+     * */
+    private int getIdxSong(final String song, final LibraryInput library) {
+        int index = 999;
+        ArrayList<SongInput> songs = library.getSongs();
+        for (int i = 0; i < songs.size(); ++i) {
+            if (songs.get(i).getName().equals(song)) {
+                index = i;
+                break;
+            }
+        }
+        return index;
     }
 
 
@@ -185,5 +157,41 @@ public class Like implements Comparable {
             }
             return song;
         }
+    }
+
+    /** Setter */
+    public void setSongName(final SongInput song) {
+        songName = song;
+    }
+    /** Getter */
+    public String getSongName() {
+        return songName.getName();
+    }
+
+    /** Getter */
+    public SongInput getSong() {
+        return songName;
+    }
+
+    /** Incrementeaza numarul de like-uri */
+    public void incrementNoUsers() {
+        users += 1;
+    }
+
+    /** Decrementeaza numarul de like-uri */
+    public void decrementNoUsers() {
+        if (users > 0) {
+            users -= 1;     // <--- Nu are sens sa existe numar negativ de aprecieri
+        }
+    }
+
+    /** Getter */
+    public int getUsers() {
+        return users;
+    }
+
+    /** Getter */
+    public int getIdx() {
+        return idx;
     }
 }

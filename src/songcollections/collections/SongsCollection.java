@@ -3,6 +3,7 @@ package songcollections.collections;
 import fileio.input.SongInput;
 import input.commands.CommandIn;
 import users.NormalUser;
+import users.UserInfo;
 
 import java.util.ArrayList;
 
@@ -11,7 +12,7 @@ import java.util.ArrayList;
  *       extinsa de clasele "Playlist" si "Album"
  * */
 public class SongsCollection {
-    private String owner;
+    private UserInfo owner;
     private String name;      // <-- Numele colectiei de melodii
     private ArrayList<SongInput> songs; // <-- Melodiile pe care le stocheaza
     private ArrayList<Integer> shuffledIndices; // <-- Vectorul de indici amestecati
@@ -106,7 +107,7 @@ public class SongsCollection {
         timeOfCreation = time;
     }
     /** Setter */
-    public void setOwner(final String owner) {
+    public void setOwner(final UserInfo owner) {
         this.owner = owner;
     }
 
@@ -128,7 +129,7 @@ public class SongsCollection {
         return timeOfCreation;
     }
     /** Getter */
-    public String getOwner() {
+    public UserInfo getOwner() {
         return owner;
     }
 

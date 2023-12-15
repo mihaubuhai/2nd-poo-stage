@@ -1,6 +1,7 @@
 package users.pages;
 
 import input.commands.CommandIn;
+import search.bar.Select;
 import users.Artist;
 import users.Host;
 import users.NormalUser;
@@ -73,19 +74,22 @@ public class Page {
      * */
     public ResultOut changePage(final CommandIn cmd, final NormalUser user) {
         ResultOut result = new ResultOut(cmd);
+        Select selectInfo = user.getSelectInfo();
 
         switch (cmd.getNextPage()) {
             case "Home" -> {
                 user.setCurrentPage(new HomePage(PageType.HOME));
-                user.getSelectInfo().setArtistHostName(null);
                 result.setMessage(user.getUsername() + " accessed " + cmd.getNextPage() + " successfully.");
             }
             case "LikedContent" -> {
                 user.setCurrentPage(new LikedContentPage(PageType.LIKEDCONTENT));
-                user.getSelectInfo().setArtistHostName(null);
                 result.setMessage(user.getUsername() + " accessed " + cmd.getNextPage() + " successfully.");
             }
             default -> result.setMessage(user + " is trying to access a non-existent page.");
+        }
+
+        if (selectInfo != null) {
+            selectInfo.setArtistHostName(null);
         }
 
         return result;
