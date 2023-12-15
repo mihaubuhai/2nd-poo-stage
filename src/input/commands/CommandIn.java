@@ -30,7 +30,7 @@ public class CommandIn {
     private String nextPage;
 
     /** Setter  */
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
     }
     /** Getter  */
@@ -39,7 +39,7 @@ public class CommandIn {
     }
 
     /** Setter  */
-    public void setDescription(String description) {
+    public void setDescription(final String description) {
         this.description = description;
     }
     /** Getter  */
@@ -48,7 +48,7 @@ public class CommandIn {
     }
 
     /** Setter  */
-    public void setReleaseYear(int releaseYear) {
+    public void setReleaseYear(final int releaseYear) {
         this.releaseYear = releaseYear;
     }
     /** Getter  */
@@ -57,7 +57,7 @@ public class CommandIn {
     }
 
     /** Setter  */
-    public void setSongs(ArrayList<SongInput> songs) {
+    public void setSongs(final ArrayList<SongInput> songs) {
         this.songs = songs;
     }
     /** Getter  */

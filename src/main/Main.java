@@ -77,33 +77,16 @@ public final class Main {
 
         // TODO add your implementation
 
-        if (
-                filePathInput.contains("test01")
-                ||filePathInput.contains("test00")
-                || filePathInput.contains("test02")
-                        || filePathInput.contains("test03")
-                        || filePathInput.contains("test04")
-                        || filePathInput.contains("test05")
-                        ||filePathInput.contains("test06")
-                        ||filePathInput.contains("test07")
-                        ||filePathInput.contains("test08")
-                        ||filePathInput.contains("test09")
-                        ||filePathInput.contains("test10")
-                ||filePathInput.contains("test11")
-                ||filePathInput.contains("test12")
-                ||filePathInput.contains("test13")
-                        ||filePathInput.contains("test14")
-                                                                                                                            ){
-            File filein = new File("input/" + filePathInput);
-            ArrayList<CommandIn> commands = objectMapper.readValue(filein, new TypeReference<>() {
-            });
+        File filein = new File("input/" + filePathInput);
+        ArrayList<CommandIn> commands = objectMapper.readValue(filein, new TypeReference<>() {
+        });
 
-            AnalyseCommands analyzer = AnalyseCommands.getInstance();
+        AnalyseCommands analyzer = AnalyseCommands.getInstance();
 
-            ArrayList<Output> result = analyzer.analyseFunc(library, commands);
+        ArrayList<Output> result = analyzer.analyseFunc(library, commands);
 
-            ObjectWriter objectWriter = objectMapper.writerWithDefaultPrettyPrinter();
-            objectWriter.writeValue(new File(filePathOutput), result);
-        }
+        ObjectWriter objectWriter = objectMapper.writerWithDefaultPrettyPrinter();
+        objectWriter.writeValue(new File(filePathOutput), result);
+
     }
 }

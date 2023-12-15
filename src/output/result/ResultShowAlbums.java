@@ -21,6 +21,7 @@ public class ResultShowAlbums extends ResultCommand {
         artist.getAlbums().forEach(album -> result.add(new SongsCollOutput(album)));
     }
 
+    /** Getter */
     public ArrayList<SongsCollOutput> getResult() {
         return result;
     }

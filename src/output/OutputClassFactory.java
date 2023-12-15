@@ -1,8 +1,12 @@
 package output;
 
 import input.commands.CommandIn;
-import output.result.*;
-
+import output.result.ResultGetTop5;
+import output.result.ResultShowPlaylists;
+import output.result.ResultStatus;
+import output.result.ResultOutSearch;
+import output.result.Output;
+import output.result.ResultOut;
 /**
  *          <p>
  *          Aceasta clasa contine o singura metoda care va intoarce un obiect pentru
@@ -13,7 +17,7 @@ import output.result.*;
  *      clasa finalizam design pattern-ul Factory pentru clasele de rezultate ale comenzilor
  *          </p>
  * */
-public class OutputClassFactory {
+public final class OutputClassFactory {
     /** Constructor privat, intrucat nu instantiem aceasta clasa nicaieri */
     private OutputClassFactory() {
     }

@@ -184,6 +184,10 @@ public class SongsCollection {
 
     /** Getter */
     public int getTotalLikes() {
+        totalLikes = 0;
+        for (SongInput song : songs) {
+            totalLikes += song.retrieveNrLikes();
+        }
         return totalLikes;
     }
 

@@ -5,7 +5,6 @@ import fileio.input.SongInput;
 import input.commands.CommandIn;
 import users.NormalUser;
 import output.result.ResultOut;
-import songcollections.collections.SongsCollection;
 import search.bar.Select;
 
 import java.util.ArrayList;
@@ -17,20 +16,19 @@ import java.util.ArrayList;
  * */
 public class Like implements Comparable {
     private SongInput songName;            /* Numele melodiei */
-    private int users;                          /* Numarul de user care apreciaza melodia */
     private int idx;                              /* Indicele din librarie al melodiei */
 
-    public Like(final SongInput song, final LibraryInput library) {
+    public Like(final SongInput song, final LibraryInput library,
+                final ArrayList<Like> topLikedSongs) {
         setSongName(song);
-        incrementNoUsers();
-        idx = getIdxSong(song.getName(), library);
+        idx = getIdxSong(song.getName(), library, topLikedSongs);
     }
 
     /** Metoda de mai jos implementeaza comanda "like" */
-    public static ResultOut likeCommand(final ArrayList<Like> topLikedSongs,
-                                                                   final NormalUser currentUser,
-                                                                   final CommandIn command,
-                                                                   final LibraryInput library) {
+    public static ResultOut likeCmd(final ArrayList<Like> topLikedSongs,
+                                    final NormalUser currentUser,
+                                    final CommandIn command,
+                                    final LibraryInput library) {
 
         ResultOut result = new ResultOut(command);
 
@@ -44,19 +42,16 @@ public class Like implements Comparable {
         } else {
             String currentSong = currentUser.getPlayer().getStats().getName();
             boolean deletedSong = false;
-            SongsCollection col = currentUser.getPlayer().getLoadInfo()
-                    .getSelectInfo().getSongsCollection();
             SongInput currSongRef = findSong(currentUser);
 
             /* Verificam daca in lista de aprecieri ale user-ului se gaseste melodia care ruleaza */
-            for (String song: currentUser.getLikedSongsNames()) {
+            for (String song : currentUser.getLikedSongsNames()) {
                 if (song.equals(currentSong)) {
                     /*
                         Daca se gaseste, o vom elimina si marcam ..
                      .. aceasta eliminare (pentru lista topLikedSongs)
                      */
                     currentUser.getLikedSongs().removeIf(tempSong -> tempSong.getName().equals(song));
-                    currSongRef.decNrLikes();
                     deletedSong = true;
                     break;
                 }
@@ -64,52 +59,36 @@ public class Like implements Comparable {
 
             if (deletedSong) {
                 /* Iteram prin lista "topLikedSongs" si cautam melodia din player */
-                for (Like iter: topLikedSongs) {
                     /*
                         Daca se gaseste aceasta melodie in lista de topLikedSongs,
                     vom decrementa numarul de users care o apreciaza
                     */
-                    if (iter.getSongName().equals(currentSong)) {
-                        iter.decrementNoUsers();
-                        break;
+                topLikedSongs.forEach(song -> {
+                    if (song.getSong().equals(currSongRef)) {
+                        song.getSong().decNrLikes();
                     }
-                }
+                });
 
-                /*
-                    Vom decrementa numarul total de like-uri al
-                    colectiei din care currentSong face parte (daca face parte)
-                */
-                if (col != null) {
-                    col.decrementTotalLikes();
-                }
                 result.setMessage("Unlike registered successfully.");
             } else {
                 /* Melodia nu a fost apreciata de user*/
                 currentUser.getLikedSongs().add(currSongRef);
                 boolean created = false;
+                currSongRef.incNrLikes();
                 /*
                     O cautam in lista si incrementam numarul de aprecieri; daca nu o gasim,
                     instantiem o clasa pentru ea
                 */
-                for (Like iter: topLikedSongs) {
+                for (Like iter : topLikedSongs) {
                     if (iter.getSongName().equals(currentSong)) {
-                        iter.incrementNoUsers();
-                        currSongRef.incNrLikes();
                         created = true;
                         break;
                     }
                 }
                 if (!created) {
-                    topLikedSongs.add(new Like(currSongRef, library));
+                    topLikedSongs.add(new Like(currSongRef, library, topLikedSongs));
                 }
 
-                /*
-                    Incrementam numarul total de like-uri al colectiei din care
-                    "currentSong" face parte (daca apartine de vreuna)
-                */
-                if (col != null) {
-                    col.incrementTotalLikes();
-                }
                 result.setMessage("Like registered successfully.");
             }
         }
@@ -118,18 +97,22 @@ public class Like implements Comparable {
 
     /** Implementare pentru sortarea listei "top5Songs" */
     public int compareTo(final Object otherLike) {
-        int compareNrUsers = ((Like) otherLike).getUsers();
-        if (users == compareNrUsers) {
+        int compareNrUsers = ((Like) otherLike).getNrLikes();
+        if (getNrLikes() == compareNrUsers) {
+            if (idx > 100 && ((Like) otherLike).getIdx() > 100) {
+                return songName.retrieveTimestampAdded() - ((Like) otherLike).getSong().retrieveTimestampAdded();
+            }
             return idx - ((Like) otherLike).getIdx();
         }
-        return compareNrUsers - users;
+        return compareNrUsers - getNrLikes();
     }
 
     /**
      *        Metoda folosita pentru a gasi indicele unei melodii in librarie
      * */
-    private int getIdxSong(final String song, final LibraryInput library) {
-        int index = 999;
+    private int getIdxSong(final String song, final LibraryInput library,
+                           final ArrayList<Like> topLikedSongs) {
+        int index = 999 + topLikedSongs.size();
         ArrayList<SongInput> songs = library.getSongs();
         for (int i = 0; i < songs.size(); ++i) {
             if (songs.get(i).getName().equals(song)) {
@@ -169,25 +152,13 @@ public class Like implements Comparable {
     }
 
     /** Getter */
-    public SongInput getSong() {
-        return songName;
-    }
-
-    /** Incrementeaza numarul de like-uri */
-    public void incrementNoUsers() {
-        users += 1;
-    }
-
-    /** Decrementeaza numarul de like-uri */
-    public void decrementNoUsers() {
-        if (users > 0) {
-            users -= 1;     // <--- Nu are sens sa existe numar negativ de aprecieri
-        }
+    public int getNrLikes() {
+        return songName.retrieveNrLikes();
     }
 
     /** Getter */
-    public int getUsers() {
-        return users;
+    public SongInput getSong() {
+        return songName;
     }
 
     /** Getter */

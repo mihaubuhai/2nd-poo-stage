@@ -34,7 +34,7 @@ public class ResultShowPlaylists extends  ResultCommand {
         private String visibility;
         private int followers;
 
-        public PlaylistOutput(final Playlist playlist) {
+        PlaylistOutput(final Playlist playlist) {
             super(playlist);
             visibility = playlist.getVisibility();
             followers = playlist.getFollowers();

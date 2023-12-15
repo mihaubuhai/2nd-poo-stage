@@ -11,6 +11,7 @@ public final class PodcastInput {
     public PodcastInput() {
     }
 
+    /** Metoda care verifica daca in podcast-ul dat ca parametru exista episodul dat ca parametru */
     public boolean isInPodcast(final EpisodeInput currEpisode, final PodcastInput podcast) {
         for (EpisodeInput episode: podcast.getEpisodes()) {
             if (episode.getName().equals(currEpisode.getName())) {
@@ -20,16 +21,19 @@ public final class PodcastInput {
         return false;
     }
 
+    /** Metoda care incrementeaza numarul de ascultatori ai podcast-ului */
     public void incrementNrListeners() {
         nrListeners++;
     }
 
+    /** Metoda care decrementeaza numarul de ascultatori ai podcast-ului */
     public void decrementNrListeners() {
         if (nrListeners > 0) {
             nrListeners--;
         }
     }
 
+    /** Metoda care intoarce numarul de ascultatori ai podcast-ului */
     public int retrieveNrListeners() {
         return nrListeners;
     }

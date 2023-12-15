@@ -151,7 +151,6 @@ public class UserInfo {
                         for (Like song : topLikedSongs) {
                             for (SongInput usersSong : userToDel.getLikedSongs()) {
                                 if (song.getSong().equals(usersSong)) {
-                                    song.decrementNoUsers();
                                     song.getSong().decNrLikes();
                                 }
                             }

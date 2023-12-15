@@ -8,7 +8,7 @@ public final class UserInput {
     public UserInput() {
     }
 
-    public UserInput(String name, int age, String city) {
+    public UserInput(final String name, final int age, final String city) {
         setUsername(name);
         setAge(age);
         setCity(city);

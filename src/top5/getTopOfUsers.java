@@ -9,10 +9,17 @@ import java.util.ArrayList;
 
 public class getTopOfUsers extends getTop implements Visitable {
     private ArrayList<UserInfo> users;
-    private int type;       // <-- Useri online sau toti userii
+    private TopType type;       // <-- Useri online sau toti userii
     /* 1 - allUsers  ;  2 - OnlineUsers  ;  3 - top5Artists */
 
-    public getTopOfUsers(final CommandIn cmd, final ArrayList<UserInfo> users, final int type) {
+    public enum TopType {
+        ALLUSERS,
+        ONLINEUSERS,
+        TOPARTIST,
+    }
+
+    public getTopOfUsers(final CommandIn cmd, final ArrayList<UserInfo> users,
+                         final TopType type) {
         super(cmd);
         this.users = users;
         this.type = type;
@@ -26,7 +33,7 @@ public class getTopOfUsers extends getTop implements Visitable {
         return users;
     }
 
-    public int getType() {
+    public TopType getType() {
         return type;
     }
 }

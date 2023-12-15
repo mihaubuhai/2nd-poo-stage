@@ -40,14 +40,23 @@ public final class Artist extends UserInfo {
      *    </p>
      *    Returneaza un obiect de tipul rezultatului corespunzator comenzii
      * */
-    public ResultOut addAlbum(final CommandIn command, final ArrayList<Album> topAlbums) {
-        ResultOut result = new ResultOut(command);
+    public ResultOut addAlbum(final CommandIn cmd, final ArrayList<Album> topAlbums,
+                              final UserInfo user) {
+        ResultOut result = new ResultOut(cmd);
+
+        if (!user.isArtist()) {
+            /* Verificam daca user-ul care a apelat aceasta metoda este artist */
+            result.setMessage(user.getUsername() + " is not an artist.");
+            return result;
+        }
+
+        Artist artist = (Artist) user;
 
         /* Verificam daca artistul are in colectia sa de albume inca unul cu acelasi nume */
-        String currAlbum = command.getName();
-        for (Album album: albums) {
+        String currAlbum = cmd.getName();
+        for (Album album: artist.getAlbums()) {
             if (album.getName().equals(currAlbum)) {
-                result.setMessage(getUsername() + " has another album with the same name.");
+                result.setMessage(artist.getUsername() + " has another album with the same name.");
                 return result;
             }
         }
@@ -56,23 +65,24 @@ public final class Artist extends UserInfo {
             Vom adauga, pe rand, melodiile din comanda in album, apoi vom face verificare
             daca se mai gaseste, dupa nume, melodia in album
          */
-        Album newAlbum = (Album) SongsCollFactory.getCollection(command);
-        for (SongInput song: command.getSongs()) {
+        Album newAlbum = (Album) SongsCollFactory.getCollection(cmd);
+        for (SongInput song: cmd.getSongs()) {
             if (!newAlbum.isInAlbum(song.getName())) {
                 newAlbum.getSongs().add(song);
                 song.changeState();
+                song.addTimestampAdded(cmd.getTimestamp());
             } else {
-                result.setMessage(getUsername() +
+                result.setMessage(artist.getUsername() +
                         " has the same song at least twice in this album.");
                 return result;
             }
         }
 
         /* Ajunsi aici, albumul nu prezinta nici o problema, va fi adaugat in lista de albume */
-        newAlbum.setOwner(this);
-        albums.add(newAlbum);
+        newAlbum.setOwner(artist);
+        artist.getAlbums().add(newAlbum);
         topAlbums.add(newAlbum);
-        result.setMessage(getUsername() + " has added new album successfully.");
+        result.setMessage(artist.getUsername() + " has added new album successfully.");
         return result;
     }
 
@@ -277,13 +287,15 @@ public final class Artist extends UserInfo {
         eventsName.add(event);
     }
 
+    /** Metoda care calculeaza campul totalAlbumsLikes */
+    public void findTotalLikes() {
+        for (Album album : albums) {
+            totalAlbumsLikes += album.getTotalLikes();
+        }
+    }
+
     /** Getter */
     public int getTotalAlbumsLikes() {
-        for (Album album : albums) {
-            for (SongInput song : album.getSongs()) {
-                totalAlbumsLikes += song.retrieveNrLikes();
-            }
-        }
         return totalAlbumsLikes;
     }
 

@@ -1,5 +1,6 @@
 package users.pages;
 
+import fileio.input.SongInput;
 import input.commands.CommandIn;
 import users.NormalUser;
 import output.result.ResultOut;
@@ -24,18 +25,9 @@ public class HomePage extends Page {
         ResultOut result = new ResultOut(cmd);
         pageContent = new StringBuilder("Liked songs:\n\t[");
 
-        /* Compunem lista de clase Like corespunzatoare melodiilor apreciate de user curent */
-        ArrayList<Like> tempLikes = new ArrayList<>();
-        for (Like song: topLikedSongs) {
-            for (String userLikes: user.getLikedSongsNames()) {
-                if (userLikes.equals(song.getSongName())) {
-                    tempLikes.add(song);
-                }
-            }
-        }
+        ArrayList<SongInput> tempLikes = new ArrayList<>(user.getLikedSongs());
 
-        /* Le sortam descrescator */
-        tempLikes.sort((o1, o2) -> o2.getUsers() - o1.getUsers());
+        tempLikes.sort((o1, o2) -> o2.retrieveNrLikes() - o1.retrieveNrLikes());
 
         /* Verificam daca sunt mai putin de 5 melodii in lista de mai sus */
         int tempSize = 5;
@@ -45,7 +37,7 @@ public class HomePage extends Page {
         }
 
         for (int i = 0; i < tempSize; ++i) {
-            pageContent.append(tempLikes.get(i).getSongName()).append(", ");
+            pageContent.append(tempLikes.get(i).getName()).append(", ");
         }
 
         if (tempSize > 0) {

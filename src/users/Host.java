@@ -140,13 +140,20 @@ public class Host extends UserInfo {
      *      Returneaza rezultatul comenzii
      *
      *  */
-    public ResultOut removeAnnouncement(final CommandIn cmd) {
+    public ResultOut removeAnnouncement(final CommandIn cmd, final UserInfo user) {
         ResultOut result = new ResultOut(cmd);
         boolean isValid = false;    //<-- Contorizeaza daca exista vreun anunt cu numele dat in cmd
         int idx = 0;
 
-        for (int i = 0; i < announcementsName.size(); ++i) {
-            String news = announcementsName.get(i);
+        if (!user.isHost()) {
+            result.setMessage(user.getUsername() + " is not a host.");
+            return result;
+        }
+
+        Host host = (Host) user;
+
+        for (int i = 0; i < host.getAnnouncementsName().size(); ++i) {
+            String news = host.getAnnouncementsName().get(i);
             if (news.equals(cmd.getName())) {
                 isValid = true; //<-- Exista un anunt, deci se poate sterge
                 idx = i;
@@ -158,8 +165,8 @@ public class Host extends UserInfo {
         if (!isValid) {
             result.setMessage(getUsername() + " has no announcement with the given name.");
         } else {
-            announcementsName.remove(idx);
-            announcementsDescription.remove(idx);
+            host.getAnnouncementsName().remove(idx);
+            host.getAnnouncementsDescription().remove(idx);
             result.setMessage(getUsername() + " has successfully deleted the announcement.");
         }
 

@@ -55,6 +55,7 @@ public class topCreatorVisitor extends Visitor {
 
     public ResultGetTop5 visit(final getTopSongs toVisit) {
         ResultGetTop5 result = new ResultGetTop5(toVisit.getCmd());
+        toVisit.getTopLikedSongs().removeIf(song -> song.getNrLikes() == 0);
         /* Sortam melodiile dupa campul "users" */
         Collections.sort(toVisit.getTopLikedSongs());
 
@@ -63,7 +64,7 @@ public class topCreatorVisitor extends Visitor {
             maxSize = toVisit.getTopLikedSongs().size();
         }
 
-       for (int i = 0; i < maxSize - 1; ++i) {
+       for (int i = 0; i < maxSize; ++i) {
            result.getResult().add(toVisit.getTopLikedSongs().get(i).getSongName());
        }
 
@@ -71,10 +72,11 @@ public class topCreatorVisitor extends Visitor {
             Ultima melodie posibil sa fie cu 0 like-uri;
             Trebuie schimbata in fct de ordinea ei in librarie
        */
+        maxSize = 5;
         int lastSize = result.getResult().size();
         int idxOfLast = lastSize - 1;
         LibraryInput lib = toVisit.getLibrary();
-        for (int i = 0; i <= (maxSize - lastSize); ++i) {
+        for (int i = 0; i < maxSize - lastSize; ++i) {
             int idxLibOfLast = toVisit.getTopLikedSongs().get(idxOfLast).getIdx();
             if (i <= idxLibOfLast) {
                 result.getResult().add(lib.getSongs().get(i).getName());
@@ -91,7 +93,7 @@ public class topCreatorVisitor extends Visitor {
         ResultGetTop5 output = new ResultGetTop5(toVisit.getCmd());
 
         switch (toVisit.getType()) {
-            case 2 ->
+            case ONLINEUSERS ->
                 toVisit.getUsers().forEach(utilizator -> {
                     if (utilizator.isNormalUser()) {
                         if (((NormalUser) utilizator).getState()) {
@@ -99,7 +101,7 @@ public class topCreatorVisitor extends Visitor {
                         }
                     }
                 });
-            case 1 -> {
+            case ALLUSERS -> {
                 toVisit.getUsers().forEach(user -> {
                     if (user.isNormalUser()) {
                         output.getResult().add(user.getUsername());
@@ -116,7 +118,7 @@ public class topCreatorVisitor extends Visitor {
                     }
                 });
             }
-            case 3 -> {
+            case TOPARTIST -> {
                 int maxSize = 5;
                 ArrayList<Artist> artists = new ArrayList<>();
                 toVisit.getUsers().forEach(user -> {
@@ -125,7 +127,9 @@ public class topCreatorVisitor extends Visitor {
                     }
                 });
 
+
                 /* Sortam lista */
+                artists.forEach(Artist::findTotalLikes);
                 artists.sort((o1, o2) -> o2.getTotalAlbumsLikes() - o1.getTotalAlbumsLikes());
 
                 if (maxSize > artists.size()) {
