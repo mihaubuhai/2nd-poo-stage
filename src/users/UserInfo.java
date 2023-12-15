@@ -29,7 +29,7 @@ public class UserInfo {
      *      <p>
      *      Aceasta este apelata de user-ul care a invocat comanda.
      */
-    public ResultOut changeConnectionStatus(CommandIn command) {
+    public ResultOut changeConnectionStatus(final CommandIn command) {
         ResultOut result = new ResultOut(command);
 
         /*
@@ -64,8 +64,8 @@ public class UserInfo {
         if (currUser == null) {
             UserInput currUserInfo = new UserInput(cmd.getUsername(), cmd.getAge(), cmd.getCity());
             users.add(UserFactory.getUser(cmd.getType(), currUserInfo));
-            result.setMessage("The username " + cmd.getUsername() +
-                    " has been added successfully.");
+            result.setMessage("The username "
+                    + cmd.getUsername() + " has been added successfully.");
         } else {
             /* Daca referinta nu este nula, cu siguranta "currUser" se gaseste in lista "users" */
             result.setMessage("The username " + cmd.getUsername() + " is already taken.");
@@ -109,22 +109,26 @@ public class UserInfo {
             /* User-ul poate fi eliminat cu succes */
             users.removeIf(user -> user.equals(currUser));
 
-            /* Trebuie eliminata orice tine de user-ul eliminat */
             if (currUser.isArtist()) {
+            /* Iteram prin lista de useri, ne intereseaza doar cei normali */
                 for (UserInfo user : users) {
                     if (user.isNormalUser()) {
                         NormalUser tempRef = (NormalUser) user;
                         for (Album album : ((Artist) currUser).getAlbums()) {
                             for (SongInput song : album.getSongs()) {
-                                topLikedSongs.removeIf(like -> like.getSongName().equals(song.getName()));
+                                /*Eliminam din topul melodiilor melodiile din albumele artistului*/
+                                topLikedSongs.removeIf(like ->
+                                        like.getSongName().equals(song.getName()));
                                 tempRef.getLikedSongs().remove(song);
+                                /* ^-- eliminam si din lista de aprecieri a fiecarui user normal */
                             }
+                            /* Eliminam din topul albumelor albumele artistului */
                             topAlbums.remove(album);
                         }
                     }
                 }
             } else if (currUser.isNormalUser()) {
-                /* User normal */
+                /* Se sterge un user normal */
                 for (UserInfo user : users) {
                     if (user.isNormalUser()) {
                         NormalUser someUser = (NormalUser) user;
@@ -136,8 +140,10 @@ public class UserInfo {
                             Apoi, din lista totala de playlist-uri urmarite, il eliminam.
                         */
                         for (Playlist playlist : userToDel.getPlaylists()) {
-                            someUser.getFwdPlaylits().removeIf(tmpPlaylist -> tmpPlaylist.equals(playlist));
-                            topFwdPlaylists.removeIf(tmpPlaylist -> tmpPlaylist.getPlaylistName().equals(playlist.getName()));
+                            someUser.getFwdPlaylits().removeIf(tmpPlaylist ->
+                                    tmpPlaylist.equals(playlist));
+                            topFwdPlaylists.removeIf(tmpPlaylist ->
+                                    tmpPlaylist.getPlaylistName().equals(playlist.getName()));
                             playlist.decNrFollowers();
                         }
 
@@ -197,17 +203,28 @@ public class UserInfo {
         return false;
     }
 
+    /** Metoda apelata de catre un artist in contextul metodei "deleteUser" pentru a verifica
+     *  daca exista cel putin un playlist ascultat de catre un user normal care contine macar o
+     *  melodie a artistului
+     * */
     private boolean checkIfSmthIsListened(final ArrayList<UserInfo> users) {
         if (isArtist()) {
             for (UserInfo user : users) {
                 if (user.isNormalUser()) {
+                    /* User-ul nu are selectat nimic / nu ruleaza nimic player-ul acestuia */
                     if (((NormalUser) user).getSelectInfo() == null) {
                         continue;
                     }
                     SongsCollection col = ((NormalUser) user).getSelectInfo().getSongsCollection();
                     if (col ==  null) {
+                        /* User-ul nu asculta un album / playlist */
                         continue;
                     }
+
+                    /*
+                        Verificam daca playlist-ul contine
+                        o melodie a artistului care a apelat metoda
+                    */
                     for (SongInput song : col.getSongs()) {
                         for (Album album : ((Artist) this).getAlbums()) {
                             if (song.getIsInAlbum() && song.getAlbum().equals(album.getName())) {
@@ -234,7 +251,7 @@ public class UserInfo {
                 if (user.isNormalUser()) {
                     NormalUser tempRef = (NormalUser) user;
 
-                    /* Clasa "Page" are un camp ce retine referinta catre artist / host-ul selectat */
+                    /*Clasa "Page" are un camp ce retine referinta catre artist/host-ul selectat */
                     UserInfo selectedUser = tempRef.getCurrentPage().getUsersPage();
                     /* ^-- Poate fi null daca user-ul este pe pagina Home / LikedContent */
 
@@ -258,7 +275,8 @@ public class UserInfo {
             if (user.isNormalUser() && !user.equals(this)) {
                 /* Verificam daca are o colectie audio selectata (sau o melodie dintr-un album) */
                 NormalUser tempRef = (NormalUser) user;
-                if (tempRef.getSelectInfo() == null || tempRef.getSelectInfo().getArtistHostName() == null) {
+                if (tempRef.getSelectInfo() == null
+                        || tempRef.getSelectInfo().getArtistHostName() == null) {
                     /*
                         Verificarea interactiunii unui user normal cu alt user se face
                         prin compararea campului "artistHostName" cu obicetul care a apelat metoda

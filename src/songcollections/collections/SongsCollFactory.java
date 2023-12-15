@@ -3,7 +3,7 @@ package songcollections.collections;
 import input.commands.CommandIn;
 
 /** Aceasta clasa face parte din Factory design pentru playlist si album */
-public class SongsCollFactory {
+public final class SongsCollFactory {
     private SongsCollFactory() {
     }
 

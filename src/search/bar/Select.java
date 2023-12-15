@@ -5,7 +5,6 @@ import fileio.input.PodcastInput;
 import fileio.input.SongInput;
 import input.commands.CommandIn;
 import users.Artist;
-import users.Host;
 import users.UserInfo;
 import users.NormalUser;
 import users.pages.ArtistPage;
@@ -67,16 +66,19 @@ public class Select {
     /** Setter */
     public void setResultType(final CommandIn command, final Search searchResults) {
         /* 1 - song     2 - podcast     3 - playlist */
+        final int playlistId = 3;
+        final int podcastId = 2;
+        final int songId = 1;
         if (command.getType().contains("song")) {
-            resultType = 1;
+            resultType = songId;
             songsSearched = searchResults.getSongsSearched();
             searchResultsize = songsSearched.size();
         } else if (command.getType().contains("podcast")) {
-            resultType = 2;
+            resultType = podcastId;
             podcastsSearched = searchResults.getPodcastsSearched();
             searchResultsize = podcastsSearched.size();
-        } else if (command.getType().contains("playlist") || command.getType().contains("album")){
-            resultType = 3;
+        } else if (command.getType().contains("playlist") || command.getType().contains("album")) {
+            resultType = playlistId;
             collectionsSearched = searchResults.getCollectionsSearched();
             searchResultsize = collectionsSearched.size();
         } else {
@@ -92,10 +94,14 @@ public class Select {
      *    Aceasta returneaza un obiect pe tiparul output-ului comenzii.
      * */
     public ResultOut selectFunc(final CommandIn cmd, final LibraryInput library,
-                                                final ArrayList<UserInfo> users,
-                                final NormalUser currUser ) {
+                                final ArrayList<UserInfo> users,
+                                final NormalUser currUser) {
         /* Declarare + initializare valoare de retur a metodei */
         ResultOut result = new ResultOut(cmd);
+
+        final int playlistId = 3;
+        final int podcastId = 2;
+        final int songId = 1;
 
         if (cmd.getItemNumber() > searchResultsize) {
             result.setMessage("The selected ID is too high.");
@@ -107,7 +113,7 @@ public class Select {
         selected = true;
 
         switch (resultType) {
-            case 1 -> {
+            case songId -> {
                 /* Se selecteaza o melodie */
                 song = songsSearched.get(idx);
                 selectionName = song.getName();
@@ -115,13 +121,13 @@ public class Select {
                     artistHostName = findOwner(song.getArtist(), users);
                 }
             }
-            case 2 -> {
+            case podcastId -> {
                 /* Se selecteaza un podcast */
                 podcast = podcastsSearched.get(idx);
                 selectionName = podcast.getName();
                 artistHostName = findOwner(podcast.getOwner(), users);
             }
-            case 3 -> {
+            case playlistId -> {
                 /* Se selecteaza o colectie de melodii */
                 songsCollection = collectionsSearched.get(idx);
                 selectionName = songsCollection.getName();
@@ -146,9 +152,9 @@ public class Select {
     }
 
     private UserInfo findOwner(final String audioFileOwner, final ArrayList<UserInfo> users) {
-        for (UserInfo user : users) {
-            if (user.getUsername().equals(audioFileOwner)) {
-                return user;
+        for (UserInfo tempUser : users) {
+            if (tempUser.getUsername().equals(audioFileOwner)) {
+                return tempUser;
             }
         }
         return null;
@@ -174,8 +180,11 @@ public class Select {
                 tempRef.decrementNrListeners();
             }
             case 2 -> podcast.decrementNrListeners();
-            /* Pentru cazul 2 si 3, ceea ce ruleaza este o colectie audio; Se apeleaza direct metoda */
-            case 3 -> songsCollection.decrementNrListeners();
+            /*
+                Pentru cazul 2 si 3, ceea ce ruleaza este o colectie audio;
+                Se apeleaza direct metoda
+             */
+            default -> songsCollection.decrementNrListeners();
         }
     }
 
@@ -192,10 +201,12 @@ public class Select {
                 tempRef.incrementNrListeners();
             }
             case 2 -> podcast.incrementNrListeners();
-            case 3 -> songsCollection.incrementNrListeners();
+            default -> songsCollection.incrementNrListeners();
         }
     }
 
+    /** Metoda care intoarce referinta catre album-ul cu numele dat ca parametru metodei <p>
+     *  Aceasta este apelata de instanta clasei "Select" aferenta unui user normal */
     private Album findAlbum(final String albumName) {
         for (Album album: ((Artist) artistHostName).getAlbums()) {
             if (album.getName().equals(albumName)) {

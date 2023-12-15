@@ -57,7 +57,8 @@ public final class Shuffle {
             result.setMessage("The loaded source is not a playlist or an album.");
         } else {
             /* Player-ul ruleaza un playlist / album; verificam daca exista shuffle activ */
-            SongsCollection songCollection = currentPlayer.getLoadInfo().getSelectInfo().getSongsCollection();
+            SongsCollection songCollection = currentPlayer.getLoadInfo()
+                    .getSelectInfo().getSongsCollection();
 
             if (currentPlayer.getStats().getShuffle()) {
                 /* Se dezactiveaza shuffle */
@@ -71,7 +72,8 @@ public final class Shuffle {
             } else {
                 /* Se activeaza functia "shuffle" si cream vectorul de indici amestecati */
                 int playlistSize = songCollection.getSongs().size();
-                songCollection.setShuffledIndices(createShuffleArray(playlistSize, command.getSeed()));
+                songCollection.setShuffledIndices(createShuffleArray(playlistSize,
+                        command.getSeed()));
                 currentPlayer.getStats().setShuffle(true);
                 result.setMessage("Shuffle function activated successfully.");
             }

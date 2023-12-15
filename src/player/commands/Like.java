@@ -17,6 +17,7 @@ import java.util.ArrayList;
 public class Like implements Comparable {
     private SongInput songName;            /* Numele melodiei */
     private int idx;                              /* Indicele din librarie al melodiei */
+    private final int bound = 100;
 
     public Like(final SongInput song, final LibraryInput library,
                 final ArrayList<Like> topLikedSongs) {
@@ -51,7 +52,8 @@ public class Like implements Comparable {
                         Daca se gaseste, o vom elimina si marcam ..
                      .. aceasta eliminare (pentru lista topLikedSongs)
                      */
-                    currentUser.getLikedSongs().removeIf(tempSong -> tempSong.getName().equals(song));
+                    currentUser.getLikedSongs().removeIf(tempSong ->
+                            tempSong.getName().equals(song));
                     deletedSong = true;
                     break;
                 }
@@ -99,9 +101,16 @@ public class Like implements Comparable {
     public int compareTo(final Object otherLike) {
         int compareNrUsers = ((Like) otherLike).getNrLikes();
         if (getNrLikes() == compareNrUsers) {
-            if (idx > 100 && ((Like) otherLike).getIdx() > 100) {
-                return songName.retrieveTimestampAdded() - ((Like) otherLike).getSong().retrieveTimestampAdded();
+            if (idx > bound && ((Like) otherLike).getIdx() > bound) {
+                /*
+                    Daca sunt melodii din albume, sa le seteze
+                    in functie de cum au fost adaugate in aplicatie
+                    (Se presupune ca nu se adauga 100 de melodii in top-ul de melodii)
+                */
+                return songName.retrieveTimestampAdded()
+                        - ((Like) otherLike).getSong().retrieveTimestampAdded();
             }
+            /* Setare crescatoare pentru melodii din biblioteca */
             return idx - ((Like) otherLike).getIdx();
         }
         return compareNrUsers - getNrLikes();
@@ -112,7 +121,9 @@ public class Like implements Comparable {
      * */
     private int getIdxSong(final String song, final LibraryInput library,
                            final ArrayList<Like> topLikedSongs) {
-        int index = 999 + topLikedSongs.size();
+        final int upperbound = 999;
+        int index = upperbound + topLikedSongs.size();
+        /* ^--- Pentru a marca melodiile dintr-un album */
         ArrayList<SongInput> songs = library.getSongs();
         for (int i = 0; i < songs.size(); ++i) {
             if (songs.get(i).getName().equals(song)) {

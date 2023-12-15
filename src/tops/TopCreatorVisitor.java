@@ -1,4 +1,4 @@
-package top5;
+package tops;
 
 import fileio.input.LibraryInput;
 import javassist.compiler.ast.Visitor;
@@ -9,17 +9,26 @@ import users.NormalUser;
 import java.util.ArrayList;
 import java.util.Collections;
 
-public class topCreatorVisitor extends Visitor {
-    int maxSize = 5;
 
-    public ResultGetTop5 visit(final getTopAlbums toVisit) {
+/** Aceasta clasa contine toti algoritmii care implementeaza "getTop*" */
+public class TopCreatorVisitor extends Visitor {
+    private final int upperbound = 5;
+    private int maxSize = upperbound;
+
+    /** Implementarea comenzii "getTop5Albums" <p>
+     *    Primeste ca parametru clasa TopAlbums ce contine lista totala de albume <p>
+     *    Returneaza rezultatul comenzii invocate (cum se doreste in fisierele .json)
+     * */
+    public ResultGetTop5 visit(final TopAlbums toVisit) {
         ResultGetTop5 result = new ResultGetTop5(toVisit.getCmd());
 
         /* Sortam lista de albume */
         toVisit.getTopAlbums().sort((o1, o2) -> {
             if (o1.getTotalLikes() == o2.getTotalLikes()) {
                 return o1.getName().compareTo(o2.getName());
+                /* Sortam crescator lexicografic ^^ */
             }
+            /* Sortam descrescator dupa numarul total de aprecieri */
             return o2.getTotalLikes() - o1.getTotalLikes();
         });
 
@@ -35,7 +44,12 @@ public class topCreatorVisitor extends Visitor {
         return result;
     }
 
-    public ResultGetTop5 visit(final getTopPlaylists toVisit) {
+    /** Metoda implementeaza "getTop5Playlists" <p>
+     *    Primeste ca parametru clasa TopPlaylists care contine lista de statistici
+     *    ale tuturor playlist-urilor <p>
+     *    Returneaza rezultatul comenzii, un obiect pe tiparul cerut
+     * */
+    public ResultGetTop5 visit(final TopPlaylists toVisit) {
         ResultGetTop5 result = new ResultGetTop5(toVisit.getCmd());
         /* Sortam playlist-urile dupa campul "followers" (in principiu) */
         Collections.sort(toVisit.getTopFwsPlaylists());
@@ -53,10 +67,24 @@ public class topCreatorVisitor extends Visitor {
         return result;
     }
 
-    public ResultGetTop5 visit(final getTopSongs toVisit) {
+    /** Metoda implementeaza "getTop5Songs" <p>
+     *  Primeste ca parametru clasa TopSongs care contine lista de melodii apreciate pe tot
+     *  programul <p>
+     *  Returneaza un obiect pe tiparul rezultatului comenzii
+     * */
+    public ResultGetTop5 visit(final TopSongs toVisit) {
         ResultGetTop5 result = new ResultGetTop5(toVisit.getCmd());
+
+        /* Nu au rost melodiile cu 0 like-uri; le eliminam */
         toVisit.getTopLikedSongs().removeIf(song -> song.getNrLikes() == 0);
-        /* Sortam melodiile dupa campul "users" */
+
+        /*
+        *   Melodiile sunt sortate astfel:
+        *       --> descrescator dupa numar de like-uri (daca difera)
+        *       --> crescator, daca sunt din biblioteca
+        *       --> sunt adaugate in ordinea in care au fost adaugate in program prin albume,
+        *               daca piesele nu sunt din biblioteca
+        * */
         Collections.sort(toVisit.getTopLikedSongs());
 
 
@@ -68,14 +96,12 @@ public class topCreatorVisitor extends Visitor {
            result.getResult().add(toVisit.getTopLikedSongs().get(i).getSongName());
        }
 
-       /*
-            Ultima melodie posibil sa fie cu 0 like-uri;
-            Trebuie schimbata in fct de ordinea ei in librarie
-       */
-        maxSize = 5;
+       /* Posibil locuri goale in rezultat; Adaugam din biblioteca */
+        maxSize = upperbound;
         int lastSize = result.getResult().size();
         int idxOfLast = lastSize - 1;
         LibraryInput lib = toVisit.getLibrary();
+        /* Comparatiile se fac, identic, ca la sortarea de mai sus */
         for (int i = 0; i < maxSize - lastSize; ++i) {
             int idxLibOfLast = toVisit.getTopLikedSongs().get(idxOfLast).getIdx();
             if (i <= idxLibOfLast) {
@@ -89,7 +115,11 @@ public class topCreatorVisitor extends Visitor {
         return result;
     }
 
-    public ResultGetTop5 visit(final getTopOfUsers toVisit) {
+    /** Metoda implementeaza toate cazurile de "get[CEVA]User / Artist" <p>
+     *  Primeste ca parametru clasa TopOfUsers care contine lista cu toti useri programului <p>
+     *   Returneaza un obiect de tipul rezultatului comenzii
+     * */
+    public ResultGetTop5 visit(final TopOfUsers toVisit) {
         ResultGetTop5 output = new ResultGetTop5(toVisit.getCmd());
 
         switch (toVisit.getType()) {
@@ -118,8 +148,8 @@ public class topCreatorVisitor extends Visitor {
                     }
                 });
             }
-            case TOPARTIST -> {
-                int maxSize = 5;
+            default -> {
+                maxSize = upperbound;
                 ArrayList<Artist> artists = new ArrayList<>();
                 toVisit.getUsers().forEach(user -> {
                     if (user.isArtist()) {

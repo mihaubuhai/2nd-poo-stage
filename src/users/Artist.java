@@ -72,8 +72,8 @@ public final class Artist extends UserInfo {
                 song.changeState();
                 song.addTimestampAdded(cmd.getTimestamp());
             } else {
-                result.setMessage(artist.getUsername() +
-                        " has the same song at least twice in this album.");
+                result.setMessage(artist.getUsername()
+                        + " has the same song at least twice in this album.");
                 return result;
             }
         }
@@ -86,6 +86,11 @@ public final class Artist extends UserInfo {
         return result;
     }
 
+    /**
+     *      Metoda implementeaza comanda "removeAlbum"<p>
+     *      Primeste ca parametru comanda invocata si user-ul care a invocat-o <p>
+     *      Returneaza un obiect pe tiparul rezultatului comenzii
+     * */
     public ResultOut removeAlbum(final CommandIn cmd, final UserInfo user) {
         ResultOut result = new ResultOut(cmd);
         Album toRemoveAlbum = null;
@@ -104,7 +109,8 @@ public final class Artist extends UserInfo {
 
             /* Verificam daca artistul are un album cu numele dat in cmd */
             if (toRemoveAlbum == null) {
-                result.setMessage(artist.getUsername() + " doesn't have an album with the given name.");
+                result.setMessage(artist.getUsername()
+                        + " doesn't have an album with the given name.");
             } else {
                 /* Albumul exista, verificam daca sunt ascultatori al lui / al vreunei piese */
                 if (toRemoveAlbum.getNrListeners() > 0 || toRemoveAlbum.getNrSongsUsed() > 0) {
@@ -150,9 +156,16 @@ public final class Artist extends UserInfo {
                 final int month = Integer.parseInt(info[1]);
                 final int year = Integer.parseInt(info[2]);
 
-                if (month > 12 || year < 1900 || year > 2023 || day > 31 || (month == 2 && day > 28)) {
-                    result.setMessage("Event for " + artist.getUsername() +
-                            " does not have a valid date.");
+                final int lastMonth = 12;
+                final int earliestYear = 1900;
+                final int currYear = 2023;
+                final int lastDay = 31;
+                final int specialDay = 28;
+
+                if (month > lastMonth || year < earliestYear || year > currYear || day > lastDay
+                        || (month == 2 && day > specialDay)) {
+                    result.setMessage("Event for " + artist.getUsername()
+                            + " does not have a valid date.");
                 } else {
                     /* Evenimentul nu prezinta probleme, va fi adaugat */
                     artist.eventsName.add(eventName);
@@ -166,6 +179,11 @@ public final class Artist extends UserInfo {
         return result;
     }
 
+
+    /** Metoda implementeaza comanda "removeEvent"<p>
+     *   Primeste ca parametrii user-ul care a invocat comanda si comanda in sine <p>
+     *   Returneaza un obiect pe tiparul rezultatului comenzii
+     * */
     public ResultOut removeEvent(final UserInfo user, final CommandIn cmd) {
         ResultOut result = new ResultOut(cmd);
 
@@ -178,7 +196,8 @@ public final class Artist extends UserInfo {
 
             /* Se verifica daca artistul are un eveniment cu numele dat in cmd */
             if (!artist.getEventsName().contains(eventName)) {
-                result.setMessage(artist.getUsername() + " doesn't have an event with the given name.");
+                result.setMessage(artist.getUsername()
+                        + " doesn't have an event with the given name.");
             } else {
                 /* Evenimentul se poate sterge cu succes */
                 int idx = artist.getEventsName().indexOf(eventName);
@@ -224,7 +243,8 @@ public final class Artist extends UserInfo {
                     artist.getMerchNames().add(merchName);
                     artist.getMerchDescription().add(cmd.getDescription());
                     artist.getMerchPrice().add(cmd.getPrice());
-                    result.setMessage(artist.getUsername() + " has added new merchandise successfully.");
+                    result.setMessage(artist.getUsername()
+                            + " has added new merchandise successfully.");
                 }
             }
         }
@@ -265,26 +285,6 @@ public final class Artist extends UserInfo {
     /** Getter */
     public ArrayList<String> getEventsDates() {
         return eventsDates;
-    }
-
-    /** Setter */
-    public void addMerchName(final String merchName) {
-        merchNames.add(merchName);
-    }
-
-    /** Setter */
-    public void addMerchDescription(final String description) {
-        merchDescription.add(description);
-    }
-
-    /** Setter */
-    public void addMerchPrice(final int price) {
-        merchPrice.add(price);
-    }
-
-    /** Setter */
-    public void addEventsName(final String event) {
-        eventsName.add(event);
     }
 
     /** Metoda care calculeaza campul totalAlbumsLikes */

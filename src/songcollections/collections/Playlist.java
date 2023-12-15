@@ -22,7 +22,8 @@ public class Playlist extends SongsCollection {
     /**
      *      Metoda de mai jos implementeaza comanda "switchVisibility"
      * */
-    public static ResultOut switchVisibility(final CommandIn command, final NormalUser currentUser) {
+    public static ResultOut switchVisibility(final CommandIn command,
+                                             final NormalUser currentUser) {
         ResultOut result = new ResultOut(command);
         int noPlaylists = currentUser.getPlaylists().size();
 

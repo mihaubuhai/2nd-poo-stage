@@ -62,7 +62,8 @@ public class Next extends RewindSongCol {
                     } else {
                         /* Nu este final de podcast, se incarca urmatorul episod */
                         EpisodeInput nextEpisode = getPodcast().getEpisodes().get(episodeIdx + 1);
-                        executeSucces(nextEpisode.getName(), command, success, nextEpisode.getDuration());
+                        executeSucces(nextEpisode.getName(), command, success,
+                                nextEpisode.getDuration());
                     }
                 } else {
                     /* Episodul se repeta */
@@ -87,12 +88,12 @@ public class Next extends RewindSongCol {
                         setResult(command, fail);
                     } else {
                         /* Nu suntem la final de playlist, se trece la urmatoarea melodie */
-                        SongInput nextSong =currSongCollection.getSongs().get(nextIdx);
+                        SongInput nextSong = currSongCollection.getSongs().get(nextIdx);
                         executeSucces(nextSong.getName(), command, success, nextSong.getDuration());
                     }
                 } else if (repeatMode.contains("all")) {
                     /* Se va trece la urmatorea melodie din playlist */
-                    SongInput nextSong =currSongCollection.getSongs().get(nextIdx);
+                    SongInput nextSong = currSongCollection.getSongs().get(nextIdx);
                     executeSucces(nextSong.getName(), command, success, nextSong.getDuration());
                 } else {
                     /* Se da next la o melodie din playlist cu repeatMode: "repeat current song" */

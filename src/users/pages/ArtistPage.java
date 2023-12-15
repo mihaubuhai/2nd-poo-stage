@@ -14,7 +14,8 @@ public class ArtistPage extends Page {
     /**
      *      Metoda de mai jos implementeaza "printPage" pentru artist
      *      <p>
-     *      Primeste ca parametrii artistul a carei pagina sa se afiseze si comanda care a invocat metoda </p>
+     *      Primeste ca parametrii artistul a carei pagina sa se afiseze
+     *      si comanda care a invocat metoda </p>
      *      Returneaza un obiect de forma mesajului de output al comenzii
      * */
     public ResultOut printPage(final Artist artist, final CommandIn cmd) {

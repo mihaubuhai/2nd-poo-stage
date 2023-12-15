@@ -111,10 +111,12 @@ public final class SongInput {
         this.artist = artist;
     }
 
+    /** Metoda care seteaza timpul la care a fost adaugata o comanda */
     public void addTimestampAdded(final int time) {
         timestampAdded = time;
     }
 
+    /** Getter */
     public int retrieveTimestampAdded() {
         return timestampAdded;
     }

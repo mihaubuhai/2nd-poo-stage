@@ -7,10 +7,9 @@ import users.Host;
 import users.NormalUser;
 import users.UserInfo;
 import output.result.ResultOut;
-import player.commands.Like;
 
-import java.util.ArrayList;
 
+/** Clasa care reprezinta conceptul de pagina */
 public class Page {
     protected static StringBuilder pageContent;
     protected UserInfo usersPage;   // Referinta catre artist / host al carei pagina sa se afiseze
@@ -46,11 +45,9 @@ public class Page {
      *      --> lista de selectii pentru fiecare user
      *      </p>
      * */
-    public ResultOut getPage(final NormalUser user, final CommandIn cmd,
-                                    final ArrayList<Like> topLikedSongs) {
-
+    public ResultOut getPage(final NormalUser user, final CommandIn cmd) {
         if (pageType == PageType.HOME) {
-            return ((HomePage) this).printPage(user, topLikedSongs, cmd);
+            return ((HomePage) this).printPage(user, cmd);
         } else if (pageType == PageType.LIKEDCONTENT) {
             return ((LikedContentPage) this).printPage(user, cmd);
         } else {
@@ -79,11 +76,13 @@ public class Page {
         switch (cmd.getNextPage()) {
             case "Home" -> {
                 user.setCurrentPage(new HomePage(PageType.HOME));
-                result.setMessage(user.getUsername() + " accessed " + cmd.getNextPage() + " successfully.");
+                result.setMessage(user.getUsername() + " accessed "
+                        + cmd.getNextPage() + " successfully.");
             }
             case "LikedContent" -> {
                 user.setCurrentPage(new LikedContentPage(PageType.LIKEDCONTENT));
-                result.setMessage(user.getUsername() + " accessed " + cmd.getNextPage() + " successfully.");
+                result.setMessage(user.getUsername() + " accessed "
+                        + cmd.getNextPage() + " successfully.");
             }
             default -> result.setMessage(user + " is trying to access a non-existent page.");
         }
@@ -98,10 +97,5 @@ public class Page {
     /** Getter */
     public UserInfo getUsersPage() {
         return usersPage;
-    }
-
-    /** Getter */
-    public PageType getPageType() {
-        return pageType;
     }
 }

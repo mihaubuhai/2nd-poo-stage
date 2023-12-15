@@ -37,7 +37,7 @@ public final class OutputClassFactory {
         }
 
         /* Intai se trateaza cazuri speciale de comenzi, intrucat unele au campuri diferite */
-        if (command.getCommand().contains("top5")) {
+        if (command.getCommand().contains("tops")) {
             return new ResultGetTop5(command);
         } else if (command.getCommand().equals("showPlaylists")) {
             return new ResultShowPlaylists(command);

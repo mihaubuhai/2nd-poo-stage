@@ -12,7 +12,6 @@ public class Host extends UserInfo {
     private ArrayList<PodcastInput> podcasts;
     private ArrayList<String> announcementsName;
     private ArrayList<String> announcementsDescription;
-    private int lookingAtPage;
 
     public Host(final UserInput user) {
         setUserInfo(user);
@@ -40,7 +39,8 @@ public class Host extends UserInfo {
             /* Verificam daca host-ul mai are un album cu acelasi nume */
             for (PodcastInput podcast : host.getPodcasts()) {
                 if (podcast.getName().equals(newPodcastName)) {
-                    result.setMessage(host.getUsername() + " has another podcast with the same name.");
+                    result.setMessage(host.getUsername()
+                            + " has another podcast with the same name.");
                     return result;
                 }
             }
@@ -55,7 +55,8 @@ public class Host extends UserInfo {
                 if (!newPodcast.isInPodcast(episode, newPodcast)) {
                     newPodcast.getEpisodes().add(episode);
                 } else {
-                    result.setMessage(host.getUsername() + " has the same episode in this podcast.");
+                    result.setMessage(host.getUsername()
+                            + " has the same episode in this podcast.");
                     return result;
                 }
             }
@@ -70,6 +71,10 @@ public class Host extends UserInfo {
         return result;
     }
 
+    /** Metoda care implementeaza comanda "removePodcast" <p>
+     *    Primeste ca parametrii comanda si user-ul care a dat comanda <p>
+     *    Returneaza un obiect de tipul rezultatului comenzii
+     * */
     public ResultOut removePodcast(final CommandIn cmd, final UserInfo user) {
         ResultOut result = new ResultOut(cmd);
 
@@ -81,6 +86,7 @@ public class Host extends UserInfo {
             for (PodcastInput podcast : host.getPodcasts()) {
                 if (podcast.getName().equals(cmd.getName())) {
                     /* Verificam daca se poate sterge */
+
                     if (podcast.retrieveNrListeners() != 0) {
                         /* Un podcast se poate sterge daca nu are nici un ascultator */
                         result.setMessage(user.getUsername() + " can't delete this podcast.");
@@ -88,7 +94,8 @@ public class Host extends UserInfo {
                     } else {
                         /* Podcast-ul nu este ascultat de nimeni, il putem sterge */
                         host.getPodcasts().remove(podcast);
-                        result.setMessage(user.getUsername() + " deleted the podcast successfully.");
+                        result.setMessage(user.getUsername()
+                                + " deleted the podcast successfully.");
                         return result;
                     }
                 }
@@ -119,8 +126,8 @@ public class Host extends UserInfo {
             /* Verificam daca mai exista un anunt cu acelasi nume */
             for (String news : host.getAnnouncementsName()) {
                 if (news.equals(newAnnounceName)) {
-                    result.setMessage(host.getUsername() +
-                            " has already added an announcement with this name.");
+                    result.setMessage(host.getUsername()
+                            + " has already added an announcement with this name.");
                     return result;
                 }
             }

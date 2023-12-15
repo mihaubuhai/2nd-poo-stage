@@ -87,7 +87,7 @@ public final class NormalUser extends UserInfo {
                 } else {
                     /* Se ruleaza un playlist / album */
                     if (!repeatSongCollection()) {
-                        SongsCollection currSongsColl = player.getLoadInfo().getSelectInfo().getSongsCollection();
+                        SongsCollection currSongsColl = selectInfo.getSongsCollection();
                         /*
                          *   "newIdx" contine indicele urmatoarei melodii relativ la cea care ..
                          * ruleaza si deci de acolo vom incepe calcularea timpului ramas
@@ -127,11 +127,11 @@ public final class NormalUser extends UserInfo {
      *      ..la ce este incarcat in player
      * */
     private int getDuration(final int idx) {
-        Select selectInfo = player.getLoadInfo().getSelectInfo();
-        if (selectInfo.getResultType() == 1) {
-            return selectInfo.getSong().getDuration();
+        Select selection = player.getLoadInfo().getSelectInfo();
+        if (selection.getResultType() == 1) {
+            return selection.getSong().getDuration();
         } else {
-            return selectInfo.getPodcast().getEpisodes().get(idx).getDuration();
+            return selection.getPodcast().getEpisodes().get(idx).getDuration();
         }
     }
 
@@ -200,7 +200,7 @@ public final class NormalUser extends UserInfo {
      *      moment in care stim si ce melodie din playlist este incarcata.
      * */
     private int findFittingSong(final int idx, final boolean shuffle) {
-        SongsCollection currPlaylist = getPlayer().getLoadInfo().getSelectInfo().getSongsCollection();
+        SongsCollection currPlaylist = selectInfo.getSongsCollection();
         int remainedTime = getPlayer().getStats().getRemainedTime();
         int index = idx;
 
@@ -361,7 +361,9 @@ public final class NormalUser extends UserInfo {
     }
 
     /** Setter */
-    public void setCurrentPage(final Page page) { currentPage = page; }
+    public void setCurrentPage(final Page page) {
+        currentPage = page;
+    }
 
     /** Getter */
     public Player getPlayer() {
@@ -401,7 +403,9 @@ public final class NormalUser extends UserInfo {
     }
 
     /** Getter */
-    public Page getCurrentPage() { return currentPage; }
+    public Page getCurrentPage() {
+        return currentPage;
+    }
 
     /** Setter */
     public void setSelectInfo(final Select selectInfo) {

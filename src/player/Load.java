@@ -34,8 +34,8 @@ public class Load {
                 String storedPodcastName = storedSelectInfo.getPodcast().getName();
                 String storedPlayerName = oldPodcastPlayer.getLoadInfo().getSelectInfo().getUser();
 
-                if (currentPodcastName.equals(storedPodcastName) &&
-                    storedPlayerName.equals(currentUser.getUsername())) {
+                if (currentPodcastName.equals(storedPodcastName)
+                        && storedPlayerName.equals(currentUser.getUsername())) {
                     /*
                         S-a selectat un podcast care a rulat la un moment dat,
                         deci va trebui sa ruleze de unde a fost stopat

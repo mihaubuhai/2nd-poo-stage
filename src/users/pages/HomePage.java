@@ -4,7 +4,6 @@ import fileio.input.SongInput;
 import input.commands.CommandIn;
 import users.NormalUser;
 import output.result.ResultOut;
-import player.commands.Like;
 import songcollections.collections.Playlist;
 
 import java.util.ArrayList;
@@ -15,13 +14,15 @@ public class HomePage extends Page {
         super(type);
     }
 
+    private final int upperBound = 5;
+
     /**
      *      <p>
      *      Metoda returneaza rezultatul comenzii "printCurrentPage"
      *      </p>
      *      Primeste ca parametrii user-ul care a invocat comanda
      * */
-    public ResultOut printPage(final NormalUser user, final ArrayList<Like> topLikedSongs, final CommandIn cmd) {
+    public ResultOut printPage(final NormalUser user, final CommandIn cmd) {
         ResultOut result = new ResultOut(cmd);
         pageContent = new StringBuilder("Liked songs:\n\t[");
 
@@ -30,7 +31,7 @@ public class HomePage extends Page {
         tempLikes.sort((o1, o2) -> o2.retrieveNrLikes() - o1.retrieveNrLikes());
 
         /* Verificam daca sunt mai putin de 5 melodii in lista de mai sus */
-        int tempSize = 5;
+        int tempSize = upperBound;
         if (tempSize > tempLikes.size()) {
             /* Nu putem afisa mai mult de 5 melodii, intrucat nu sunt atatea apreciate */
             tempSize = tempLikes.size();
@@ -48,7 +49,7 @@ public class HomePage extends Page {
         }
         pageContent.append("\n\nFollowed playlists:\n\t[");
 
-        tempSize = 5;
+        tempSize = upperBound;
 
         ArrayList<Playlist> tempPlaylists = new ArrayList<>(user.getFwdPlaylits());
         tempPlaylists.sort((o1, o2) -> o2.getTotalLikes() - o1.getTotalLikes());

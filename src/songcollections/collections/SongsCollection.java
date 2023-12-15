@@ -49,7 +49,7 @@ public class SongsCollection {
         /* Verificam starea shuffle */
         if (!user.getPlayer().getStats().getShuffle()) {
             /* Verificam daca s-a ajuns la final de playlist */
-            SongsCollection usersPlaylist = user.getPlayer().getLoadInfo().getSelectInfo().getSongsCollection();
+            SongsCollection usersPlaylist = user.getSelectInfo().getSongsCollection();
             if (currentIdxSong == usersPlaylist.getSongs().size() - 1) {
                 /* S-a ajuns la final de playlist, verificam starea de repeat */
                 if (repeatMode.contains("no")) {
@@ -96,10 +96,10 @@ public class SongsCollection {
         int idx = 0;
 
         /* Iteram prin colectia de melodii selectata */
-        ArrayList<SongInput> songs = user.getSelectInfo().getSongsCollection().getSongs();
-        int size = songs.size();
+        ArrayList<SongInput> tempSongs = user.getSelectInfo().getSongsCollection().getSongs();
+        int size = tempSongs.size();
         for (int i = 0;  i < size; ++i) {
-            if (songs.get(i).getName().equals(songName)) {
+            if (tempSongs.get(i).getName().equals(songName)) {
                 idx = i;
                 break;
             }

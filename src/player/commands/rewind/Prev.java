@@ -65,7 +65,8 @@ public class Prev extends RewindSongCol {
                 if (!currentPlayer.getStats().getShuffle()) {
                     checkTime(currSong, currSongIdx, command, false, succes);
                 } else {
-                    int shuffleCurrIdx = getSongsCollection().getShuffledIndices().indexOf(currSongIdx);
+                    int shuffleCurrIdx = getSongsCollection().getShuffledIndices()
+                            .indexOf(currSongIdx);
                     checkTime(currSong, shuffleCurrIdx, command, true, succes);
                 }
             }

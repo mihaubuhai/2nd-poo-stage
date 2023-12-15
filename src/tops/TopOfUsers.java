@@ -1,15 +1,19 @@
-package top5;
+package tops;
 
 import input.commands.CommandIn;
 import output.result.ResultGetTop5;
-import top5.interfaces.Visitable;
+import tops.interfaces.Visitable;
 import users.UserInfo;
 
 import java.util.ArrayList;
 
-public class getTopOfUsers extends getTop implements Visitable {
+/**
+ * Clasa ce contine lista totala de useri si
+ * tipul de statistica generala (getAllUsers, getOnlineUsers)...
+ * */
+public class TopOfUsers extends GetTops implements Visitable {
     private ArrayList<UserInfo> users;
-    private TopType type;       // <-- Useri online sau toti userii
+    private TopType type;       // ---v
     /* 1 - allUsers  ;  2 - OnlineUsers  ;  3 - top5Artists */
 
     public enum TopType {
@@ -18,21 +22,24 @@ public class getTopOfUsers extends getTop implements Visitable {
         TOPARTIST,
     }
 
-    public getTopOfUsers(final CommandIn cmd, final ArrayList<UserInfo> users,
-                         final TopType type) {
+    public TopOfUsers(final CommandIn cmd, final ArrayList<UserInfo> users,
+                      final TopType type) {
         super(cmd);
         this.users = users;
         this.type = type;
     }
 
-    public ResultGetTop5 accept(final topCreatorVisitor v) {
+    /** Metoda care completeaza "Visitor Pattern" */
+    public ResultGetTop5 accept(final TopCreatorVisitor v) {
         return v.visit(this);
     }
 
+    /** Getter */
     public ArrayList<UserInfo> getUsers() {
         return users;
     }
 
+    /** Getter */
     public TopType getType() {
         return type;
     }

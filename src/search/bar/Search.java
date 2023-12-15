@@ -34,9 +34,16 @@ public final class Search {
         return instance;
     }
 
+    // v-- Retine referinte catre melodiile la care cautarea a avut succes
     private static  ArrayList<SongInput> songsSearched;
+
+    // v-- Retine referinte catre colectiile de melodii la care cautarea a avut succes
     private static  ArrayList<SongsCollection> collectionsSearched;
+
+    // v--- Retine referinte catre podcast-urile la care cautarea a avut succes
     private static  ArrayList<PodcastInput> podcastsSearched;
+
+    // v--- Retine referinte catre user-ii la care cautarea a avut succes
     private static  ArrayList<UserInfo> usersSearched;
 
     /**
@@ -113,10 +120,10 @@ public final class Search {
                     for (Playlist playlist : normalUser.getPlaylists()) {
                         Playlist result = checkFiltersPlaylist(cmd.getFilters(), playlist);
 
-                        /*Macar un filtru nerespectat rezulta in "result" fiind initializat cu null */
+                        /*Macar un filtru nerespectat rezulta in result fiind initializat cu null*/
                         if (result != null) {
+                            /* Rezultatele cautarii se afiseaza doar daca playlist-ul este public*/
                             if (checkVisibility(cmd.getUsername(), result)) {
-                                /* Rezultatele cautarii se afiseaza doar daca playlist-ul este public */
                                 output.addResult(result.getName());
                                 collectionsSearched.add(result);
                             }

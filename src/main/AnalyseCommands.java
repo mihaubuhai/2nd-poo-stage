@@ -1,7 +1,7 @@
 package main;
 
 import fileio.input.UserInput;
-import top5.getTopAlbums;
+import tops.TopAlbums;
 import output.result.ResultOut;
 import output.result.Output;
 import output.result.ResultGetTop5;
@@ -10,8 +10,8 @@ import output.result.ResultShowPodcasts;
 import output.result.ResultShowAlbums;
 import output.result.ResultPreferedSongs;
 import songcollections.collections.Album;
-import top5.getTopPlaylists;
-import top5.getTopSongs;
+import tops.TopPlaylists;
+import tops.TopSongs;
 import fileio.input.LibraryInput;
 import input.commands.CommandIn;
 import player.Player;
@@ -31,9 +31,9 @@ import songcollections.collections.Playlist;
 import search.bar.Search;
 import search.bar.Select;
 import output.OutputClassFactory;
-import top5.topCreatorVisitor;
-import top5.getTop;
-import top5.getTopOfUsers;
+import tops.TopCreatorVisitor;
+import tops.GetTops;
+import tops.TopOfUsers;
 import users.Host;
 import users.UserInfo;
 import users.NormalUser;
@@ -89,34 +89,34 @@ public final class AnalyseCommands {
         /* Itereaza prin lista de comenzi si verifica ce tip este aceasta */
         for (CommandIn cmd: commands) {
             if (cmd.getCommand().contains("get")) {
-                topCreatorVisitor v  = new topCreatorVisitor();
-                getTop top;
+                TopCreatorVisitor v  = new TopCreatorVisitor();
+                GetTops top;
                 ResultGetTop5 output;
 
                 switch (cmd.getCommand()) {
                     case "getTop5Albums" ->  {
-                        top = new getTopAlbums(cmd, topAlbums);
-                        output = ((getTopAlbums) top).accept(v);
+                        top = new TopAlbums(cmd, topAlbums);
+                        output = ((TopAlbums) top).accept(v);
                     }
                     case "getAllUsers" -> {
-                        top = new getTopOfUsers(cmd, users, getTopOfUsers.TopType.ALLUSERS);
-                        output = ((getTopOfUsers) top).accept(v);
+                        top = new TopOfUsers(cmd, users, TopOfUsers.TopType.ALLUSERS);
+                        output = ((TopOfUsers) top).accept(v);
                     }
                     case "getOnlineUsers" -> {
-                        top = new getTopOfUsers(cmd, users, getTopOfUsers.TopType.ONLINEUSERS);
-                        output = ((getTopOfUsers) top).accept(v);
+                        top = new TopOfUsers(cmd, users, TopOfUsers.TopType.ONLINEUSERS);
+                        output = ((TopOfUsers) top).accept(v);
                     }
                     case "getTop5Songs" -> {
-                        top = new getTopSongs(cmd, library, topLikedSongs);
-                        output = ((getTopSongs) top).accept(v);
+                        top = new TopSongs(cmd, library, topLikedSongs);
+                        output = ((TopSongs) top).accept(v);
                     }
                     case "getTop5Artists" -> {
-                        top = new getTopOfUsers(cmd, users, getTopOfUsers.TopType.TOPARTIST);
-                        output = ((getTopOfUsers) top).accept(v);
+                        top = new TopOfUsers(cmd, users, TopOfUsers.TopType.TOPARTIST);
+                        output = ((TopOfUsers) top).accept(v);
                     }
                     default -> {
-                        top = new getTopPlaylists(cmd, topFwdPlaylits);
-                        output = ((getTopPlaylists) top).accept(v);
+                        top = new TopPlaylists(cmd, topFwdPlaylits);
+                        output = ((TopPlaylists) top).accept(v);
                     }
                 }
 
@@ -208,7 +208,7 @@ public final class AnalyseCommands {
                     result.add(temp.followPlaylist(cmd, users, selectInfo, topFwdPlaylits));
                 }
                 case "printCurrentPage" -> result.add(currentUser.getCurrentPage()
-                        .getPage(currentUser, cmd, topLikedSongs));
+                        .getPage(currentUser, cmd));
                 case "addEvent" -> {
                     Artist tempArtist = new Artist(null);   // <-- pentru a apela metoda
                     result.add(tempArtist.addEvent(user, cmd));

@@ -164,7 +164,7 @@ public class FollowStats implements Comparable {
     private NormalUser findUser(final ArrayList<UserInfo> users, final String username) {
         for (UserInfo user: users) {
             if (user.getUsername().equals(username) && user.isNormalUser()) {
-                return (NormalUser)user;
+                return (NormalUser) user;
             }
         }
         return null;
