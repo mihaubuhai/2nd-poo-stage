@@ -90,6 +90,24 @@ public class SongsCollection {
         }
     }
 
+    /** Metoda gaseste indicele melodiei care ruleaza din colectia de melodii */
+    public int findCurrIdx(final NormalUser user) {
+        String songName = user.getPlayer().getStats().getName();
+        int idx = 0;
+
+        /* Iteram prin colectia de melodii selectata */
+        ArrayList<SongInput> songs = user.getSelectInfo().getSongsCollection().getSongs();
+        int size = songs.size();
+        for (int i = 0;  i < size; ++i) {
+            if (songs.get(i).getName().equals(songName)) {
+                idx = i;
+                break;
+            }
+        }
+
+        return idx;
+    }
+
     /** Setter */
     public void setName(final String name) {
         this.name = name;

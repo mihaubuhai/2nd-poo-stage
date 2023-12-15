@@ -1,0 +1,124 @@
+[ {
+  "command" : "search",
+  "timestamp" : 10,
+  "user" : "alice22",
+  "message" : "Search returned 1 results",
+  "results" : [ "Shape of You" ]
+}, {
+  "command" : "select",
+  "timestamp" : 15,
+  "user" : "alice22",
+  "message" : "Successfully selected Shape of You."
+}, {
+  "command" : "load",
+  "timestamp" : 20,
+  "user" : "alice22",
+  "message" : "Playback loaded successfully."
+}, {
+  "command" : "status",
+  "timestamp" : 25,
+  "user" : "alice22",
+  "stats" : {
+    "name" : "Shape of You",
+    "remainedTime" : 228,
+    "repeat" : "No Repeat",
+    "shuffle" : false,
+    "paused" : false
+  }
+}, {
+  "command" : "switchConnectionStatus",
+  "timestamp" : 240,
+  "user" : "alice22",
+  "message" : "alice22 has changed status successfully."
+}, {
+  "command" : "like",
+  "timestamp" : 280,
+  "user" : "alice22",
+  "message" : "alice22 is offline."
+}, {
+  "command" : "addUser",
+  "timestamp" : 295,
+  "user" : "melodymaster",
+  "message" : "The username melodymaster has been added successfully."
+}, {
+  "command" : "addAlbum",
+  "timestamp" : 305,
+  "user" : "melodymaster",
+  "message" : "melodymaster has added new album successfully."
+}, {
+  "command" : "showAlbums",
+  "timestamp" : 350,
+  "user" : "melodymaster",
+  "result" : [ {
+    "name" : "Harmonic Horizons",
+    "songs" : [ "Vibrant Echoes", "Synth Symphony", "Retro Rhythms", "Digital Dreams", "Night Pulse" ]
+  } ]
+}, {
+  "command" : "addUser",
+  "timestamp" : 380,
+  "user" : "alice22",
+  "message" : "The username alice22 is already taken."
+}, {
+  "command" : "switchConnectionStatus",
+  "timestamp" : 390,
+  "user" : "alice22",
+  "message" : "alice22 has changed status successfully."
+}, {
+  "command" : "search",
+  "timestamp" : 395,
+  "user" : "alice22",
+  "message" : "Search returned 2 results",
+  "results" : [ "Radio Ga Ga", "Retro Rhythms" ]
+}, {
+  "command" : "addAlbum",
+  "timestamp" : 400,
+  "user" : "melodymaster",
+  "message" : "melodymaster has added new album successfully."
+}, {
+  "command" : "search",
+  "timestamp" : 420,
+  "user" : "alice22",
+  "message" : "Search returned 4 results",
+  "results" : [ "Money Trees", "Maps", "Moves Like Jagger", "Melodic Mirage" ]
+}, {
+  "command" : "select",
+  "timestamp" : 430,
+  "user" : "alice22",
+  "message" : "Successfully selected Melodic Mirage."
+}, {
+  "command" : "load",
+  "timestamp" : 440,
+  "user" : "alice22",
+  "message" : "Playback loaded successfully."
+}, {
+  "command" : "like",
+  "timestamp" : 460,
+  "user" : "alice22",
+  "message" : "Like registered successfully."
+}, {
+  "command" : "printCurrentPage",
+  "timestamp" : 480,
+  "user" : "alice22",
+  "message" : "Liked songs:\n\t[Melodic Mirage]\n\nFollowed playlists:\n\t[]"
+}, {
+  "command" : "addAlbum",
+  "timestamp" : 515,
+  "user" : "melodymaster",
+  "message" : "melodymaster has another album with the same name."
+}, {
+  "command" : "showAlbums",
+  "timestamp" : 550,
+  "user" : "melodymaster",
+  "result" : [ {
+    "name" : "Harmonic Horizons",
+    "songs" : [ "Vibrant Echoes", "Synth Symphony", "Retro Rhythms", "Digital Dreams", "Night Pulse" ]
+  }, {
+    "name" : "Echoes of Harmony",
+    "songs" : [ "Melodic Mirage", "Pop Serenade" ]
+  } ]
+}, {
+  "command" : "addAlbum",
+  "timestamp" : 560,
+  "user" : "melodymaster",
+  "message" : "melodymaster has the same song at least twice in this album."
+} ]

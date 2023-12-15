@@ -89,15 +89,11 @@ public final class NormalUser extends UserInfo {
                     if (!repeatSongCollection()) {
                         SongsCollection currSongsColl = player.getLoadInfo().getSelectInfo().getSongsCollection();
                         /*
-                         *   "idxSong" continea indicele urmatoarei melodii relativ la cea care ..
+                         *   "newIdx" contine indicele urmatoarei melodii relativ la cea care ..
                          * ruleaza si deci de acolo vom incepe calcularea timpului ramas
                          * */
-                        int newIdx = currSongsColl.findNextIdxSong(this);
-                        if (newIdx < 0) {
-                            removePlayer();
-                            return;
-                        }
-                        int result = findFittingSong(newIdx, false);
+                        int newIdx = currSongsColl.findCurrIdx(this);
+                        int result = findFittingSong(newIdx, player.getStats().getShuffle());
                         if (result < 0) {
                             removePlayer();
                             return;
@@ -180,32 +176,18 @@ public final class NormalUser extends UserInfo {
         }
 
         /* Accessam melodia curenta din playlist / album */
-        SongsCollection currSongsColl = player.getLoadInfo().getSelectInfo().getSongsCollection();
-        int nextIdx = currSongsColl.findNextIdxSong(this);
-        // "idxSong"  ----^ stoca indicele melodiei care urma dupa cea care se rula in player
-        int currIdx = findPrevSong(nextIdx, currSongsColl);
-        SongInput currSong;
-        //  ^--- Melodia care ruleaza in player
+        SongsCollection currSongsColl = selectInfo.getSongsCollection();
+        int currIdx = currSongsColl.findCurrIdx(this);
 
         /* Abordam cazul "repeat current song" */
         if (repeatMode.contains("current")) {
-            /* nextIdx va fi chiar indicele corepunzator melodiei care ruleaza pt acest caz */
-            currSong = currSongsColl.getSongs().get(nextIdx);
+            /* Melodia care ruleaza este tot ceea care era inainte */
+            SongInput currSong = currSongsColl.getSongs().get(currIdx);
             int initialDuration = currSong.getDuration();
             int remainedTime = player.getStats().getRemainedTime();
             player.getStats().setRemainedTime(evaluateLeftTime(remainedTime, initialDuration));
         } else {
-            /* Daca cu adevarat melodia curenta este ultima din playlist */
-            if (currIdx == currSongsColl.getSongs().size() - 1) {
-                /* Vom incepe aflarea timpului ramas de la prima melodie */
-                findFittingSong(findFstSong(currSongsColl), true);
-            } else {
-                /*
-                 *   Vom incepe cautarea de la urmatoarea melodie fata de cea care rula ..
-                 *   .. deoarece aceasta s-a terminat si nu merita luata in considerare
-                 * */
-                findFittingSong(nextIdx, true);
-            }
+            findFittingSong(currIdx, player.getStats().getShuffle());
         }
 
         return true;
@@ -217,65 +199,23 @@ public final class NormalUser extends UserInfo {
      *      .. (datorita scurgerii timpului) pana cand campul devine pozitiv,
      *      moment in care stim si ce melodie din playlist este incarcata.
      * */
-    private int findFittingSong(final int idx, final boolean repeat) {
+    private int findFittingSong(final int idx, final boolean shuffle) {
         SongsCollection currPlaylist = getPlayer().getLoadInfo().getSelectInfo().getSongsCollection();
         int remainedTime = getPlayer().getStats().getRemainedTime();
         int index = idx;
-        boolean fstIter = false;    // <--- Pentru cand se face doar o singura iteratie in while
-        boolean forceExit = false;
 
         while (remainedTime <= 0) {
-            /*
-                    Se intampla ca o singura iteratie prin playlist sa nu ajunga ..
-                .. trebuie sa revenim la inceputul playlist-ului.
-            */
-            if (verifyIdx(index, currPlaylist) && fstIter) {
-                if (!repeat) {
-                    /*
-                        Se poate ajunge atunci cand shuffle este pornit si se ..
-                        .. ajunge la finalul vectorului de shuffle, cu timp ramas negativ.
-                    */
-                    return -1;
-                }
-                index = findFstSong(currPlaylist);
+            if (verifyIdx(index, currPlaylist)) {
+                return -1;
             }
 
-            SongInput playlistSong = currPlaylist.getSongs().get(index);
-            int songDuration = playlistSong.getDuration();
-            remainedTime += songDuration;
-            int tempIdx = findNextSong(index, currPlaylist);
-            /*
-                    Se poate intampla ca metoda de mai sus sa returneze o valoare negativa ..
-                .. doar in cazul in care melodia curenta este la final de playlist si nu exista ..
-                .. repeat
-                    Se disting astfel doua cazuri;
-            */
-            if (tempIdx < 0) {
-                if (remainedTime > 0) {
-                    /* "index" este ultimul indice din playlist si timpul ramas este pozitiv */
-                    forceExit = true;
-                    break;
-                } else {
-                    /* "index" este ultimul indice din playlist si timpul ramas este negativ */
-                    return -1;
-                }
-            }
-            index = tempIdx;
-            fstIter = true;
+            index = findNextSong(index, currPlaylist);
+            SongInput songToRun = currPlaylist.getSongs().get(index);
+            remainedTime += songToRun.getDuration();
+            player.getStats().setName(songToRun.getName());
         }
 
-        int prevIdx;
-        if (forceExit) {
-            /* Ne aflam la final de playlist, cu timp ramas pozitiv */
-            prevIdx = index;
-        } else {
-            /* Daca se stabilizeaza "remainedTime", idx va fi inainte cu o pozitie */
-            prevIdx = findPrevSong(index, currPlaylist);
-        }
-        String newSong = currPlaylist.getSongs().get(prevIdx).getName();
-        getPlayer().getStats().setName(newSong);
-        getPlayer().getStats().setRemainedTime(remainedTime);
-
+        player.getStats().setRemainedTime(remainedTime);
         return 1;
     }
 
@@ -294,7 +234,7 @@ public final class NormalUser extends UserInfo {
             return idx + 1;
         } else {
             ArrayList<Integer> shuffles = currentPlaylist.getShuffledIndices();
-            /* "idx" reprezinta indicele playlist-ului, deci trebuie cautat in "shuffleIndices" */
+            /* "idx" reprezinta indicele din playlist, deci trebuie cautat in "shuffleIndices" */
             int corespondingIdx = 0;
             int playlistSize = currentPlaylist.getSongs().size();
             for (int i = 0; i < playlistSize; ++i) {
@@ -307,6 +247,10 @@ public final class NormalUser extends UserInfo {
                 /* Am ajuns la final de vector de indici */
                 if (player.getStats().getRepeat().toLowerCase().contains("no")) {
                     return -1;
+                } else if (player.getStats().getRepeat().toLowerCase().contains("all")) {
+                    return shuffles.get(0);
+                } else {
+                    return shuffles.get(corespondingIdx);
                 }
             }
             return shuffles.get(corespondingIdx + 1);
@@ -326,10 +270,10 @@ public final class NormalUser extends UserInfo {
         } else {
             ArrayList<Integer> shuffles = currSongsColl.getShuffledIndices();
             /* "idx" contine indicele lui playlist, deci trebuie cautat in vectorul shuffles */
-            if (idx == 0 && repeatMode.contains("all")) {
+//            if (idx == 0 && repeatMode.contains("all")) {
                 /* idx reprezenta indicele piesei ce ar trebui incarcata */
-                return shuffles.get(shuffles.size() - 1);
-            }
+//                return shuffles.get(shuffles.size() - 1);
+//            }
             int correspondingIdx = 0;
             for (int i = 0; i < shuffles.size(); ++i) {
                 if (shuffles.get(i) == idx) {
@@ -359,12 +303,15 @@ public final class NormalUser extends UserInfo {
     public boolean verifyIdx(final int idx, final SongsCollection currSongsColl) {
         /* Verificam starea shuffle */
         ArrayList<Integer> shuffles = currSongsColl.getShuffledIndices();
+        if (idx < 0) {
+            return true;
+        }
         if (!player.getStats().getShuffle()) {
             int playlistSize = currSongsColl.getSongs().size();
-            return idx > playlistSize - 1;
+            return idx >= playlistSize - 1;
         } else {
             /* Cautam pe "idx" in "shuffles" */
-            int corespondingIdx = 0;
+            int corespondingIdx = -1;
             for (int i = 0; i < shuffles.size(); ++i) {
                 if (shuffles.get(i) == idx) {
                     corespondingIdx = i;
