@@ -1,7 +1,0 @@
-Starting audit...
-[ERROR] C:\Users\User\Desktop\tema2poo\2nd-poo-stage\.\src\main\AnalyseCommands.java:63:5: Method length is 246 lines (max allowed is 150). [MethodLength]
-[ERROR] C:\Users\User\Desktop\tema2poo\2nd-poo-stage\.\src\output\OutputClassFactory.java:34:37: Inner assignments should be avoided. [InnerAssignment]
-[ERROR] C:\Users\User\Desktop\tema2poo\2nd-poo-stage\.\src\output\OutputClassFactory.java:35:37: Inner assignments should be avoided. [InnerAssignment]
-[ERROR] C:\Users\User\Desktop\tema2poo\2nd-poo-stage\.\src\output\OutputClassFactory.java:36:32: Inner assignments should be avoided. [InnerAssignment]
-Audit done.
-Checkstyle ends with 4 errors.

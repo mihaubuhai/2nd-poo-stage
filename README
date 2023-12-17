@@ -1,0 +1,37 @@
+/* Tănase Mihai - 324 CD */
+
+    In implementarea temei s-au folosit 3 design patterns:
+--> Visitor, pentru metodele de tipul "getTop" (Artist, OnlineUsers, ..)
+--> Factory, pentru clasele:
+                --> care reprezentau output-ul fiecarei comenzi
+                --> ce desemnau user-ii programului
+                --> ce reprezentau conceptul de pagina
+                --> pentru colectiile de melodii
+--> Singleton, pentru clasele Search, Repeat si alte putine cateva.
+
+(Am incercat sa micsorez metoda analyseFunc cat am putut de mult)
+
+    Fiecare user are metode specifice doar lui, precum artistul isi poate adauga albume.
+Intrucat aceste metode au stransa legatura cu user-ul care o apeleaza, acestea sunt
+declarate si implementate in clasele corespunzatoare; adica, metodele "(add/remove)Album"
+se afla in clasa Artist; si asa se procedeaza si pentru restul.
+    S-a folosit Factory Design pentru useri intrucat acestia impart cateva campuri in comun,
+dar si pentru portabilitate, adica acestia pot fi stocati toti intr-un singur loc si
+folositi doar cei necesari in cadrul unei metode.
+    Metodele ce tin de starea unui user din program, la un moment dat, precum metoda
+"deleteUser", se afla in clasa UserInfo, clasa mostenita de fiecare "user"; aceste metode,
+din clasa UserInfo, sunt declarate ca fiind statice, intrucat nu au fost implementate sa depinda de apelant.
+    Conceptul de pagina este implementat in pachetul "users" intrucat "pagina" este
+dependenta de user, mai exact un user normal, intrucat doar acesta poate interactiona cu
+aceasta; acestea sunt implementate cam nedinamic, se schimba doar la apelarea metodei
+"getPage".
+    Visitor Pattern pentru comenzile de tipul "getTopX" s-a folosit pentru ca exista o oarecare
+asemanare intre aceste comenzi, anume ca se creaza un top, un clasament. Pentru a nu impovara
+metodele cu parametri, se recurge la clase ce contin campurile necesare acelei metode si
+apelarea de catre vizitator pentru clasa respectiva pentru efectuarea comenzii.
+    Un Factory Design mai micut s-a folosit si pentru colectiile de melodii, adica Playlist
+si Album; acestea doua, insa, impart majoritatea campurilor ce le desemneaza, de la lista de
+melodii, la statistici generale prin care se identifica (detinator, nume, numar de aprecieri).
+    Ceea ce ruleaza player-ul si contorizarea timpului din acesta este abordata in clasa
+NormalUser, intrucat doar un user normal simuleaza ascultarea unui fisier audio. Metoda
+"updateRemainedTime" este punctul de unde incepe aceasta simulare.
